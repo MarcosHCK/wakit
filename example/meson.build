@@ -15,25 +15,12 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-gtk_dep = dependency ('gtk4', required: true)
-__host_src = []
-
-foreach lib: [ 'application' ]
-
-  __host_src += [ '@0@.cc'.format (lib) ]
-  __host_src += [ '@0@.h'.format (lib) ]
-endforeach
-
-__host_lib = library ('wakit-host',
-  c_args: [ '-DG_LOG_DOMAIN="WaKit.Host"', '-DG_LOG_USE_STRUCTURED=1',
+executable ('wakit-example',
+  c_args: [ '-DG_LOG_DOMAIN="WaKit.Example"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="WaKit.Host"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="WaKit.Example"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_pch: 'pch/pch.h',
-  dependencies: [ config_dep, gtk_dep, __utility_dep ],
-  sources: __host_src)
-
-__host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep ],
-  link_with: __host_lib)
+  dependencies: [ config_dep, __host_dep ],
+  sources: 'application.cc')
