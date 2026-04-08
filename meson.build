@@ -117,6 +117,16 @@ add_project_arguments (cpp.get_supported_arguments (warning_c_args), language: '
 add_project_link_arguments (cpp.get_supported_link_arguments (warning_c_link_args), language: 'cpp')
 
 ########################
+# Source               #
+########################
+
+# source tree
+subdir ('src')
+
+# tests
+subdir ('tests')
+
+########################
 # Summaries            #
 ########################
 
