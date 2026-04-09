@@ -24,20 +24,16 @@ __testing_lib = static_library ('testing',
   c_args: [ '-DG_LOG_DOMAIN="Testing"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Testing"', '-DG_LOG_USE_STRUCTURED=1',
-              '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_pch: 'pch/pch.h',
   build_by_default: false,
-  dependencies: [ config_dep, glib_dep, __utility_dep ],
+  dependencies: [ config_dep, glib_dep ],
   include_directories: include_directories ('.'),
-  sources: [ 'testing.cc', 'testing.hh' ])
+  sources: [ ])
 
 __testing_dep = declare_dependency (dependencies: [ config_dep, glib_dep ],
   include_directories: include_directories ('.'),
   link_with: __testing_lib)
 
-foreach bit: [ ] 
+foreach bit: [ ]
 
   subdir (bit)
 endforeach

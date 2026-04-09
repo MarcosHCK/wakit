@@ -15,17 +15,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
-#include <testing.hh>
-using namespace testing;
+#include <host/wakit-host.h>
 
-int main (int argc, char* argv[])
+int main (int argc, char* argv [])
 {
 
-  g_test_init (&argc, &argv, NULL);
+  GApplication* app;
+  int ret;
 
-  g_test_add_ (TESTPATHROOT "/new", []
-    {
-    });
+  app = g_object_new (WAKIT_TYPE_APPLICATION, "application-id", "org.hck.wakit.example",
+                                                       "flags", G_APPLICATION_DEFAULT_FLAGS,
+                           NULL);
 
-return g_test_run ();
+  ret = g_application_run (G_APPLICATION (app), argc, argv);
+
+return (g_object_unref (app), ret);
 }

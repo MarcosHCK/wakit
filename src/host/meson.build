@@ -16,23 +16,14 @@
 #
 
 gtk_dep = dependency ('gtk4', required: true)
-__host_src = []
 
-foreach lib: [ 'application' ]
-
-  __host_src += [ '@0@.cc'.format (lib) ]
-  __host_src += [ '@0@.h'.format (lib) ]
-endforeach
+__host_src = [ 'application.vala' ]
 
 __host_lib = library ('wakit-host',
   c_args: [ '-DG_LOG_DOMAIN="WaKit.Host"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="WaKit.Host"', '-DG_LOG_USE_STRUCTURED=1',
-              '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_pch: 'pch/pch.h',
-  dependencies: [ config_dep, gtk_dep, __utility_dep ],
+  dependencies: [ config_dep, gtk_dep ],
   sources: __host_src)
 
 __host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep ],

@@ -19,8 +19,5 @@ executable ('wakit-example',
   c_args: [ '-DG_LOG_DOMAIN="WaKit.Example"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="WaKit.Example"', '-DG_LOG_USE_STRUCTURED=1',
-              '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_dep, __host_dep ],
-  sources: 'application.cc')
+  sources: 'application.c')

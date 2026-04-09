@@ -18,10 +18,4 @@
 src_inc = include_directories ('.')
 config_dep = declare_dependency (dependencies: config_dep, include_directories: src_inc)
 
-gio_dep = dependency ('gio-2.0', required: true)
-
-# level 0
-subdir ('utility')
-
-# level 1
 subdir ('host')

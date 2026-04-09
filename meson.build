@@ -16,7 +16,7 @@
 #
 
 project \
-  ( 'wakit', 'c', 'cpp',
+  ( 'wakit', 'c', 'vala',
 
     default_options: [ 'c_std=c23', 'cpp_std=c++26', 'warning_level=3' ],
     license: 'GPL-3.0-or-later',
@@ -26,7 +26,6 @@ project \
     version: run_command ('version.py', 'get-version', check: true).stdout ().strip ())
 
 cc = meson.get_compiler ('c')
-cpp = meson.get_compiler ('cpp')
 
 meson.add_dist_script ('version.py', 'set-dist', meson.project_version ())
 
@@ -113,9 +112,6 @@ endif
 add_project_arguments (cc.get_supported_arguments (warning_c_args), language: 'c')
 add_project_link_arguments (cc.get_supported_link_arguments (warning_c_link_args), language: 'c')
 
-add_project_arguments (cpp.get_supported_arguments (warning_c_args), language: 'cpp')
-add_project_link_arguments (cpp.get_supported_link_arguments (warning_c_link_args), language: 'cpp')
-
 ########################
 # Source               #
 ########################
@@ -135,7 +131,6 @@ subdir ('tests')
 
 summary ({
     'C compiler': cc.get_id (),
-    'C++ compiler': cpp.get_id (),
     'debug build': get_option ('debug') ? 'yes' : 'no',
     'develop build': get_option ('develop') ? 'yes' : 'no',
     'host cpu': host_machine.cpu_family (),
