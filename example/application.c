@@ -15,9 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
+#include <host/gui/wakit-host-gui.h>
 #include <host/wakit-host.h>
 
 static void on_activate (WakitApplication* app);
+static void on_open_uris (WakitApplication* app, GFile** files, gint n_files, const gchar* hint);
 
 int main (int argc, char* argv [])
 {
@@ -26,10 +28,11 @@ int main (int argc, char* argv [])
   int ret;
 
   app = g_object_new (WAKIT_TYPE_APPLICATION, "application-id", "org.hck.wakit.example",
-                                                       "flags", G_APPLICATION_DEFAULT_FLAGS,
+                                                       "flags", G_APPLICATION_HANDLES_OPEN,
                            NULL);
 
   g_signal_connect (app, "activate", G_CALLBACK (on_activate), NULL);
+  g_signal_connect (app, "open-uris", G_CALLBACK (on_open_uris), NULL);
 
   ret = g_application_run (G_APPLICATION (app), argc, argv);
 
@@ -38,5 +41,15 @@ return (g_object_unref (app), ret);
 
 static void on_activate (WakitApplication* app)
 {
-  g_application_hold (app);
+
+  GtkWindow* window = (GtkWindow*) wakit_gui_window_new ((GtkApplication*) app);
+  wakit_gui_window_set_has_titlebar ((WakitGuiWindow*) window, TRUE);
+  gtk_window_present (window);
+}
+
+static void on_open_uris (WakitApplication* app, GFile** files, gint n_files, const gchar* hint)
+{
+
+  GtkWindow* window = (GtkWindow*) wakit_gui_window_new ((GtkApplication*) app);
+  gtk_window_present (window);
 }

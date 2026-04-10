@@ -22,16 +22,23 @@ subdir ('process')
 
 # level 1
 subdir ('appbus')
+subdir ('gui')
 
-__host_src = [ 'application.vala', 'deferredurl.vala' ]
+__host_src = [ ]
 
-foreach bit: [] 
+foreach bit: []
 
   __host_src += [ '@0@.c'.format (bit) ]
   __host_src += [ '@0@.h'.format (bit) ]
 endforeach
 
+foreach bit: [ 'application', 'deferredurl' ]
+
+  __host_src += [ '@0@.vala'.format (bit) ]
+endforeach
+
 __host_deps = [ __host_appbus_dep,
+                __host_gui_dep,
                 __host_process_dep,
                 __utility_dep ]
 
@@ -42,5 +49,7 @@ __host_lib = library ('wakit-host',
   dependencies: [ config_dep, gtk_dep, __host_deps ],
   sources: __host_src)
 
-__host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep ],
+__host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __utility_dep ],
   link_with: __host_lib)
+
+meson.override_dependency ('wakit-host', __host_dep)

@@ -32,6 +32,17 @@ namespace Wakit
       private class string _extension_dir = null;
       private class bool _launch_appbus = true;
 
+      class construct
+        {
+
+          typeof (Wakit.AppBus.Registrar).ensure ();
+          typeof (Wakit.AppBus.Watcher).ensure ();
+          typeof (Wakit.Gui.Window).ensure ();
+
+          if (null == (void*) Wakit.Gui.get_resource ())
+            error ("WTF?");
+        }
+
       public class void class_set_bus_config_envvar (string? envvar)
         {
           _bus_config_envvar = envvar;
@@ -105,8 +116,11 @@ namespace Wakit
 
           bool bootstrap = false; try
             {
+
               bootstrap = _appbus_registrar.switch_to.end (result);
               ready = true;
+
+              open_deferred ();
             }
           catch (GLib.Error error)
             {
@@ -133,6 +147,18 @@ namespace Wakit
 
             foreach (unowned var file in files)
               _deferred_open.push_tail (DeferredUrl (file, hint));
+        }
+
+      private void open_deferred ()
+        {
+
+          var files = new GLib.File [1]; 
+
+          DeferredUrl? deferred; while (null != (deferred = _deferred_open.pop_head ()))
+            {
+              files [0] = deferred.file;
+              open_uris (files, deferred.hint);
+            }
         }
 
       [HasEmitter]
