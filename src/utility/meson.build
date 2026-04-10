@@ -15,32 +15,28 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-gtk_dep = dependency ('gtk4', required: true)
+gio_dep = dependency ('gio-2.0', required: true)
 
-# level 0
-subdir ('process')
+__utility_src = []
 
-# level 1
-subdir ('appbus')
+foreach lib: [ ]
 
-__host_src = [ 'application.vala', 'deferredurl.vala' ]
-
-foreach bit: [] 
-
-  __host_src += [ '@0@.c'.format (bit) ]
-  __host_src += [ '@0@.h'.format (bit) ]
+  __utility_src += [ '@0@.c'.format (lib) ]
+  __utility_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-__host_deps = [ __host_appbus_dep,
-                __host_process_dep,
-                __utility_dep ]
+foreach lib: [ 'timeoutcancellable' ]
 
-__host_lib = library ('wakit-host',
-  c_args: [ '-DG_LOG_DOMAIN="WaKit.Host"', '-DG_LOG_USE_STRUCTURED=1',
+  __utility_src += [ '@0@.vala'.format (lib) ]
+endforeach
+
+__utility_lib = library ('wakit-utility',
+  c_args: [ '-DG_LOG_DOMAIN="WaKit.Utility"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_dep, gtk_dep, __host_deps ],
-  sources: __host_src)
+  dependencies: [ config_dep, gio_dep ],
+  sources: __utility_src)
 
-__host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep ],
-  link_with: __host_lib)
+__utility_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
+  include_directories: include_directories ('.'),
+  link_with: __utility_lib)

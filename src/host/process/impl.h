@@ -14,28 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-#include <config.h>
-#include <host/wakit-host.h>
+#pragma once
+#include <gio/gio.h>
 
-static void on_activate (WakitApplication* app);
+G_BEGIN_DECLS
 
-int main (int argc, char* argv [])
-{
+  void wakit_process_impl_setup_launcher (GSubprocessLauncher* launcher);
+  void wakit_process_impl_terminate_gracefully (GSubprocess* subprocess);
+  void wakit_process_impl_terminate_gracefully_and_wait (GSubprocess* subprocess, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data);
+  void wakit_process_impl_terminate_gracefully_and_wait_finish (GAsyncResult* result, GError** error);
 
-  GApplication* app;
-  int ret;
-
-  app = g_object_new (WAKIT_TYPE_APPLICATION, "application-id", "org.hck.wakit.example",
-                                                       "flags", G_APPLICATION_DEFAULT_FLAGS,
-                           NULL);
-
-  g_signal_connect (app, "activate", G_CALLBACK (on_activate), NULL);
-
-  ret = g_application_run (G_APPLICATION (app), argc, argv);
-
-return (g_object_unref (app), ret);
-}
-
-static void on_activate (WakitApplication* app)
-{
-}
+G_END_DECLS

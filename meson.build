@@ -54,6 +54,12 @@ config.set ('PACKAGE_VERSION_MINOR', git_version_minor)
 config.set ('PACKAGE_VERSION_MICRO', git_version_micro)
 config.set_quoted ('PACKAGE_VERSION_STAGE', git_version_stage)
 
+prefix = get_option ('prefix')
+
+config.set_quoted ('DATA_DIR', prefix / get_option ('datadir') / 'wakit')
+config.set_quoted ('LIB_DIR', prefix / get_option ('libdir') / 'wakit')
+config.set_quoted ('LIBEXEC_DIR', prefix / get_option ('libexecdir') / 'wakit')
+
 config_dep = declare_dependency (sources: configure_file (output: 'config.h', configuration: config))
 config_dep = declare_dependency (dependencies: config_dep, include_directories: include_directories ('.'))
 
@@ -107,6 +113,16 @@ if cc.get_id () == 'gcc' or cc.get_id () == 'clang'
   ]
 else
   error ('Unsupported compiler')
+endif
+
+if get_option ('debug')
+
+  add_project_arguments (([ '-D', 'DEBUG' ]), language: 'vala')
+endif
+
+if get_option ('develop')
+
+  add_project_arguments (([ '-D', 'DEVELOP' ]), language: 'vala')
 endif
 
 add_project_arguments (cc.get_supported_arguments (warning_c_args), language: 'c')

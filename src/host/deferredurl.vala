@@ -14,28 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-#include <config.h>
-#include <host/wakit-host.h>
 
-static void on_activate (WakitApplication* app);
-
-int main (int argc, char* argv [])
+namespace Wakit
 {
 
-  GApplication* app;
-  int ret;
+  internal struct DeferredUrl
+    {
 
-  app = g_object_new (WAKIT_TYPE_APPLICATION, "application-id", "org.hck.wakit.example",
-                                                       "flags", G_APPLICATION_DEFAULT_FLAGS,
-                           NULL);
+      public GLib.File file;
+      public string hint;
 
-  g_signal_connect (app, "activate", G_CALLBACK (on_activate), NULL);
-
-  ret = g_application_run (G_APPLICATION (app), argc, argv);
-
-return (g_object_unref (app), ret);
-}
-
-static void on_activate (WakitApplication* app)
-{
+      public DeferredUrl (GLib.File file, string hint)
+        {
+          this.file = file;
+          this.hint = hint;
+        }
+    }
 }

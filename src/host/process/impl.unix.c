@@ -15,27 +15,29 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
-#include <host/wakit-host.h>
+#include <host/process/impl.h>
+#include <sys/prctl.h>
+#include <signal.h>
 
-static void on_activate (WakitApplication* app);
-
-int main (int argc, char* argv [])
+static void child_setup (gpointer user_data)
 {
 
-  GApplication* app;
-  int ret;
+  prctl (PR_SET_PDEATHSIG, SIGTERM);
 
-  app = g_object_new (WAKIT_TYPE_APPLICATION, "application-id", "org.hck.wakit.example",
-                                                       "flags", G_APPLICATION_DEFAULT_FLAGS,
-                           NULL);
+  if (1 == getppid ())
 
-  g_signal_connect (app, "activate", G_CALLBACK (on_activate), NULL);
-
-  ret = g_application_run (G_APPLICATION (app), argc, argv);
-
-return (g_object_unref (app), ret);
+    /* mitigate race condition (parent crashed before the prctl call above) */
+    _exit (1);
 }
 
-static void on_activate (WakitApplication* app)
+void wakit_process_impl_setup_launcher (GSubprocessLauncher* launcher)
 {
+
+  g_subprocess_launcher_set_child_setup (launcher, child_setup, NULL, NULL);
+}
+
+void wakit_process_impl_terminate_gracefully (GSubprocess* subprocess)
+{
+
+  g_subprocess_send_signal (subprocess, SIGTERM);
 }
