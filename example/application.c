@@ -38,4 +38,5 @@ return (g_object_unref (app), ret);
 
 static void on_activate (WakitApplication* app)
 {
+  g_application_hold (app);
 }

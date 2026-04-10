@@ -17,10 +17,15 @@
 
 __host_appbus_src = [ 'watcher.vala' ]
 
-foreach lib: [ ]
+foreach lib: [ 'registrar' ]
 
   __host_appbus_src += [ '@0@.c'.format (lib) ]
   __host_appbus_src += [ '@0@.h'.format (lib) ]
+endforeach
+
+foreach lib: [ 'registrar', 'watcher' ]
+
+  __host_appbus_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
 __host_appbus_deps = [ __host_process_dep, __utility_dep ]

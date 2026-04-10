@@ -24,6 +24,7 @@ namespace Wakit
       public bool ready { get; private set; default = false; }
 
       private AppBus.Watcher _appbus_watcher;
+      private AppBus.Registrar _appbus_registrar;
       private GLib.Queue<DeferredUrl?> _deferred_open;
 
       private class string _bus_config_envvar = null;
@@ -67,6 +68,7 @@ namespace Wakit
 
           hold ();
           _appbus_watcher = new AppBus.Watcher ();
+          _appbus_registrar = new AppBus.Registrar ();
 
           if (null != (value = null == (name = _bus_config_envvar) ? null : GLib.Environment.get_variable (name)))
             _appbus_watcher.config = value;
@@ -81,18 +83,44 @@ namespace Wakit
 
       private void on_daemon_connected (GLib.DBusConnection connection)
         {
+
+          hold ();
+          _appbus_registrar.switch_to.begin (this, connection, on_registrar_finished);
         }
 
       private void on_daemon_crashed (uint tries, GLib.Error error)
         {
 
-          if (3 > tries)
+          ready = false; if (3 > tries)
 
             // leave a few tries slip through
             return;
 
           critical ("could not restart the appbus after %u tries", tries);
           quit ();
+        }
+
+      private void on_registrar_finished (GLib.Object? source_object, GLib.AsyncResult result)
+        {
+
+          bool bootstrap = false; try
+            {
+              bootstrap = _appbus_registrar.switch_to.end (result);
+              ready = true;
+            }
+          catch (GLib.Error error)
+            {
+
+              unowned uint code = error.code;
+              unowned string domain = error.domain.to_string ();
+              unowned string message = error.message.to_string ();
+
+              critical ("could not register on appbus: %s: %u: %s", domain, code, message);
+              quit ();
+            }
+
+          for (int i = 0; i < (! bootstrap ? 1 : 2); ++i)
+            release ();
         }
 
       public override void open ([CCode (array_length_cname = "n_files", array_length_pos = 1.5)] GLib.File[] files, string hint)
@@ -136,6 +164,8 @@ namespace Wakit
 
           var context = GLib.MainContext.ref_thread_default ();
           var loop = new GLib.MainLoop (context, false);
+
+          _appbus_registrar.clear_last (this);
 
           _appbus_watcher.quit_async.begin ((o, res) =>
             {
