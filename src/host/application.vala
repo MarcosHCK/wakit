@@ -21,10 +21,12 @@ namespace Wakit
   public class Application: Gtk.Application
     {
 
+      public IBrowser browser { get { return _browser_maker; } }
       public bool ready { get; private set; default = false; }
 
       private AppBus.Watcher _appbus_watcher;
       private AppBus.Registrar _appbus_registrar;
+      private Browser.Maker _browser_maker;
       private GLib.Queue<DeferredUrl?> _deferred_open;
 
       private class string _bus_config_envvar = null;
@@ -68,6 +70,7 @@ namespace Wakit
 
           base.constructed ();
 
+          _browser_maker = new Browser.Maker ();
           _deferred_open = new GLib.Queue<DeferredUrl?> ();
           _ready = false;
         }

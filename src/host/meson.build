@@ -18,10 +18,16 @@
 gtk_dep = dependency ('gtk4', required: true)
 
 # level 0
-subdir ('process')
+subdir ('interfaces')
 
 # level 1
+subdir ('process')
+
+# level 2
 subdir ('appbus')
+subdir ('browser')
+
+# level 3
 subdir ('gui')
 
 __host_src = [ ]
@@ -38,7 +44,9 @@ foreach bit: [ 'application', 'deferredurl' ]
 endforeach
 
 __host_deps = [ __host_appbus_dep,
+                __host_browser_dep,
                 __host_gui_dep,
+                __host_interfaces_dep,
                 __host_process_dep,
                 __utility_dep ]
 
@@ -49,7 +57,7 @@ __host_lib = library ('wakit-host',
   dependencies: [ config_dep, gtk_dep, __host_deps ],
   sources: __host_src)
 
-__host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __utility_dep ],
+__host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __host_interfaces_dep, __utility_dep ],
   link_with: __host_lib)
 
 meson.override_dependency ('wakit-host', __host_dep)

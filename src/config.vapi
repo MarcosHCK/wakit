@@ -22,7 +22,7 @@ namespace Wakit
     {
 
       public const bool DEBUG;
-      public const bool DEVELOPER;
+      public const bool DEVELOP;
       public const string BUILD_DIR;
       public const string DATA_DIR;
       public const string SOURCE_DIR;

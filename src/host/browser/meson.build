@@ -15,30 +15,31 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-gio_dep = dependency ('gio-2.0', required: true)
+webkit_dep = dependency ('webkitgtk-6.0', required: true)
 
-__utility_src = [ 'enum.cc', 'enum.h' ]
+__host_browser_src = [ ]
 
-foreach lib: [ ]
+foreach lib: [ 'maker' ]
 
-  __utility_src += [ '@0@.c'.format (lib) ]
-  __utility_src += [ '@0@.h'.format (lib) ]
+  __host_browser_src += [ '@0@.c'.format (lib) ]
+  __host_browser_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'enum', 'timeoutcancellable' ]
+foreach lib: [ 'maker', 'widget' ]
 
-  __utility_src += [ '@0@.vala'.format (lib) ]
+  __host_browser_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-__utility_lib = library ('wakit-utility',
-  c_args: [ '-DG_LOG_DOMAIN="WaKit.Utility"', '-DG_LOG_USE_STRUCTURED=1',
+__host_browser_deps = [ __host_interfaces_dep,
+                        __utility_dep ]
+
+__host_browser_lib = static_library ('wakit-host-browser',
+  c_args: [ '-DG_LOG_DOMAIN="WaKit.Host.Browser"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_dep, gio_dep ],
-  sources: __utility_src)
+  dependencies: [ config_vala_dep, webkit_dep, __host_browser_deps ],
+  sources: __host_browser_src)
 
-__utility_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
+__host_browser_dep = declare_dependency (dependencies: [ config_dep, webkit_dep ],
   include_directories: include_directories ('.'),
-  link_with: __utility_lib)
-
-meson.override_dependency ('wakit-utility', __utility_dep)
+  link_with: __host_browser_lib)
