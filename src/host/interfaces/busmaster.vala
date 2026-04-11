@@ -48,13 +48,11 @@ namespace Wakit
 
           var length = application_id.length;
           var builder = new StringBuilder.sized (2 + length);
-          var i = (long) 1;
 
           builder.append_len ("/", 1);
           builder.append_len (application_id, length);
+          builder.replace (".", "/");
 
-          for (var ptr = builder.str.data; i < builder.len; ++i) if ('.' == ptr [i])
-            ptr [i] = '/';
         return builder.free_and_steal ();
         }
 

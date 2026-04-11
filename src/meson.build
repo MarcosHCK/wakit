@@ -19,5 +19,7 @@ src_inc = include_directories ('.')
 config_dep = declare_dependency (dependencies: config_dep, include_directories: src_inc)
 config_vala_dep = declare_dependency (dependencies: config_dep, sources: 'config.vapi')
 
+base_dir = meson.current_build_dir ()
+
 subdir ('common')
 subdir ('host')

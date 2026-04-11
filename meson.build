@@ -21,7 +21,7 @@ project \
     default_options: [ 'c_std=c23', 'cpp_std=c++26', 'warning_level=3' ],
     license: 'GPL-3.0-or-later',
     license_files: [ 'COPYING' ],
-    meson_version: '>= 1.3.2',
+    meson_version: '>= 1.10.0',
 
     version: run_command ('version.py', 'get-version', check: true).stdout ().strip ())
 

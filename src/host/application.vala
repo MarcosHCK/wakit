@@ -28,6 +28,7 @@ namespace Wakit
       private AppBus.Registrar _appbus_registrar;
       private Browser.Maker _browser_maker;
       private GLib.Queue<DeferredUrl?> _deferred_open;
+      private PostableRegistry _postable_registry;
 
       private class string _bus_config_envvar = null;
       private class string _bus_executable_envvar = null;
@@ -36,10 +37,6 @@ namespace Wakit
 
       class construct
         {
-
-          typeof (Wakit.AppBus.Registrar).ensure ();
-          typeof (Wakit.AppBus.Watcher).ensure ();
-          typeof (Wakit.Gui.Window).ensure ();
 
           if (null == (void*) Wakit.Gui.get_resource ())
             error ("WTF?");
@@ -93,6 +90,22 @@ namespace Wakit
           _browser_maker = new Browser.Maker ();
           _deferred_open = new GLib.Queue<DeferredUrl?> ();
           _ready = false;
+          _postable_registry = new PostableRegistry ();
+        }
+
+      public override bool dbus_register (GLib.DBusConnection connection, string object_path) throws GLib.Error
+        {
+
+          bool result = base.dbus_register (connection, object_path)
+                     && _postable_registry.post (connection, object_path);
+        return result;
+        }
+
+      public override void dbus_unregister (GLib.DBusConnection connection, string object_path)
+        {
+
+          base.dbus_unregister (connection, object_path);
+          _postable_registry.unpost (connection, object_path);
         }
 
       private void launch_appbus ()

@@ -33,8 +33,8 @@ __host_process_lib = static_library ('wakit-host-process',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, gio_dep, __host_process_deps ],
-  sources: __host_process_src)
+  sources: __host_process_src,
+  vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
 __host_process_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  include_directories: include_directories ('.'),
   link_with: __host_process_lib)

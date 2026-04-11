@@ -41,8 +41,8 @@ __host_browser_lib = static_library ('wakit-host-browser',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, webkit_dep, __host_browser_deps ],
-  sources: __host_browser_src)
+  sources: __host_browser_src,
+  vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
 __host_browser_dep = declare_dependency (dependencies: [ config_dep, webkit_dep ],
-  include_directories: include_directories ('.'),
   link_with: __host_browser_lib)

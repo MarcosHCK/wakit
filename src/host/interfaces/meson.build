@@ -23,7 +23,7 @@ foreach lib: [ ]
   __host_interfaces_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'browser', 'busmaster', 'webview' ]
+foreach lib: [ 'browser', 'busmaster', 'postable', 'webview' ]
 
   __host_interfaces_src += [ '@0@.vala'.format (lib) ]
 endforeach
@@ -36,8 +36,8 @@ __host_interfaces_lib = static_library ('wakit-host-interfaces',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, gtk_dep, __common_dep ],
-  sources: __host_interfaces_src)
+  sources: __host_interfaces_src,
+  vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
 __host_interfaces_dep = declare_dependency (dependencies: [ config_dep, gtk_dep ],
-  include_directories: include_directories ('.'),
   link_with: __host_interfaces_lib)

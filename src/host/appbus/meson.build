@@ -40,8 +40,8 @@ __host_appbus_lib = static_library ('wakit-host-appbus',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, gio_dep, __host_appbus_deps ],
-  sources: __host_appbus_src)
+  sources: __host_appbus_src,
+  vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
 __host_appbus_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  include_directories: include_directories ('.'),
   link_with: __host_appbus_lib)
