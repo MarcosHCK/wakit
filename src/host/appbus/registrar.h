@@ -15,6 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #pragma once
+#include <host/interfaces/wakit-host-interfaces.h>
 #include <gio/gio.h>
 
 typedef struct _WakitAppBusRegistrarImpl WakitAppBusRegistrarImpl;
@@ -24,7 +25,8 @@ G_BEGIN_DECLS
   struct _WakitAppBusRegistrarImpl
     {
 
-      GDBusConnection* current;
+      gchar* bus_address;
+      GDBusConnection* connection;
       guint owned_id;
     };
 
@@ -32,9 +34,9 @@ G_BEGIN_DECLS
   G_GNUC_INTERNAL void wakit_app_bus_registrar_impl_free (WakitAppBusRegistrarImpl* self);
 
   G_GNUC_INTERNAL void wakit_app_bus_registrar_impl_clear (WakitAppBusRegistrarImpl* impl);
-  G_GNUC_INTERNAL gboolean wakit_app_bus_registrar_impl_clear_last (WakitAppBusRegistrarImpl* impl, GApplication* app);
+  G_GNUC_INTERNAL gboolean wakit_app_bus_registrar_impl_clear_last (WakitAppBusRegistrarImpl* impl, WakitBusMaster* master);
   G_GNUC_INTERNAL void wakit_app_bus_registrar_impl_init (WakitAppBusRegistrarImpl* impl);
-  G_GNUC_INTERNAL void wakit_app_bus_registrar_impl_switch_to (WakitAppBusRegistrarImpl* impl, GApplication* app, GDBusConnection* connection, GAsyncReadyCallback callback, gpointer user_data);
+  G_GNUC_INTERNAL void wakit_app_bus_registrar_impl_switch_to (WakitAppBusRegistrarImpl* impl, WakitBusMaster* master, const gchar* bus_address, GDBusConnection* connection, GAsyncReadyCallback callback, gpointer user_data);
   G_GNUC_INTERNAL gboolean wakit_app_bus_registrar_impl_switch_to_finish (WakitAppBusRegistrarImpl* impl, GAsyncResult* result, GError** error);
 
 G_END_DECLS

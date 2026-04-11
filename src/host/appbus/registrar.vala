@@ -29,19 +29,19 @@ namespace Wakit.AppBus
           impl.clear ();
         }
 
-      public void clear_last (GLib.Application app)
+      public void clear_last (IBusMaster master)
         {
 
-          impl.clear_last (app);
+          impl.clear_last (master);
         }
 
-      public extern async bool switch_to (GLib.Application app, GLib.DBusConnection connection) throws GLib.Error;
+      public extern async bool switch_to (IBusMaster master, string bus_address, GLib.DBusConnection connection) throws GLib.Error;
 
       [CCode (cname = "wakit_app_bus_registrar_switch_to")]
-      public void switch_to_ (GLib.Application app, GLib.DBusConnection connection, GLib.TaskReadyCallback callback)
+      public void switch_to_ (IBusMaster master, string bus_address, GLib.DBusConnection connection, GLib.TaskReadyCallback callback)
         {
 
-          impl.switch_to (app, connection, callback);
+          impl.switch_to (master, bus_address, connection, callback);
         }
 
       public bool switch_to_finish (GLib.AsyncResult result) throws GLib.Error
@@ -55,8 +55,8 @@ namespace Wakit.AppBus
 
           public extern Impl ();
           public extern void clear ();
-          public extern bool clear_last (GLib.Application app);
-          public extern void switch_to (GLib.Application app, GLib.DBusConnection connection, GLib.TaskReadyCallback callback);
+          public extern bool clear_last (IBusMaster master);
+          public extern void switch_to (IBusMaster master, string bus_address, GLib.DBusConnection connection, GLib.TaskReadyCallback callback);
           public extern bool switch_to_finish (GLib.AsyncResult result) throws GLib.Error;
         }
     }

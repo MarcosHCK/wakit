@@ -42,15 +42,18 @@ return (g_object_unref (app), ret);
 static void on_activate (WakitApplication* app)
 {
 
-  GtkWindow* window = (GtkWindow*) wakit_gui_window_new ((GtkApplication*) app);
-  wakit_gui_window_set_has_titlebar ((WakitGuiWindow*) window, TRUE);
-  gtk_window_set_child (window, wakit_browser_make_viewer (wakit_application_get_browser (app)));
-  gtk_window_present (window);
+  GFile* uri = g_file_new_for_uri ("about:blank");
+  GFile* uris [1] = { uri };
+
+  g_application_open ((GApplication*) app, uris, 1, "");
+  g_object_unref (uri);
 }
 
 static void on_open_uris (WakitApplication* app, GFile** files, gint n_files, const gchar* hint)
 {
 
   GtkWindow* window = (GtkWindow*) wakit_gui_window_new ((GtkApplication*) app);
+  wakit_gui_window_set_has_titlebar ((WakitGuiWindow*) window, TRUE);
+  gtk_window_set_child (window, wakit_browser_make_viewer (wakit_application_get_browser (app)));
   gtk_window_present (window);
 }

@@ -15,14 +15,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit
+namespace Wakit.AppBus
 {
 
-  [CCode (cname = "WakitBrowser",
-          lower_case_cprefix = "wakit_browser_")]
-  public interface IBrowser: GLib.Object
+  [CCode (has_copy_function = false, has_type_id = false)] public struct AddressOption
     {
 
-      public abstract Gtk.Widget make_viewer ();
+      public AddressString _key;
+      public AddressString _value;
+
+      public string key { owned get { return _key.get_value (); } }
+      public string value { owned get { return _value.get_value (); } }
+
+      public AddressOption (owned AddressString key, owned AddressString value)
+        {
+
+          _key = key;
+          _value = value;
+        }
     }
 }

@@ -43,7 +43,7 @@ namespace Wakit.AppBus
       private uint _tries = 0;
       private Process.Watcher? _watcher = null;
 
-      public signal void connected (GLib.DBusConnection connection);
+      public signal void connected (string address, GLib.DBusConnection connection);
       public signal void crashed (uint tries, GLib.Error error);
 
       private async GLib.DBusConnection launch (GLib.Cancellable? cancellable = null) throws GLib.Error
@@ -75,6 +75,7 @@ namespace Wakit.AppBus
 
           var connection = yield new GLib.DBusConnection.for_address (address, flags, null, cancellable);
 
+          _address = address;
           connection.exit_on_close = false;
         return connection;
         }
@@ -159,7 +160,7 @@ namespace Wakit.AppBus
 
           try
             {
-              connected (launch.end (res));
+              connected (_address, launch.end (res));
               _tries = 0;
             }
           catch (GLib.Error error)

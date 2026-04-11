@@ -18,7 +18,7 @@
 namespace Wakit
 {
 
-  public class Application: Gtk.Application
+  public class Application: Gtk.Application, IBusMaster
     {
 
       public IBrowser browser { get { return _browser_maker; } }
@@ -43,6 +43,26 @@ namespace Wakit
 
           if (null == (void*) Wakit.Gui.get_resource ())
             error ("WTF?");
+        }
+
+      public override bool IBusMaster.acquire (string bus_address, GLib.DBusConnection connection) throws GLib.Error
+        {
+
+          var address = new AppBus.Address (bus_address);
+          var result = ((IBusMaster) this).default_acquire (bus_address, connection);
+
+          debug ("Wakit.IBusMaster.acquire ('%s', %p)", bus_address, (void*) connection);
+
+          AppBus.AddressOption? opt; switch (address.transport)
+            {
+
+            case "nonce-tcp": if (null != (opt = address.lookup_option ("noncefile")))
+              _browser_maker.context.add_path_to_sandbox (opt.value, true); break;
+
+            case "unix": if (null != (opt = address.lookup_option ("path")))
+              _browser_maker.context.add_path_to_sandbox (opt.value, true); break;
+            }
+        return result;
         }
 
       public class void class_set_bus_config_envvar (string? envvar)
@@ -95,11 +115,11 @@ namespace Wakit
           _appbus_watcher.restart ();
         }
 
-      private void on_daemon_connected (GLib.DBusConnection connection)
+      private void on_daemon_connected (string bus_address, GLib.DBusConnection connection)
         {
 
           hold ();
-          _appbus_registrar.switch_to.begin (this, connection, on_registrar_finished);
+          _appbus_registrar.switch_to.begin (this, bus_address, connection, on_registrar_finished);
         }
 
       private void on_daemon_crashed (uint tries, GLib.Error error)
@@ -137,7 +157,7 @@ namespace Wakit
             }
 
           for (int i = 0; i < (! bootstrap ? 1 : 2); ++i)
-            release ();
+            base.release ();
         }
 
       public override void open ([CCode (array_length_cname = "n_files", array_length_pos = 1.5)] GLib.File[] files, string hint)
@@ -168,6 +188,26 @@ namespace Wakit
       public virtual signal void open_uris ([CCode (array_length_cname = "n_files", array_length_pos = 1.5)] GLib.File[] files, string hint)
         {
           warning ("Wakit.Application unimplemented");
+        }
+
+      public override void IBusMaster.release (string bus_address, GLib.DBusConnection connection)
+        {
+
+          AppBus.Address address; try
+            {
+              address = new AppBus.Address (bus_address);
+            }
+          catch (GLib.Error error)
+            {
+              unowned uint code = error.code;
+              unowned string domain = error.domain.to_string ();
+              unowned string message = error.message.to_string ();
+              GLib.error ("Wakit.AppBus.Address ()!: %s: %u: %s", domain, code, message);
+            }
+
+          ((IBusMaster) this).default_release (bus_address, connection);
+
+          debug ("Wakit.IBusMaster.release ('%s', %p)", bus_address, (void*) connection);
         }
 
       public override void shutdown ()

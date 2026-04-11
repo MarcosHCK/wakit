@@ -15,14 +15,4 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit
-{
-
-  [CCode (cname = "WakitBrowser",
-          lower_case_cprefix = "wakit_browser_")]
-  public interface IBrowser: GLib.Object
-    {
-
-      public abstract Gtk.Widget make_viewer ();
-    }
-}
+#include <gio/gio.h>

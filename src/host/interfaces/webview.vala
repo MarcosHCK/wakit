@@ -25,7 +25,7 @@ namespace Wakit
       OUT_OF_MEMORY,
     }
 
-  [CCode (cprefix = "WakitWebView",
+  [CCode (cname = "WakitWebView",
           lower_case_cprefix = "wakit_web_view_")]
   public interface IWebView: Gtk.Widget
     {

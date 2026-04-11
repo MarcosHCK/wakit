@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+#include <gio/gio.h>
 
-namespace Wakit
-{
+G_BEGIN_DECLS
 
-  [CCode (cname = "WakitBrowser",
-          lower_case_cprefix = "wakit_browser_")]
-  public interface IBrowser: GLib.Object
-    {
+  typedef void (*WakitAppBusAddressForeachOption) (const gchar* key, guint key_length,
+                                                   const gchar* value, guint value_length,
+                                                   gpointer user_data);
 
-      public abstract Gtk.Widget make_viewer ();
-    }
-}
+  G_GNUC_INTERNAL const gchar* wakit_app_bus_address_parse (const gchar* address, guint* out_length, WakitAppBusAddressForeachOption callback, gpointer user_data, GError** error);
+
+G_END_DECLS
