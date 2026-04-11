@@ -38,7 +38,7 @@ foreach bit: []
   __host_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'application', 'deferredurl', 'postableregistry' ]
+foreach bit: [ 'application', 'deferredurl' ]
 
   __host_src += [ '@0@.vala'.format (bit) ]
 endforeach

@@ -35,44 +35,26 @@ namespace Wakit.AppBus
       public uint kill_timeout { get; construct set; default = 1000; }
       public uint launch_timeout { get; construct set; default = 1000; }
 
+      public string address { get; private set; }
+      public GLib.DBusConnection connection { get; private set; }
+
       private string _config = DEFAULT_CONFIG;
-      private GLib.Cancellable _cancellable = new GLib.Cancellable ();
       private string _executable = "dbus-daemon";
-      private bool _quitting = true;
-      private uint _tries = 0;
       private Process.Watcher? _watcher = null;
 
-      public signal void connected (string address, GLib.DBusConnection connection);
-      public signal void crashed (uint tries, GLib.Error error);
+      [HasEmitter]
+      public signal void crashed (GLib.Error? error);
 
-      [Compact (opaque = false)] private class LaunchResult
+      public async bool launch (GLib.Cancellable? cancellable = null) throws GLib.Error requires (null == _watcher)
         {
-
-          public string address;
-          public GLib.DBusConnection connection;
-
-          public LaunchResult (owned string address, owned GLib.DBusConnection connection)
-            {
-              this.address = (owned) address;
-              this.connection = (owned) connection;
-            }
-        }
-
-      private async LaunchResult launch (GLib.Cancellable? cancellable = null) throws GLib.Error
-        {
-
-          if (null != _watcher)
-            yield _watcher.terminate (kill_timeout, cancellable);
-
-          _watcher = null;
 
           var cancellable2 = new TimeoutCancellable (launch_timeout, cancellable);
-          var result = yield launch_spawn (cancellable2);
+          var result = (bool) yield launch_spawn (cancellable2);
 
-        return (owned) result;
+        return result;
         }
 
-      private async LaunchResult launch_reach (GLib.Subprocess subprocess, GLib.Cancellable? cancellable = null) throws GLib.Error
+      private async bool launch_reach (GLib.Subprocess subprocess, GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
           var stdout = new GLib.DataInputStream (subprocess.get_stdout_pipe ());
@@ -89,10 +71,13 @@ namespace Wakit.AppBus
 
           connection.exit_on_close = false;
 
-        return new LaunchResult ((owned) address, connection);
+          _address = address;
+          _connection = connection;
+
+        return true;
         }
 
-      private async LaunchResult launch_spawn (GLib.Cancellable? cancellable = null) throws GLib.Error
+      private async bool launch_spawn (GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
           unowned var flag1 = GLib.SubprocessFlags.STDOUT_PIPE;
@@ -103,12 +88,12 @@ namespace Wakit.AppBus
           var launcher = new GLib.SubprocessLauncher (flags);
           Process.Impl.setup_launcher (launcher);
 
-          LaunchResult result;
+          bool result;
           GLib.Subprocess subprocess = launcher.spawnv (argv);
 
           try
             { result = yield launch_reach (subprocess, cancellable);
-              (_watcher = new Process.Watcher (subprocess)).terminated.connect (process_crash); }
+              (_watcher = new Process.Watcher (subprocess)).terminated.connect (crashed); }
           catch (GLib.Error error)
             { yield Process.terminate_async (subprocess, _kill_timeout);
               throw (owned) error; }
@@ -121,13 +106,11 @@ namespace Wakit.AppBus
           quit_async.begin ();
         }
 
-      public async void quit_async () requires (false == _quitting)
+      public async void quit_async ()
         {
 
           var watcher = _watcher;
 
-          _quitting = true;
-          _cancellable.cancel ();
           _watcher = null;
 
           if (null != watcher) try
@@ -143,64 +126,6 @@ namespace Wakit.AppBus
 
               warning ("daemon reap failed: %s: %u: %s", domain, code, message);
             }
-        }
-
-      private void process_crash (GLib.Error? error)
-        {
-
-          if (null == error)
-            {
-              restart_schedule (this);
-              return;
-            }
-
-          crashed (++_tries, error);
-          restart_schedule (this);
-        }
-
-      public void restart () requires (true == _quitting)
-        {
-
-          _quitting = false;
-          _cancellable = new GLib.Cancellable ();
-
-          restart_internal ();
-        }
-
-      private void restart_finished (GLib.AsyncResult res)
-        {
-
-          try
-            {
-              LaunchResult result = launch.end (res);
-              connected (result.address, result.connection);
-              _tries = 0;
-            }
-          catch (GLib.Error error)
-            { process_crash (error); }
-        }
-
-      private void restart_internal ()
-        {
-
-          launch.begin (_cancellable, (o, res) =>
-            {
-              ((AppBus.Watcher) o).restart_finished (res);
-            });
-        }
-
-      private static void restart_schedule (AppBus.Watcher self)
-        {
-
-          if (self._quitting)
-            return;
-
-          var source = new GLib.TimeoutSource (self._cooldown);
-
-          source.set_callback (() => { self.restart_internal ();
-                                            return GLib.Source.REMOVE; });
-
-          source.attach (GLib.MainContext.ref_thread_default ());
         }
     }
 }

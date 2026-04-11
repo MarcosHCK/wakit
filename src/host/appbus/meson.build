@@ -17,13 +17,13 @@
 
 __host_appbus_src = [ 'watcher.vala' ]
 
-foreach lib: [ 'address' ]
+foreach lib: [ 'address', 'ownname', 'postablecollection' ]
 
   __host_appbus_src += [ '@0@.cc'.format (lib) ]
   __host_appbus_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'address', 'addressoption', 'addressstring', 'bus', 'watcher' ]
+foreach lib: [ 'address', 'addressoption', 'addressstring', 'bus', 'ownname', 'postablecollection', 'watcher' ]
 
   __host_appbus_src += [ '@0@.vala'.format (lib) ]
 endforeach

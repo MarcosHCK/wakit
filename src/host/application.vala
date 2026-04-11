@@ -21,10 +21,12 @@ namespace Wakit
   public class Application: Gtk.Application
     {
 
+      private AppBus.Bus _appbus_bus;
       private AppBus.Watcher _appbus_watcher;
       private Browser.Maker _browser_maker;
       private GLib.Queue<DeferredUrl?> _deferred_open;
 
+      public AppBus.Bus appbus { get { return _appbus_bus; } }
       public IBrowser browser { get { return _browser_maker; } }
       public bool ready { get; private set; default = false; }
 
@@ -45,19 +47,21 @@ namespace Wakit
           _ready = false;
         }
 
-      private void on_daemon_connected (string bus_address, GLib.DBusConnection connection)
-        {
-        }
-
-      private void on_daemon_crashed (uint tries, GLib.Error error)
+      private void on_appbus_crashed (GLib.Error? error)
         {
 
-          ready = false; if (3 > tries)
+          if (null == error)
 
-            // leave a few tries slip through
-            return;
+            critical ("AppBus crashed!");
+          else
+            {
+              unowned uint code = error.code;
+              unowned string domain = error.domain.to_string ();
+              unowned string message = error.message.to_string ();
 
-          critical ("could not restart the appbus after %u tries", tries);
+              critical ("AppBus crashed!: %s: %u: %s", domain, code, message);
+            }
+
           quit ();
         }
 
@@ -105,6 +109,8 @@ namespace Wakit
           var context = GLib.MainContext.ref_thread_default ();
           var loop = new GLib.MainLoop (context, false);
 
+          _appbus_bus.reap_on_connection (_appbus_watcher.connection);
+
           _appbus_watcher.quit_async.begin ((o, res) =>
             {
               ((AppBus.Watcher) o).quit_async.end (res);
@@ -119,11 +125,71 @@ namespace Wakit
 
           base.startup ();
 
+          _appbus_bus = new AppBus.Bus (application_id);
           _appbus_watcher = new AppBus.Watcher ();
 
-          _appbus_watcher.connected.connect (on_daemon_connected);
-          _appbus_watcher.crashed.connect (on_daemon_crashed);
-          _appbus_watcher.restart ();
+          _appbus_watcher.crashed.connect (on_appbus_crashed);
+
+          hold ();
+          startup_appbus.begin (null, startup_appbus_finished);
+        }
+
+      private async bool startup_appbus (GLib.Cancellable? cancellable = null) throws GLib.Error
+        {
+
+          bool result = (yield _appbus_watcher.launch (cancellable))
+                     && (yield _appbus_bus.graft_on_connection (_appbus_watcher.connection, cancellable));
+
+          GLib.debug ("AppBus launched (address = '%s')", _appbus_watcher.address);
+
+          var address = new AppBus.Address (_appbus_watcher.address);
+
+          AppBus.AddressOption? opt; switch (address.transport)
+            {
+
+            case "nonce-tcp": if (null != (opt = address.lookup_option ("noncefile")))
+              _browser_maker.context.add_path_to_sandbox (opt.value, true); break;
+
+            case "unix": if (null != (opt = address.lookup_option ("path")))
+              _browser_maker.context.add_path_to_sandbox (opt.value, true); break;
+            }
+        return result;
+        }
+
+      private void startup_complete ()
+        {
+
+          var files = new GLib.File [1];
+          ready = true;
+
+          DeferredUrl? deferred; while (null != (deferred = _deferred_open.pop_head ()))
+            {
+
+              files [0] = deferred.file;
+              open_uris (files, deferred.hint);
+            }
+        }
+
+      private static void startup_appbus_finished (GLib.Object? source_object, GLib.AsyncResult result)
+        {
+
+          try
+            {
+
+              ((Application) source_object).startup_appbus.end (result);
+              ((Application) source_object).startup_complete ();
+              ((Application) source_object).release ();
+            }
+          catch (GLib.Error error)
+            {
+
+              unowned uint code = error.code;
+              unowned string domain = error.domain.to_string ();
+              unowned string message = error.message.to_string ();
+
+              critical ("can not acquire AppBus: %s: %u: %s", domain, code, message);
+              ((Application) source_object).quit ();
+            }
         }
     }
 }
