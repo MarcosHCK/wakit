@@ -32,6 +32,9 @@ __host_interfaces_lib = static_library ('wakit-host-interfaces',
   c_args: [ '-DG_LOG_DOMAIN="WaKit.Host.Interfaces"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+  cpp_args: [ '-DG_LOG_DOMAIN="WaKit.Host.Interfaces"', '-DG_LOG_USE_STRUCTURED=1',
+              '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
+              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, gtk_dep, __utility_dep ],
   sources: __host_interfaces_src)
 

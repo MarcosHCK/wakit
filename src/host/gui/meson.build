@@ -42,6 +42,9 @@ __host_gui_lib = static_library ('wakit-host-gui',
   c_args: [ '-DG_LOG_DOMAIN="WaKit.Host.Gui"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+  cpp_args: [ '-DG_LOG_DOMAIN="WaKit.Host.Gui"', '-DG_LOG_USE_STRUCTURED=1',
+              '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
+              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, gtk_dep, __host_gui_deps ],
   sources: __host_gui_src)
 

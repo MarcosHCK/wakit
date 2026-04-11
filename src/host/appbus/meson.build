@@ -39,7 +39,6 @@ __host_appbus_lib = static_library ('wakit-host-appbus',
   cpp_args: [ '-DG_LOG_DOMAIN="WaKit.Host.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_pch: 'pch/pch.h',
   dependencies: [ config_vala_dep, gio_dep, __host_appbus_deps ],
   sources: __host_appbus_src)
 

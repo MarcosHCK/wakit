@@ -37,6 +37,9 @@ __host_browser_lib = static_library ('wakit-host-browser',
   c_args: [ '-DG_LOG_DOMAIN="WaKit.Host.Browser"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+  cpp_args: [ '-DG_LOG_DOMAIN="WaKit.Host.Browser"', '-DG_LOG_USE_STRUCTURED=1',
+              '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
+              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, webkit_dep, __host_browser_deps ],
   sources: __host_browser_src)
 
