@@ -25,17 +25,30 @@ namespace Wakit
       OUT_OF_MEMORY,
     }
 
-  [CCode (cname = "WakitWebView",
-          lower_case_cprefix = "wakit_web_view_")]
   public interface IWebView: Gtk.Widget
     {
 
+      [CCode (cname = "WAKIT_IWEB_VIEW_GET_INTERFACE (self)->terminated")]
+      extern const uintptr terminated_actv;
+
+      [CCode (cname = "wakit_iweb_view_real_terminated")]
+      extern const uintptr terminated_real;
+
+      [CCode (cname = "wakit_iweb_view_signals[WAKIT_IWEB_VIEW_TERMINATED_SIGNAL]")]
+      extern const uint terminated_sid;
+
       [HasEmitter]
+      [Signal (run = "last")]
       public virtual signal void terminated (WebViewTerminationReason reason)
         {
 
-          var str = Enum.to_string<WebViewTerminationReason> (reason);
-          critical ("WebView web process was terminated (reason = %s)", str);
+          if (! GLib.Signal.has_handler_pending (this, terminated_sid, 0, true)
+             && terminated_actv == terminated_real)
+            {
+
+              string str = Enum.to_string<WebViewTerminationReason> (reason);
+              critical ("WebView web process was terminated (reason = %s)", str);
+            }
         }
     }
 }

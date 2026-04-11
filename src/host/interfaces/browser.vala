@@ -18,11 +18,9 @@
 namespace Wakit
 {
 
-  [CCode (cname = "WakitBrowser",
-          lower_case_cprefix = "wakit_browser_")]
   public interface IBrowser: GLib.Object
     {
 
-      public abstract Gtk.Widget make_viewer ();
+      public abstract Wakit.IWebView make_viewer ();
     }
 }

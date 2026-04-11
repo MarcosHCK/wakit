@@ -54,6 +54,6 @@ static void on_open_uris (WakitApplication* app, GFile** files, gint n_files, co
 
   GtkWindow* window = (GtkWindow*) wakit_gui_window_new ((GtkApplication*) app);
   wakit_gui_window_set_has_titlebar ((WakitGuiWindow*) window, TRUE);
-  gtk_window_set_child (window, wakit_browser_make_viewer (wakit_application_get_browser (app)));
+  gtk_window_set_child (window, (GtkWidget*) wakit_ibrowser_make_viewer (wakit_application_get_browser (app)));
   gtk_window_present (window);
 }

@@ -15,12 +15,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit
+namespace Wakit.AppBus
 {
-
-  public interface IPostable: GLib.Object
-    {
-
-      public abstract uint post (GLib.DBusConnection connection, string object_path) throws GLib.Error;
-    }
 }

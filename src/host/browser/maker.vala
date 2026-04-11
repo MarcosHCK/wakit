@@ -68,7 +68,7 @@ namespace Wakit.Browser
           _context.set_cache_model (WebKit.CacheModel.DOCUMENT_BROWSER);
         }
 
-      public Gtk.Widget make_viewer ()
+      public Wakit.IWebView make_viewer ()
         {
 
           WebKit.WebView _viewer;

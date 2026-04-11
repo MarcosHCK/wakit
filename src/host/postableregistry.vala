@@ -18,7 +18,7 @@
 namespace Wakit
 {
 
-  internal struct PostableEntry
+  public struct PostableEntry
     {
 
       public uint post_id;
@@ -31,7 +31,7 @@ namespace Wakit
         }
     }
 
-  [Compact (opaque = true)] internal class PostableRegistry: GLib.Array<PostableEntry>
+  [Compact (opaque = true)] public class PostableRegistry: GLib.Array<PostableEntry>
     {
 
       public PostableRegistry ()

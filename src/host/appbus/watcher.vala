@@ -29,7 +29,6 @@ namespace Wakit.AppBus
       public const string DEFAULT_EXECUTABLE = Config.LIBEXEC_DIR + "/wakit-appbus";
 #endif // DEVELOP
 
-      public string address { get; private set; }
       public uint cooldown { get; construct set; default = 500; }
       public string config { get { return _config; } set { _config = value; } }
       public string executable { get { return _executable; } set { _executable = value; } }
@@ -46,7 +45,20 @@ namespace Wakit.AppBus
       public signal void connected (string address, GLib.DBusConnection connection);
       public signal void crashed (uint tries, GLib.Error error);
 
-      private async GLib.DBusConnection launch (GLib.Cancellable? cancellable = null) throws GLib.Error
+      [Compact (opaque = false)] private class LaunchResult
+        {
+
+          public string address;
+          public GLib.DBusConnection connection;
+
+          public LaunchResult (owned string address, owned GLib.DBusConnection connection)
+            {
+              this.address = (owned) address;
+              this.connection = (owned) connection;
+            }
+        }
+
+      private async LaunchResult launch (GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
           if (null != _watcher)
@@ -55,12 +67,12 @@ namespace Wakit.AppBus
           _watcher = null;
 
           var cancellable2 = new TimeoutCancellable (launch_timeout, cancellable);
-          var connection = (GLib.DBusConnection) yield launch_spawn (cancellable2);
+          var result = yield launch_spawn (cancellable2);
 
-        return connection;
+        return (owned) result;
         }
 
-      private async GLib.DBusConnection launch_reach (GLib.Subprocess subprocess, GLib.Cancellable? cancellable = null) throws GLib.Error
+      private async LaunchResult launch_reach (GLib.Subprocess subprocess, GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
           var stdout = new GLib.DataInputStream (subprocess.get_stdout_pipe ());
@@ -75,12 +87,12 @@ namespace Wakit.AppBus
 
           var connection = yield new GLib.DBusConnection.for_address (address, flags, null, cancellable);
 
-          _address = address;
           connection.exit_on_close = false;
-        return connection;
+
+        return new LaunchResult ((owned) address, connection);
         }
 
-      private async GLib.DBusConnection launch_spawn (GLib.Cancellable? cancellable = null) throws GLib.Error
+      private async LaunchResult launch_spawn (GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
           unowned var flag1 = GLib.SubprocessFlags.STDOUT_PIPE;
@@ -91,16 +103,16 @@ namespace Wakit.AppBus
           var launcher = new GLib.SubprocessLauncher (flags);
           Process.Impl.setup_launcher (launcher);
 
-          GLib.DBusConnection connection;
-          var subprocess = launcher.spawnv (argv);
+          LaunchResult result;
+          GLib.Subprocess subprocess = launcher.spawnv (argv);
 
           try
-            { connection = yield launch_reach (subprocess, cancellable);
+            { result = yield launch_reach (subprocess, cancellable);
               (_watcher = new Process.Watcher (subprocess)).terminated.connect (process_crash); }
           catch (GLib.Error error)
             { yield Process.terminate_async (subprocess, _kill_timeout);
               throw (owned) error; }
-        return connection;
+        return result;
         }
 
       public void quit ()
@@ -160,7 +172,8 @@ namespace Wakit.AppBus
 
           try
             {
-              connected (_address, launch.end (res));
+              LaunchResult result = launch.end (res);
+              connected (result.address, result.connection);
               _tries = 0;
             }
           catch (GLib.Error error)
