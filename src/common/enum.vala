@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Utility
+namespace Wakit
 {
 
   public errordomain EnumError
@@ -28,7 +28,7 @@ namespace Wakit.Utility
       public extern static GLib.Quark quark ();
     }
 
-  [CCode (cheader_filename = "utility/enum.h")] namespace Enum
+  [CCode (cheader_filename = "common/enum.h")] namespace Enum
     {
 
       [CCode (simple_generics = true)]

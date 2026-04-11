@@ -19,9 +19,9 @@
 
 G_BEGIN_DECLS
 
-  const gchar* wakit_utility_enum_as_string (gint value, GType enum_type, GError** error);
-  gint wakit_utility_enum_from_name (const gchar* name, GType enum_type, GError** error);
-  gint wakit_utility_enum_from_nick (const gchar* nick, GType enum_type, GError** error);
-  const gchar* wakit_utility_enum_to_string (gint value, GType enum_type);
+  const gchar* wakit_enum_as_string (gint value, GType enum_type, GError** error);
+  gint wakit_enum_from_name (const gchar* name, GType enum_type, GError** error);
+  gint wakit_enum_from_nick (const gchar* nick, GType enum_type, GError** error);
+  const gchar* wakit_enum_to_string (gint value, GType enum_type);
 
 G_END_DECLS

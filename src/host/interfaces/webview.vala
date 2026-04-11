@@ -34,7 +34,7 @@ namespace Wakit
       public virtual signal void terminated (WebViewTerminationReason reason)
         {
 
-          var str = Utility.Enum.to_string<WebViewTerminationReason> (reason);
+          var str = Enum.to_string<WebViewTerminationReason> (reason);
           critical ("WebView web process was terminated (reason = %s)", str);
         }
     }

@@ -28,15 +28,15 @@ foreach lib: [ 'address', 'addressoption', 'addressstring', 'registrar', 'watche
   __host_appbus_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-__host_appbus_deps = [ __host_interfaces_dep,
-                       __host_process_dep,
-                       __utility_dep ]
+__host_appbus_deps = [ __common_dep,
+                       __host_interfaces_dep,
+                       __host_process_dep ]
 
 __host_appbus_lib = static_library ('wakit-host-appbus',
-  c_args: [ '-DG_LOG_DOMAIN="WaKit.Host.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="WaKit.Host.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, gio_dep, __host_appbus_deps ],

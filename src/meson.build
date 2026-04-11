@@ -19,8 +19,5 @@ src_inc = include_directories ('.')
 config_dep = declare_dependency (dependencies: config_dep, include_directories: src_inc)
 config_vala_dep = declare_dependency (dependencies: config_dep, sources: 'config.vapi')
 
-# level 0
-subdir ('utility')
-
-# level 1
+subdir ('common')
 subdir ('host')

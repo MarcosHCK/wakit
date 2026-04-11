@@ -29,13 +29,13 @@ foreach lib: [ 'browser', 'busmaster', 'webview' ]
 endforeach
 
 __host_interfaces_lib = static_library ('wakit-host-interfaces',
-  c_args: [ '-DG_LOG_DOMAIN="WaKit.Host.Interfaces"', '-DG_LOG_USE_STRUCTURED=1',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Interfaces"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="WaKit.Host.Interfaces"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Interfaces"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_vala_dep, gtk_dep, __utility_dep ],
+  dependencies: [ config_vala_dep, gtk_dep, __common_dep ],
   sources: __host_interfaces_src)
 
 __host_interfaces_dep = declare_dependency (dependencies: [ config_dep, gtk_dep ],

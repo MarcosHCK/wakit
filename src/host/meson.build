@@ -43,24 +43,24 @@ foreach bit: [ 'application', 'deferredurl' ]
   __host_src += [ '@0@.vala'.format (bit) ]
 endforeach
 
-__host_deps = [ __host_appbus_dep,
+__host_deps = [ __common_dep,
+                __host_appbus_dep,
                 __host_browser_dep,
                 __host_gui_dep,
                 __host_interfaces_dep,
-                __host_process_dep,
-                __utility_dep ]
+                __host_process_dep ]
 
 __host_lib = library ('wakit-host',
-  c_args: [ '-DG_LOG_DOMAIN="WaKit.Host"', '-DG_LOG_USE_STRUCTURED=1',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="WaKit.Host"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_dep, gtk_dep, __host_deps ],
   sources: __host_src)
 
-__host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __host_interfaces_dep, __utility_dep ],
+__host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __host_interfaces_dep ],
   link_with: __host_lib)
 
 meson.override_dependency ('wakit-host', __host_dep)

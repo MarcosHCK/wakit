@@ -28,7 +28,7 @@ foreach lib: [ 'headerbar', 'window' ]
   __host_gui_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-__host_gui_deps = [ __utility_dep ]
+__host_gui_deps = [ __common_dep ]
 
 __host_gui_src += import ('gnome').compile_resources ('wakit-host-gui-resources',
   [ 'resources.xml' ],
@@ -39,10 +39,10 @@ __host_gui_src += import ('gnome').compile_resources ('wakit-host-gui-resources'
 __host_gui_src += 'resources.vala'
 
 __host_gui_lib = static_library ('wakit-host-gui',
-  c_args: [ '-DG_LOG_DOMAIN="WaKit.Host.Gui"', '-DG_LOG_USE_STRUCTURED=1',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Gui"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="WaKit.Host.Gui"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Gui"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, gtk_dep, __host_gui_deps ],

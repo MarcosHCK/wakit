@@ -54,7 +54,7 @@ namespace Wakit.AppBus
 
           _watcher = null;
 
-          var cancellable2 = new Utility.TimeoutCancellable (launch_timeout, cancellable);
+          var cancellable2 = new TimeoutCancellable (launch_timeout, cancellable);
           var connection = (GLib.DBusConnection) yield launch_spawn (cancellable2);
 
         return connection;

@@ -15,9 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
-#include <utility/enum.h>
+#include <common/enum.h>
 
-extern "C" GQuark wakit_utility_enum_error_quark (void) G_GNUC_CONST;
+extern "C" GQuark wakit_enum_error_quark (void) G_GNUC_CONST;
 
 template<int error_code> static inline bool collect_base (GEnumValue* value, GError** dst_error, const gchar* format, va_list l)
                                             G_GNUC_PRINTF(3, 0);
@@ -28,7 +28,7 @@ template<int error_code> static inline bool collect_base (GEnumValue* value, GEr
   auto null = NULL == value; if (G_UNLIKELY (null))
     {
 
-      auto quark = wakit_utility_enum_error_quark (); \
+      auto quark = wakit_enum_error_quark (); \
       auto error = g_error_new_valist (quark, error_code, format, l);
 
       g_propagate_error (dst_error, error);
@@ -57,7 +57,7 @@ return (va_end (l), result); \
 
 #define implementation(suffix,error_code) \
  ; \
-gint wakit_utility_enum_from_##suffix (const gchar* suffix, GType g_type, GError** error) \
+gint wakit_enum_from_##suffix (const gchar* suffix, GType g_type, GError** error) \
 { \
   g_return_val_if_fail (suffix != NULL, -1); \
   g_return_val_if_fail (g_type_is_a (g_type, G_TYPE_ENUM), -1); \
@@ -74,7 +74,7 @@ return (g_type_class_unref (klass), collect_value<error_code> (value, error, "un
 
 #undef implementation
 
-const gchar* wakit_utility_enum_as_string (gint num_value, GType g_type, GError** error)
+const gchar* wakit_enum_as_string (gint num_value, GType g_type, GError** error)
 {
 
   g_return_val_if_fail (g_type_is_a (g_type, G_TYPE_ENUM), NULL);
@@ -85,12 +85,12 @@ const gchar* wakit_utility_enum_as_string (gint num_value, GType g_type, GError*
 return (g_type_class_unref (klass), collect_value_name<3> (value, error, "unknown enum value %i", num_value));
 }
 
-const gchar* wakit_utility_enum_to_string (gint value, GType g_type)
+const gchar* wakit_enum_to_string (gint value, GType g_type)
 {
 
   GError* tmperr = NULL;
 
-  if (auto result = wakit_utility_enum_as_string (value, g_type, &tmperr);
+  if (auto result = wakit_enum_as_string (value, g_type, &tmperr);
       G_UNLIKELY (NULL == tmperr))
 
     return result;

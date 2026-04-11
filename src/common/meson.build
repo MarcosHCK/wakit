@@ -17,31 +17,31 @@
 
 gio_dep = dependency ('gio-2.0', required: true)
 
-__utility_src = [ 'enum.cc', 'enum.h' ]
+__common_src = [ 'enum.cc', 'enum.h' ]
 
 foreach lib: [ ]
 
-  __utility_src += [ '@0@.c'.format (lib) ]
-  __utility_src += [ '@0@.h'.format (lib) ]
+  __common_src += [ '@0@.c'.format (lib) ]
+  __common_src += [ '@0@.h'.format (lib) ]
 endforeach
 
 foreach lib: [ 'enum', 'timeoutcancellable' ]
 
-  __utility_src += [ '@0@.vala'.format (lib) ]
+  __common_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-__utility_lib = library ('wakit-utility',
-  c_args: [ '-DG_LOG_DOMAIN="WaKit.Utility"', '-DG_LOG_USE_STRUCTURED=1',
+__common_lib = library ('wakit-common',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Common"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="WaKit.Utility"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Common"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_dep, gio_dep ],
-  sources: __utility_src)
+  sources: __common_src)
 
-__utility_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
+__common_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
   include_directories: include_directories ('.'),
-  link_with: __utility_lib)
+  link_with: __common_lib)
 
-meson.override_dependency ('wakit-utility', __utility_dep)
+meson.override_dependency ('wakit-common', __common_dep)
