@@ -36,8 +36,23 @@ namespace Wakit.AppBus
           unowned var tl = (uint) 0;
           unowned var tr = (string) parse_ (_address = address, out tl, ar);
 
+          ar.sort (compare_func);
+
           _options = ar.steal ();
           _transport = AddressString (tr, tl);
+        }
+
+      static int compare_func (AddressOption? a, AddressOption? b)
+        {
+
+          unowned AddressString* ak = &a._key;
+          unowned AddressString* bk = &b._key;
+
+          if (ak.length != bk.length)
+
+            return (int) ak.length - (int) bk.length;
+          else
+            return GLib.Memory.cmp (ak.value, bk.value, bk.length);
         }
 
       public unowned AddressOption? lookup_option (string key)
