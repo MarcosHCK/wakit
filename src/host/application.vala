@@ -183,11 +183,29 @@ namespace Wakit
               open_uris (files, deferred.hint);
             }
         }
+  
+      [CCode (cname = "WAKIT_APPLICATION_GET_CLASS (self)->open_uris")]
+      extern const uintptr open_uris_actv;
+
+      [CCode (cname = "wakit_application_real_open_uris")]
+      extern const uintptr open_uris_real;
+
+      [CCode (cname = "wakit_application_signals[WAKIT_APPLICATION_OPEN_URIS_SIGNAL]")]
+      extern const uint open_uris_sid;
 
       [HasEmitter]
+      [Signal (run = "last")]
       public virtual signal void open_uris ([CCode (array_length_cname = "n_files", array_length_pos = 1.5)] GLib.File[] files, string hint)
         {
-          warning ("Wakit.Application unimplemented");
+
+          if (! GLib.Signal.has_handler_pending (this, open_uris_sid, 0, true)
+             && open_uris_actv == open_uris_real)
+            {
+
+              GLib.warning_once ("Your application does not implement "
+                               + "wakit_application_open_uris() and has no handlers connected "
+                               + "to the 'open_uris' signal. It should do one of these.");
+            }
         }
 
       public override void IBusMaster.release (string bus_address, GLib.DBusConnection connection)

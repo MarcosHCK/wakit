@@ -84,18 +84,30 @@ namespace Wakit.Process
           yield Process.terminate_async (_subprocess, timeout, cancellable);
         }
 
+      [CCode (cname = "WAKIT_PROCESS_WATCHER_GET_CLASS (self)->terminated")]
+      extern const uintptr terminated_actv;
+
+      [CCode (cname = "wakit_process_watcher_real_terminated")]
+      extern const uintptr terminated_real;
+
+      [CCode (cname = "wakit_process_watcher_signals[WAKIT_PROCESS_WATCHER_TERMINATED_SIGNAL]")]
+      extern const uint terminated_sid;
+
+      [HasEmitter]
       [Signal (run = "last")]
-      public signal void terminated (GLib.Error? error)
+      public virtual signal void terminated (GLib.Error? error)
         {
 
-          if (null == error)
-            return;
+          if (! GLib.Signal.has_handler_pending (this, terminated_sid, 0, true)
+             && terminated_actv == terminated_real)
+            {
 
-          unowned uint code = error.code;
-          unowned string domain = error.domain.to_string ();
-          unowned string message = error.message.to_string ();
+              if (null == error)
 
-          warning ("watcher program crashed: %s: %u: %s", domain, code, message);
+                warning ("watched program was terminated");
+              else
+                warning ("watched program crashed: %s: %u: %s", error.domain.to_string (), error.code, error.message);
+            }
         }
     }
 }
