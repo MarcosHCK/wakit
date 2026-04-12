@@ -16,6 +16,7 @@
  */
 #include <config.h>
 #include <host/gui/wakit-host-gui.h>
+#include <host/interfaces/wakit-host-interfaces.h>
 #include <host/wakit-host.h>
 
 static void on_activate (WakitApplication* app);
@@ -49,11 +50,22 @@ static void on_activate (WakitApplication* app)
   g_object_unref (uri);
 }
 
-static void on_open_uris (WakitApplication* app, GFile** files, gint n_files, const gchar* hint)
+static void on_open_uri (WakitApplication* app, GFile* file, const gchar* hint)
 {
 
   GtkWindow* window = (GtkWindow*) wakit_gui_window_new ((GtkApplication*) app);
   wakit_gui_window_set_has_titlebar ((WakitGuiWindow*) window, TRUE);
-  gtk_window_set_child (window, (GtkWidget*) wakit_ibrowser_make_viewer (wakit_application_get_browser (app)));
+
+  WakitIWebView* web_view = wakit_ibrowser_make_viewer (wakit_application_get_browser (app));
+  wakit_iweb_view_open_uri (web_view, file, hint);
+
+  gtk_window_set_child (window, (GtkWidget*) web_view);
   gtk_window_present (window);
+}
+
+static void on_open_uris (WakitApplication* app, GFile** files, gint n_files, const gchar* hint)
+{
+
+  for (gint i = 0; i < n_files; ++i)
+    on_open_uri (app, files [i], hint);
 }

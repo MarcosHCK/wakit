@@ -39,6 +39,12 @@ namespace Wakit.Browser
           attach (_web_view, 0, 0);
         }
 
+      public void open_uri (GLib.File file, string hint)
+        {
+
+          _web_view.load_uri (file.get_uri ());
+        }
+
       private void on_web_process_terminated (WebKit.WebView webview, WebKit.WebProcessTerminationReason reason)
         {
 
