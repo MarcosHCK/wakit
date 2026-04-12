@@ -39,6 +39,8 @@ namespace Wakit
       public override void constructed ()
         {
 
+          base.constructed ();
+
           constructed_static (this);
         }      
 

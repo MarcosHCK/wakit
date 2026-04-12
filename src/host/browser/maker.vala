@@ -46,6 +46,8 @@ namespace Wakit.Browser
       public override void constructed ()
         {
 
+          base.constructed ();
+
           _context = (WebKit.WebContext) GLib.Object.new (typeof (WebKit.WebContext),
             null);
 

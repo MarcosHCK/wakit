@@ -47,6 +47,8 @@ namespace Wakit.AppBus
       public override void constructed ()
         {
 
+          base.constructed ();
+
           _postables = new PostableCollection ();
           _object_path = build_path (_bus_name);
         }

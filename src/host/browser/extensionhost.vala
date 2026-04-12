@@ -34,6 +34,7 @@ namespace Wakit.Browser
       public override void constructed ()
         {
 
+          base.constructed ();
           _context.initialize_web_process_extensions.connect (on_initialize_web_process_extensions);
         }
 

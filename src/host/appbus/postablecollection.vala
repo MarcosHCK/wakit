@@ -45,6 +45,8 @@ namespace Wakit.AppBus
       public override void constructed ()
         {
 
+          base.constructed ();
+
           unowned bool clear = false;
           unowned bool zero_terminated = false;
 

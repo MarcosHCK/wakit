@@ -31,6 +31,8 @@ namespace Wakit.Browser
       public override void constructed ()
         {
 
+          base.constructed ();
+
           _web_view.hexpand = true;
           _web_view.vexpand = true;
 
