@@ -26,6 +26,7 @@ int main (int argc, char* argv [])
 {
 
   GApplication* app;
+  WakitIExtensionHost* extension_host;
   int ret;
 
   app = g_object_new (WAKIT_TYPE_APPLICATION, "application-id", "org.hck.wakit.example",
@@ -34,6 +35,10 @@ int main (int argc, char* argv [])
 
   g_signal_connect (app, "activate", G_CALLBACK (on_activate), NULL);
   g_signal_connect (app, "open-uris", G_CALLBACK (on_open_uris), NULL);
+
+  extension_host = wakit_application_get_extension_host ((WakitApplication*) app);
+
+  wakit_iextension_host_set_extension_dir (extension_host, "src/extension/");
 
   ret = g_application_run (G_APPLICATION (app), argc, argv);
 
