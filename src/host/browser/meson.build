@@ -25,7 +25,7 @@ foreach lib: [ 'maker' ]
   __host_browser_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'maker', 'widget' ]
+foreach lib: [ 'extensionhost', 'maker', 'widget' ]
 
   __host_browser_src += [ '@0@.vala'.format (lib) ]
 endforeach

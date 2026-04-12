@@ -23,7 +23,7 @@ foreach lib: [ ]
   __host_interfaces_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'browser', 'postable', 'webview' ]
+foreach lib: [ 'browser', 'extensionhost', 'postable', 'webview' ]
 
   __host_interfaces_src += [ '@0@.vala'.format (lib) ]
 endforeach

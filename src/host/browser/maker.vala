@@ -22,20 +22,26 @@ namespace Wakit.Browser
     {
 
       public string? application_id { private get; construct; default = null; }
-      public string application_version { private get; construct; default = Config.PACKAGE_VERSION; }
+      public string? application_version { private get; construct; default = null; }
       public WebKit.WebContext context { get; private set; }
       public WebKit.Settings settings { get; private set; }
       public WebKit.UserContentManager user_content_manager { get; private set; }
 
       private string application_name { owned get
         {
+
           var name = "Wakit";
           var appid = (string?) null;
 
           if (null != (appid = application_id))
-            name += @": $appid";
+            name = @"$appid $name";
         return name;
         }}
+
+      public Maker (string application_id, string? application_version = null)
+        {
+          Object (application_id: application_id, application_version: application_version);
+        }
 
       public override void constructed ()
         {
