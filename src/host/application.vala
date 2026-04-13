@@ -32,13 +32,6 @@ namespace Wakit
       public IExtensionHost extension_host { get { return _browser_extension_host; } }
       public bool ready { get; private set; default = false; }
 
-      class construct
-        {
-
-          if (null == (void*) Wakit.Gui.get_resource ())
-            error ("WTF?");
-        }
-
       public override void constructed ()
         {
 

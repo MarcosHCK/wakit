@@ -27,9 +27,6 @@ subdir ('process')
 subdir ('appbus')
 subdir ('browser')
 
-# level 3
-subdir ('gui')
-
 __host_src = [ ]
 
 foreach bit: []
@@ -46,7 +43,6 @@ endforeach
 __host_deps = [ __common_dep,
                 __host_appbus_dep.as_link_whole (),
                 __host_browser_dep.as_link_whole (),
-                __host_gui_dep.as_link_whole (),
                 __host_interfaces_dep.as_link_whole (),
                 __host_process_dep.as_link_whole () ]
 
