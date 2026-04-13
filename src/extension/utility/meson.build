@@ -15,32 +15,31 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__extension_binding_src = [ ]
+__extension_utility_src = [ ]
 
-foreach bit: [ ]
+foreach bit: [ 'promise' ]
 
-  __extension_binding_src += [ '@0@.cc'.format (bit) ]
-  __extension_binding_src += [ '@0@.h'.format (bit) ]
+  __extension_utility_src += [ '@0@.cc'.format (bit) ]
+  __extension_utility_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'binding' ]
+foreach bit: [ 'promise' ]
 
-  __extension_binding_src += [ '@0@.vala'.format (bit) ]
+  __extension_utility_src += [ '@0@.vala'.format (bit) ]
 endforeach
 
-__extension_binding_deps = [ __common_dep,
-                             __extension_utility_dep, ]
+__extension_utility_deps = [ __common_dep ]
 
-__extension_binding_lib = static_library ('wakit-extension-binding',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Extension.Binding"', '-DG_LOG_USE_STRUCTURED=1',
+__extension_utility_lib = static_library ('wakit-extension-utility',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Extension.Utility"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Extension.Binding"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Extension.Utility"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_vala_dep, webkitext_dep, __extension_binding_deps ],
-  sources: __extension_binding_src,
+  dependencies: [ config_vala_dep, webkitext_dep, __extension_utility_deps ],
+  sources: __extension_utility_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__extension_binding_dep = declare_dependency (dependencies: [ config_dep, webkitext_dep ],
-  link_with: __extension_binding_lib)
+__extension_utility_dep = declare_dependency (dependencies: [ config_dep, webkitext_dep ],
+  link_with: __extension_utility_lib)

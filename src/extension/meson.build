@@ -18,6 +18,10 @@
 gmodule_dep = dependency ('gmodule-2.0', required: true)
 webkitext_dep = dependency ('webkitgtk-web-process-extension-6.0', required: true)
 
+# level 0
+subdir ('utility')
+
+# level 1
 subdir ('binding')
 subdir ('bindings')
 
@@ -36,7 +40,8 @@ endforeach
 
 __extension_deps = [ __common_dep,
                      __extension_binding_dep.as_link_whole (),
-                     __extension_bindings_dep.as_link_whole (), ]
+                     __extension_bindings_dep.as_link_whole (),
+                     __extension_utility_dep.as_link_whole (), ]
 
 __extension_lib = library ('wakit-extension',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Extension"', '-DG_LOG_USE_STRUCTURED=1',
