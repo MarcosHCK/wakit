@@ -51,6 +51,10 @@ namespace Wakit.Browser
           _context = (WebKit.WebContext) GLib.Object.new (typeof (WebKit.WebContext),
             null);
 
+          _context.set_automation_allowed (false);
+          _context.set_cache_model (WebKit.CacheModel.DOCUMENT_BROWSER);
+          _context.set_spell_checking_enabled (false);
+
           _settings = (WebKit.Settings) GLib.Object.new (typeof (WebKit.Settings),
             "allow-file-access-from-file-urls", false,
             "allow-modal-dialogs", false,
@@ -59,10 +63,23 @@ namespace Wakit.Browser
             "default-charset", "UTF-8",
             "enable-back-forward-navigation-gestures", false,
             "enable-developer-extras", Config.DEVELOP,
+            "enable_dns_prefetching", false,
             "enable-fullscreen", false,
+            "enable-html5-database", false,
+            "enable-html5-local-storage", false,
+            "enable-media-capabilities", false,
+            "enable-media-stream", false,
+            "enable-media", false,
+            "enable-mediasource", false,
+            "enable-mock-capture-devices", false,
             "enable-page-cache", false,
             "enable-site-specific-quirks", false,
+            "enable-webaudio", false,
+            "enable-webgl", false,
+            "enable-webrtc", false,
             "enable-write-console-messages-to-stdout", Config.DEBUG,
+            "hardware-acceleration-policy", WebKit.HardwareAccelerationPolicy.NEVER,
+            "javascript_can_access_clipboard", false,
             "javascript-can-open-windows-automatically", false,
             null);
 
@@ -70,10 +87,6 @@ namespace Wakit.Browser
 
           _user_content_manager = (WebKit.UserContentManager) GLib.Object.new (typeof (WebKit.UserContentManager),
             null);
-
-          // var _security = (WebKit.SecurityManager) _context.get_security_manager ();
-
-          _context.set_cache_model (WebKit.CacheModel.DOCUMENT_BROWSER);
         }
 
       public Wakit.IWebView make_viewer ()
