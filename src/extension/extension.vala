@@ -81,9 +81,13 @@ namespace Wakit
       [CCode (cname = "wakit_web_extension_signals[WAKIT_WEB_EXTENSION_REGISTRATION_SIGNAL]")]
       extern const uint registration_sid;
 
+      [HasEmitter]
       [Signal (run = "last")]
       public virtual signal void registration (JSC.Context context, WebKit.WebPage web_page, WebKit.Frame frame)
         {
+
+          Binding.Error.register (context);
+          context.set_value ("test", new Binding.Error.literal (IOError.quark (), IOError.BUSY, "just kidding").to_value (context));
 
           if (! GLib.Signal.has_handler_pending (this, registration_sid, 0, true)
              && registration_actv == registration_real)
