@@ -61,7 +61,7 @@ __host_lib = library ('wakit-host',
   sources: __host_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __common_dep ],
+__host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __common_dep, __host_interfaces_dep ],
   link_with: __host_lib)
 
 meson.override_dependency ('wakit-host', __host_dep)

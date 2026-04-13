@@ -18,14 +18,15 @@
 namespace Wakit.AppBus
 {
 
-  public class Bus: GLib.Object
+  public class Bus: GLib.Object, IAppBus
     {
 
       public string bus_name { get; construct; }
-      public PostableCollection postables { get; private set; }
+      public ICollection<IPostable> postables { get { return _postables; } }
 
       private string _object_path;
       private uint _own_id;
+      private PostableCollection _postables;
 
       public Bus (string bus_name)
         {
@@ -60,14 +61,14 @@ namespace Wakit.AppBus
           unowned var flags = flag1;
 
           _own_id = yield own_name_async (connection, _bus_name, flags, cancellable);
-          postables.post (connection, _object_path);
+          _postables.post (connection, _object_path);
         return true;
         }
 
       public void reap_on_connection (GLib.DBusConnection connection)
         {
 
-          postables.unpost (connection, _object_path);
+          _postables.unpost (connection, _object_path);
           GLib.Bus.unown_name (_own_id);
         }
     }

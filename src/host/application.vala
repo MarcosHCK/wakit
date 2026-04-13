@@ -27,7 +27,7 @@ namespace Wakit
       private Browser.Maker _browser_maker;
       private GLib.Queue<DeferredUrl?> _deferred_open;
 
-      public AppBus.Bus appbus { get { return _appbus_bus; } }
+      public IAppBus appbus { get { return _appbus_bus; } }
       public IBrowser browser { get { return _browser_maker; } }
       public IExtensionHost extension_host { get { return _browser_extension_host; } }
       public bool ready { get; private set; default = false; }

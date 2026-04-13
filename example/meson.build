@@ -20,7 +20,7 @@ __example_bin = executable ('wakit-example',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_dep, __host_dep ],
-  sources: 'application.c')
+  sources: 'application.vala')
 
 __example_cfg = configuration_data ()
 

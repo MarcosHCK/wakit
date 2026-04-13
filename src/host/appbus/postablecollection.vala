@@ -18,7 +18,7 @@
 namespace Wakit.AppBus
 {
 
-  public class PostableCollection: GLib.Object
+  public class PostableCollection: GLib.Object, ICollection<IPostable>
     {
 
       struct Entry
@@ -36,7 +36,7 @@ namespace Wakit.AppBus
 
       private GLib.Array<Entry> _ar;
 
-      public void add (IPostable postable)
+      public void add (owned IPostable postable)
         {
 
           _ar.append_val (Entry (postable));
@@ -53,9 +53,17 @@ namespace Wakit.AppBus
           _ar = new Array<Entry> (zero_terminated, clear);
         }
 
-      public bool del (IPostable postable, out uint post_id = null)
+      public void del (IPostable postable)
         {
 
+          uint post_id;
+
+          if (try_del (postable, out post_id) && 0 != post_id)
+            warning ("removing a posted object from the collection");
+        }
+
+      public bool try_del (IPostable postable, out uint post_id = null)
+        {
           return del_impl (_ar, postable, out post_id);
         }
 
