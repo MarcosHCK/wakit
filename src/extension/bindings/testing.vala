@@ -34,13 +34,14 @@ namespace Wakit.Binding
           unowned Class klass = IBinding<Testing>.register (context, "Testing");
 
           klass.add_default_ctor (typeof (Testing));
-          klass.add_method_va ("test_promise", (c, a) => ((Testing) c).test_promise (a));
-          klass.add_method_va ("test_simple_promise", (c, a) => ((Testing) c).test_simple_promise (a));
-          klass.add_method_va ("test_throw", (c, a) => ((Testing) c).test_throw (a));
-          klass.add_method_va ("test_throw_promise", (c, a) => ((Testing) c).test_throw_promise (a));
 
           IAttributable<Testing>.add_property (klass, "property1");
           IAttributable<Testing>.add_property (klass, "property2", "property2_with_alias");
+
+          IInvocable<Testing>.add_method (klass, "test_promise", (s, a) => s.test_promise (a));
+          IInvocable<Testing>.add_method (klass, "test_simple_promise", (s, a) => s.test_simple_promise (a));
+          IInvocable<Testing>.add_method (klass, "test_throw", (s, a) => s.test_throw (a));
+          IInvocable<Testing>.add_method (klass, "test_throw_promise", (s, a) => s.test_throw_promise (a));
 
         return klass;
         }

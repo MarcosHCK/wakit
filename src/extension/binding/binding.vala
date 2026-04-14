@@ -78,12 +78,6 @@ namespace Wakit.Binding
               return add_ctor (default_ctor_build (g_type), namespace_);
             }
 
-          public void add_method_va (string name, owned JSC.ClassMethodCb callback, GLib.Type return_type = typeof (JSC.Value))
-            {
-
-              _jsc_class.add_method (name, (owned) callback, return_type);
-            }
-
           [CCode (cheader_filename = "extension/binding/binding.c", type = "GCallback")]
           extern static ConstructorCb default_ctor_build (GLib.Type g_type);
 
