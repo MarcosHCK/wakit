@@ -18,8 +18,15 @@
 namespace Wakit.Binding
 {
 
-  public class Testing: GLib.Object, IBinding<Testing>
+  public class Testing: GLib.Object, IBinding<Testing>, IAttributable<Testing>
     {
+
+      public new JSC.Value IAttributable.get_property (JSC.Context context, string property_name)
+        {
+
+          message (@"get property $property_name");
+          return new JSC.Value.string (context, property_name);
+        }
 
       public static unowned Class register (JSC.Context context)
         {
@@ -32,7 +39,16 @@ namespace Wakit.Binding
           klass.add_method_va ("test_throw", (c, a) => ((Testing) c).test_throw (a));
           klass.add_method_va ("test_throw_promise", (c, a) => ((Testing) c).test_throw_promise (a));
 
+          IAttributable<Testing>.add_property (klass, "property1");
+          IAttributable<Testing>.add_property (klass, "property2", "property2_with_alias");
+
         return klass;
+        }
+
+      public new void IAttributable.set_property (JSC.Context context, string property_name, JSC.Value value)
+        {
+
+          message (@"set property $property_name");
         }
 
       private JSC.Value test_promise (GenericArray<JSC.Value> args)

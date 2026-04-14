@@ -23,7 +23,7 @@ foreach bit: [ ]
   __extension_binding_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'binding' ]
+foreach bit: [ 'attributable', 'binding' ]
 
   __extension_binding_src += [ '@0@.vala'.format (bit) ]
 endforeach
