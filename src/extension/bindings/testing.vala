@@ -27,13 +27,15 @@ namespace Wakit.Binding
           unowned Class klass = IBinding<Testing>.register (context, "Testing");
 
           klass.add_default_ctor (typeof (Testing));
-          klass.add_method_va ("test", (c, a) => ((Testing) c).test (a));
-          klass.add_method_va ("test2", (c, a) => ((Testing) c).test2 (a));
+          klass.add_method_va ("test_promise", (c, a) => ((Testing) c).test_promise (a));
+          klass.add_method_va ("test_simple_promise", (c, a) => ((Testing) c).test_simple_promise (a));
+          klass.add_method_va ("test_throw", (c, a) => ((Testing) c).test_throw (a));
+          klass.add_method_va ("test_throw_promise", (c, a) => ((Testing) c).test_throw_promise (a));
 
         return klass;
         }
 
-      private JSC.Value test (GenericArray<JSC.Value> args)
+      private JSC.Value test_promise (GenericArray<JSC.Value> args)
         {
 
           unowned var context = JSC.Context.get_current ();
@@ -55,7 +57,7 @@ namespace Wakit.Binding
             });
         }
 
-      private JSC.Value test2 (GenericArray<JSC.Value> args)
+      private JSC.Value test_simple_promise (GenericArray<JSC.Value> args)
         {
 
           unowned var context = JSC.Context.get_current ();
@@ -73,6 +75,39 @@ namespace Wakit.Binding
               var source = new TimeoutSource (interval);
 
               source.set_callback (() => { resolve.function_callv ({ new JSC.Value.number (context2, GLib.Random.next_double ()) });
+                                                return GLib.Source.REMOVE; });
+              source.attach ();
+            });
+        }
+
+      private JSC.Value? test_throw (GenericArray<JSC.Value> args)
+        {
+
+          unowned var context = JSC.Context.get_current ();
+
+          Error.throw (context, new GLib.Error.literal (IOError.quark (), IOError.FAILED, "just testing"));
+        return null;
+        }
+
+      private JSC.Value test_throw_promise (GenericArray<JSC.Value> args)
+        {
+
+          unowned var context = JSC.Context.get_current ();
+
+          JSC.Value arg1 = null;
+          uint interval = 1000;
+
+          if (args.length > 0 && (arg1 = args [0]).is_number ())
+            interval = (uint) (arg1.to_double () * 1000.0f);
+
+          return Promise.simple (context, (resolve, reject) =>
+            {
+
+              var context2 = JSC.Context.get_current ();
+              var error = new GLib.Error.literal (IOError.quark (), IOError.FAILED, "just testing");
+              var source = new TimeoutSource (interval);
+
+              source.set_callback (() => { reject.function_callv ({ (new Error.take (error)).to_value (context2) });
                                                 return GLib.Source.REMOVE; });
               source.attach ();
             });

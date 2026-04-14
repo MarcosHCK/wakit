@@ -23,7 +23,7 @@ foreach bit: []
   __extension_bindings_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'error', 'testing' ]
+foreach bit: [ 'testing' ]
 
   __extension_bindings_src += [ '@0@.vala'.format (bit) ]
 endforeach

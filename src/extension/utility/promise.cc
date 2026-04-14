@@ -73,14 +73,14 @@ void wakit_promise_reject (WakitPromise* self, JSCValue* value)
   finish (self->_context, self->_reject, value);
 }
 
-extern "C" gpointer wakit_binding_error_new_take (GError* error);
-extern "C" JSCValue* wakit_binding_error_to_value (gpointer error);
+extern "C" gpointer wakit_error_new_take (GError* error);
+extern "C" JSCValue* wakit_error_to_value (gpointer error);
 
 static JSCValue* _gerror_to_jsc (GError* g_error)
 {
 
-  auto error = wakit_binding_error_new_take (g_error);
-  auto value = wakit_binding_error_to_value (error);
+  auto error = wakit_error_new_take (g_error);
+  auto value = wakit_error_to_value (error);
 return (g_object_unref (error), value);
 }
 

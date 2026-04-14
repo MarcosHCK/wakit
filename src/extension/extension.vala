@@ -86,7 +86,7 @@ namespace Wakit
       public virtual signal void registration (JSC.Context context, WebKit.WebPage web_page, WebKit.Frame frame)
         {
 
-          Binding.Error.register (context);
+          Error.register (context);
           Binding.Testing.register (context).export_global (context);
 
           if (! GLib.Signal.has_handler_pending (this, registration_sid, 0, true)

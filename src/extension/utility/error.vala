@@ -15,15 +15,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Binding
+namespace Wakit
 {
 
-  public class Error: GLib.Object, IBinding<Error>
+  public class Error: GLib.Object
     {
 
       public int code { get; construct; }
       public GLib.Quark domain { get; construct; }
       public string message { get; construct; }
+
+      [CCode (cheader_filename = "extension/utility/error.c")]
+      extern const GLib.Quark KLASS_QUARK;
 
       [PrintfFormat]
       public Error (GLib.Quark domain, int code, string fmt, ...)
@@ -72,28 +75,35 @@ namespace Wakit.Binding
           return new JSC.Value.string (context, value);
         }
 
-      public static unowned Class register (JSC.Context context)
+      public static void register (JSC.Context context)
         {
 
-          unowned Class klass = IBinding<Error>.register (context, "GError");
+          unowned GLib.DestroyNotify destroy_notify = GLib.Object.unref;
+          unowned JSC.Class? parent_class = null;
+          unowned JSC.ClassVTable? vtable = null;
 
-          klass.jsc_class.add_property ("__throw__", typeof (JSC.Value),
+          unowned JSC.Class klass = context.register_class ("GError", parent_class, vtable, destroy_notify);
+
+          klass.add_property ("__throw__", typeof (JSC.Value),
             () => make_thrower (JSC.Context.get_current ()), null);
 
-          klass.jsc_class.add_property ("code", typeof (JSC.Value), 
+          klass.add_property ("code", typeof (JSC.Value), 
             s => query_int (((Error) s)._code), null);
 
-          klass.jsc_class.add_property ("domain", typeof (JSC.Value),
+          klass.add_property ("domain", typeof (JSC.Value),
             s => query_string (((Error) s)._domain.to_string ()), null);
 
-          klass.jsc_class.add_property ("message", typeof (JSC.Value),
+          klass.add_property ("message", typeof (JSC.Value),
             s => query_string (((Error) s)._message.to_string ()), null);
 
-          klass.jsc_class.add_method ("toString",
+          klass.add_method ("toString",
             s => ((Error) s).to_string (), typeof (JSC.Value));
 
-        return klass;
+          _g_object_set_qdata (context, KLASS_QUARK, klass);
         }
+
+      [CCode (cheader_filename = "glib-object.h", cname = "g_object_set_qdata")]
+      extern static void _g_object_set_qdata (GLib.Object object, GLib.Quark quark, void* data);
 
       public static void @throw (JSC.Context context, owned GLib.Error error)
         {
@@ -112,7 +122,13 @@ namespace Wakit.Binding
       public JSC.Value to_value (JSC.Context context)
         {
 
-          return IBinding<Error>.to_value (context, this);
+          unowned JSC.Class jsc_class;
+
+          if (likely (null != (jsc_class = context.get_qdata<JSC.Class> (KLASS_QUARK))))
+
+            return new JSC.Value.object (context, @ref (), jsc_class);
+          else
+            error ("trying to query an unregistered type (JSCClass GError)");
         }
     }
 }

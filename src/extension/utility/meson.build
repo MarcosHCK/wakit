@@ -23,7 +23,7 @@ foreach bit: [ 'promise' ]
   __extension_utility_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'promise' ]
+foreach bit: [ 'error', 'promise' ]
 
   __extension_utility_src += [ '@0@.vala'.format (bit) ]
 endforeach
