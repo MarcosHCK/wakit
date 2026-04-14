@@ -34,7 +34,7 @@ namespace Wakit.Binding
         return result;
         }
 
-      public abstract JSC.Value get_property (JSC.Context context, string property_name) throws GLib.Error;
+      public abstract JSC.Value? get_property (JSC.Context context, string property_name) throws GLib.Error;
 
       JSC.Value? setter (string property_name, JSC.Value value)
         {
@@ -59,6 +59,26 @@ namespace Wakit.Binding
           klass.jsc_class.add_property (field_name, typeof (JSC.Value),
             (s) => ((IAttributable<T>) s).getter (property_name),
             (s, v) => ((IAttributable<T>) s).setter (property_name, (JSC.Value) v));
+        }
+
+      public static void add_property_no_getter (IBinding.Class klass, string field_name, string? property_name = null)
+        {
+
+          property_name = property_name ?? field_name;
+
+          klass.jsc_class.add_property (field_name, typeof (JSC.Value),
+            null,
+            (s, v) => ((IAttributable<T>) s).setter (property_name, (JSC.Value) v));
+        }
+
+      public static void add_property_no_setter (IBinding.Class klass, string field_name, string? property_name = null)
+        {
+
+          property_name = property_name ?? field_name;
+
+          klass.jsc_class.add_property (field_name, typeof (JSC.Value),
+            (s) => ((IAttributable<T>) s).getter (property_name),
+            null);
         }
     }
 }

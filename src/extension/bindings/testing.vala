@@ -18,10 +18,12 @@
 namespace Wakit.Binding
 {
 
-  public class Testing: GLib.Object, IBinding<Testing>, IAttributable<Testing>
+  public class Testing: GLib.Object, IBinding<Testing>, IAttributable<Testing>, ISignalable<Testing>
     {
 
-      public new JSC.Value IAttributable.get_property (JSC.Context context, string property_name)
+      public Hub signal_hub { get; protected set; default = new Hub (); }
+
+      public new JSC.Value? IAttributable.get_property (JSC.Context context, string property_name)
         {
 
           message (@"get property $property_name");
@@ -37,12 +39,17 @@ namespace Wakit.Binding
 
           IAttributable<Testing>.add_property (klass, "property1");
           IAttributable<Testing>.add_property (klass, "property2", "property2_with_alias");
+          IAttributable<Testing>.add_property_no_setter (klass, "property3", "property3_read_only");
 
           IInvocable<Testing>.add_method (klass, "test_promise", (s, a) => s.test_promise (a));
           IInvocable<Testing>.add_method (klass, "test_simple_promise", (s, a) => s.test_simple_promise (a));
           IInvocable<Testing>.add_method (klass, "test_throw", (s, a) => s.test_throw (a));
           IInvocable<Testing>.add_method (klass, "test_throw_promise", (s, a) => s.test_throw_promise (a));
+          IInvocable<Testing>.add_method (klass, "test_post_signal", (s, a) => s.test_post_signal (a));
 
+          ISignalable<Testing>.prepare (klass, context);
+
+          ISignalable<Testing>.add_signal (klass, "signal1", "signal1");
         return klass;
         }
 
@@ -52,7 +59,42 @@ namespace Wakit.Binding
           message (@"set property $property_name");
         }
 
-      private JSC.Value test_promise (GenericArray<JSC.Value> args)
+      private GenericArray<JSC.Value> _slice_ar (GenericArray<JSC.Value> ar, int start = 0, int end = -1)
+          requires (start >= 0)
+          requires (-1 == end || end > start)
+        {
+
+          GenericArray<JSC.Value> result;
+
+          end = int.min (ar.length, int.max (end, ar.length));
+
+          if (start > ar.length)
+
+            result = new GenericArray<JSC.Value> (0);
+          else
+            {
+
+              result = new GenericArray<JSC.Value> (end - start);
+
+              for (uint i = start; i < ar.length; ++i)
+                result.add (ar [i]);
+            }
+        return result;
+        }
+
+      private JSC.Value? test_post_signal (GenericArray<JSC.Value> args)
+        {
+
+          if (args.length > 0 && args [0].is_string ())
+
+            emit (args [0].to_string (), _slice_ar (args, 1));
+          else
+            JSC.Context.get_current ().throw ("test_post_signal ()'s first argument should be an string");
+
+        return null;
+        }
+
+      private JSC.Value? test_promise (GenericArray<JSC.Value> args)
         {
 
           unowned var context = JSC.Context.get_current ();
@@ -74,7 +116,7 @@ namespace Wakit.Binding
             });
         }
 
-      private JSC.Value test_simple_promise (GenericArray<JSC.Value> args)
+      private JSC.Value? test_simple_promise (GenericArray<JSC.Value> args)
         {
 
           unowned var context = JSC.Context.get_current ();
@@ -106,7 +148,7 @@ namespace Wakit.Binding
         return null;
         }
 
-      private JSC.Value test_throw_promise (GenericArray<JSC.Value> args)
+      private JSC.Value? test_throw_promise (GenericArray<JSC.Value> args)
         {
 
           unowned var context = JSC.Context.get_current ();

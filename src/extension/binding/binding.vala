@@ -158,5 +158,20 @@ namespace Wakit.Binding
 
         return new JSC.Value.object (context, binding.ref (), jsc_class);
         }
+
+      public static unowned Class? try_class_for (JSC.Context context, GLib.Type g_type = typeof (T))
+        {
+
+          unowned Class? ibc_class;
+          unowned string? cdp_path;
+
+          if (unlikely (null == (cdp_path = (string?) g_type.get_qdata (TYPE_PATH_QUARK))))
+            return null;
+
+          if (unlikely (null == (ibc_class = context.get_data<Class?> (cdp_path))))
+            return null;
+
+        return ibc_class;
+        }
     }
 }
