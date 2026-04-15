@@ -15,7 +15,9 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__extension_utility_src = [ ]
+__extension_utility_src = [ 'marshalling.h',
+                            'marshallingpack.cc',
+                            'marshallingunpack.cc', ]
 
 foreach bit: [ 'promise' ]
 
@@ -23,7 +25,7 @@ foreach bit: [ 'promise' ]
   __extension_utility_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'error', 'promise' ]
+foreach bit: [ 'error', 'marshalling', 'promise' ]
 
   __extension_utility_src += [ '@0@.vala'.format (bit) ]
 endforeach
@@ -37,6 +39,7 @@ __extension_utility_lib = static_library ('wakit-extension-utility',
   cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Extension.Utility"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+  cpp_pch: 'pch/pch.h',
   dependencies: [ config_vala_dep, webkitext_dep, __extension_utility_deps ],
   sources: __extension_utility_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])

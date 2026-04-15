@@ -15,37 +15,28 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-basepath = meson.current_source_dir ()
-testpathroot = '/org/hck/wakit'
+jsc_dep = dependency ('javascriptcoregtk-6.0', required: true)
 
-glib_dep = dependency ('glib-2.0', required: true)
-
-__testing_src = [ 'bits.h' ]
+__testing_extension_src = [ ]
 
 foreach lib: [ 'testing' ]
 
-  __testing_src += [ '@0@.cc'.format (lib) ]
-  __testing_src += [ '@0@.h'.format (lib) ]
+  __testing_extension_src += [ '@0@.cc'.format (lib) ]
+  __testing_extension_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-__testing_lib = static_library ('testing',
-  c_args: [ '-DG_LOG_DOMAIN="Testing"', '-DG_LOG_USE_STRUCTURED=1',
+__testing_extension_lib = static_library ('testing-extension',
+  c_args: [ '-DG_LOG_DOMAIN="Testing.Extension"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Testing"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Testing.Extension"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_pch: 'pch/pch.h',
   build_by_default: false,
-  dependencies: [ config_dep, glib_dep ],
-  include_directories: include_directories ('.'),
-  sources: __testing_src)
+  dependencies: [ config_dep, glib_dep, jsc_dep ],
+  sources: __testing_extension_src)
 
-__testing_dep = declare_dependency (dependencies: [ config_dep, glib_dep ],
-  include_directories: include_directories ('.'),
-  link_with: __testing_lib)
+__testing_extension_dep = declare_dependency (dependencies: [ config_dep, glib_dep, jsc_dep ],
+  link_with: __testing_extension_lib)
 
-foreach bit: [ 'extension' ]
-
-  subdir (bit)
-endforeach
+subdir ('utility')
