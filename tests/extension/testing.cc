@@ -26,16 +26,6 @@ testing::JSCContainer::~JSCContainer ()
   _vm = (g_object_unref (_vm), nullptr);
 }
 
-static void error_handler (JSCContext* G_GNUC_UNUSED, JSCException* ex, gpointer user_data G_GNUC_UNUSED)
-{
-
-  auto cn = jsc_exception_get_column_number (ex);
-  auto ln = jsc_exception_get_line_number (ex);
-  auto ms = jsc_exception_get_message (ex);
-
-  g_printerr ("%u: %u: %s\n", ln, cn, ms);
-}
-
 static auto make_toString (JSCContext* context)
 {
 
@@ -56,11 +46,9 @@ return value;
 
 testing::JSCContainer::JSCContainer () noexcept:
   _vm (jsc_virtual_machine_new ()),
-  _ct (jsc_context_new_with_virtual_machine (_vm))
+  _ct (jsc_context_new_with_virtual_machine (_vm)),
+  _ts (make_toString (_ct))
 {
-
-  jsc_context_push_exception_handler (_ct, error_handler, this, NULL);
-  _ts = make_toString (_ct);
 }
 
 gchar* testing::JSCContainer::to_string (JSCValue* value) const noexcept

@@ -50,6 +50,18 @@ namespace Wakit
           Object (code: error.code, domain: error.domain, message: error.message);
         }
 
+      public new static unowned JSC.Class get_class (JSC.Context context)
+        {
+
+          unowned JSC.Class jsc_class;
+
+          if (likely (null != (jsc_class = context.get_qdata<JSC.Class> (KLASS_QUARK))))
+
+            return jsc_class;
+          else
+            return register (context);
+        }
+
       static JSC.Value make_thrower (JSC.Context context)
         {
 
@@ -75,7 +87,7 @@ namespace Wakit
           return new JSC.Value.string (context, value);
         }
 
-      public static void register (JSC.Context context)
+      public static unowned JSC.Class register (JSC.Context context)
         {
 
           unowned GLib.DestroyNotify destroy_notify = GLib.Object.unref;
@@ -100,6 +112,7 @@ namespace Wakit
             s => ((Error) s).to_string (), typeof (JSC.Value));
 
           _g_object_set_qdata (context, KLASS_QUARK, klass);
+        return klass;
         }
 
       [CCode (cheader_filename = "glib-object.h", cname = "g_object_set_qdata")]
@@ -122,13 +135,9 @@ namespace Wakit
       public JSC.Value to_value (JSC.Context context)
         {
 
-          unowned JSC.Class jsc_class;
+          unowned JSC.Class jsc_class = get_class (context);
 
-          if (likely (null != (jsc_class = context.get_qdata<JSC.Class> (KLASS_QUARK))))
-
-            return new JSC.Value.object (context, @ref (), jsc_class);
-          else
-            error ("trying to query an unregistered type (JSCClass GError)");
+        return new JSC.Value.object (context, @ref (), jsc_class);
         }
     }
 }

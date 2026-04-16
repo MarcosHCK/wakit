@@ -19,7 +19,7 @@ gio_dep = dependency ('gio-2.0', required: true)
 
 subdir ('appbus')
 
-__common_src = [ 'enum.cc', 'enum.h' ]
+__common_src = [ 'bits.h', 'enum.cc', 'enum.h' ]
 
 foreach lib: [ ]
 

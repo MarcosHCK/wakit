@@ -18,11 +18,29 @@
 #include <glib.h>
 #include <jsc/jsc.h>
 
+typedef enum _WakitMarshallingError
+{
+
+  WAKIT_MARSHALLING_ERROR_FAILED,
+  WAKIT_MARSHALLING_ERROR_ARG_COUNT_MISMATCH,
+  WAKIT_MARSHALLING_ERROR_ARRAY_EXPECTED,
+} WakitMarshallingError;
+
+typedef struct _WakitObjectSerializer WakitObjectSerializer;
+
+#define WAKIT_MARSHALLING_ERROR (wakit_marshalling_error_quark ())
+
 G_BEGIN_DECLS
 
+  GQuark wakit_marshalling_error_quark (void) G_GNUC_CONST;
+
   GPtrArray* wakit_marshalling_container_to_jsc_values (JSCContext* context, GVariant* variant);
-  GVariant* wakit_marshalling_jsc_value_to_variant (JSCContext* context, const GVariantType* type, JSCValue* value);
-  GVariant* wakit_marshalling_jsc_values_to_variant (JSCContext* context, const GVariantType* type, GPtrArray* values);
+  GVariant* wakit_marshalling_jsc_value_to_variant (JSCContext* context, const GVariantType* type, JSCValue* value, GError** error);
+  GVariant* wakit_marshalling_jsc_values_to_variant (JSCContext* context, const GVariantType* type, GPtrArray* values, GError** error);
   JSCValue* wakit_marshalling_variant_to_jsc_value (JSCContext* context, GVariant* variant);
+
+  GVariant* wakit_object_serializer_finish (WakitObjectSerializer* self);
+  JSCClass* wakit_object_serializer_get_class (JSCContext* context);
+  WakitObjectSerializer* wakit_object_serializer_new (const GVariantType* vtype);
 
 G_END_DECLS

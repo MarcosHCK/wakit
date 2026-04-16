@@ -25,7 +25,7 @@ foreach bit: [ 'promise' ]
   __extension_utility_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'error', 'marshalling', 'promise' ]
+foreach bit: [ 'error', 'marshalling', 'objectserializer', 'promise' ]
 
   __extension_utility_src += [ '@0@.vala'.format (bit) ]
 endforeach

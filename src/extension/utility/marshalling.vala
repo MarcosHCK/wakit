@@ -17,4 +17,15 @@
 
 namespace Wakit
 {
+
+  [CCode (cheader_filename = "extension/utility/marshalling.h")] namespace Marshalling
+    {
+
+      public extern static GenericArray<JSC.Value> container_to_jsc_values (JSC.Context context, GLib.Variant variant);
+      [CCode (returns_floating_reference = true)]
+      public extern static GLib.Variant jsc_value_to_variant (JSC.Context context, GLib.VariantType type, JSC.Value value) throws GLib.Error;
+      [CCode (returns_floating_reference = true)]
+      public extern static GLib.Variant jsc_values_to_variant (JSC.Context context, GLib.VariantType type, GenericArray<JSC.Value> values) throws GLib.Error;
+      public extern static JSC.Value variant_to_jsc_value (JSC.Context context, GLib.Variant variant);
+    }
 }
