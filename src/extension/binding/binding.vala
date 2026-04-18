@@ -175,7 +175,7 @@ namespace Wakit.Binding
       public static JSC.Value to_value_static (JSC.Context context, IBinding binding, GLib.Type g_type = typeof (T))
         {
 
-          unowned var ibc_class = get_class (context, g_type);
+          unowned var ibc_class = must_get_class (context, g_type);
           unowned var jsc_class = ibc_class.jsc_class;
 
         return new JSC.Value.object (context, binding.ref (), jsc_class);

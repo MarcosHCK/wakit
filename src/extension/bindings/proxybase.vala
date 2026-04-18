@@ -23,7 +23,6 @@ namespace Wakit.Binding
 
       public GLib.DBusProxy dbus_proxy { get; construct set; }
       public Hub signal_hub { get; protected set; default = new Hub (); }
-      public int timeout_msec { get; set; default = -1; }
 
       [CCode (cname = "((guint) sizeof (WakitBindingProxyBaseClass))")]
       internal extern const uint SIZEOF_KLASS;
@@ -58,48 +57,15 @@ namespace Wakit.Binding
           if (likely (null != (variant = dbus_proxy.get_cached_property (property_name))))
             return Marshalling.variant_to_jsc_value (context, variant);
 
-          if (GLib.DBusProxyFlags.DO_NOT_LOAD_PROPERTIES in dbus_proxy.g_flags)
-
-          get_property_async.begin (dbus_proxy, property_name, _timeout_msec, (o, res) =>
-            {
-
-              try
-                { get_property_async.end (res); }
-              catch (GLib.Error error)
-                { unowned uint code = error.code;
-                  unowned string domain = error.domain.to_string ();
-                  unowned string message = error.message.to_string ();
-                  critical ("can not read property: %s: %u: %s", domain, code, message); }
-            });
-
           throw new GLib.IOError.INVALID_DATA ("uncached property");
         }
 
-      static async void get_property_async (GLib.DBusProxy dbus_proxy, string property_name, int timeout_msec) throws GLib.Error
-        {
-
-          unowned GLib.DBusCallFlags flag1 = GLib.DBusCallFlags.ALLOW_INTERACTIVE_AUTHORIZATION;
-          unowned GLib.DBusCallFlags flag2 = GLib.DBusCallFlags.NO_AUTO_START;
-          unowned GLib.DBusCallFlags flags = flag1 | flag2;
-          unowned GLib.DBusInterfaceInfo info = dbus_proxy.get_info ();
-          unowned var method_name = "org.freedesktop.DBus.Properties.Get";
-
-          GLib.Variant v_interface_name = new GLib.Variant.string (info.name);
-          GLib.Variant v_property_name = new GLib.Variant.string (property_name);
-          GLib.Variant a_parameters [2] = { v_interface_name, v_property_name };
-
-          var parameters = new GLib.Variant.tuple (a_parameters);
-          var result = yield dbus_proxy.call (method_name, parameters, flags, timeout_msec);
-
-          dbus_proxy.set_cached_property (property_name, result.get_child_value (0));
-        }
-
-      static JSC.Value? invoke (DBusProxy dbus_proxy, string method_name, string signature, int timeout_msec, GenericArray<JSC.Value> a)
+      static JSC.Value? invoke (DBusProxy dbus_proxy, string method_name, string signature, GenericArray<JSC.Value> a)
         {
 
           return Promise.create (JSC.Context.get_current (), p =>
 
-            invoke_async.begin (p.context, dbus_proxy, method_name, signature, timeout_msec, a, (o, res) =>
+            invoke_async.begin (p.context, dbus_proxy, method_name, signature, a, (o, res) =>
               {
 
                 try
@@ -109,7 +75,7 @@ namespace Wakit.Binding
               }));
         }
 
-      static async JSC.Value? invoke_async (JSC.Context c, DBusProxy proxy, string method_name, string signature, int timeout_msec, GenericArray<JSC.Value> a) throws GLib.Error
+      static async JSC.Value? invoke_async (JSC.Context c, DBusProxy proxy, string method_name, string signature, GenericArray<JSC.Value> a) throws GLib.Error
         {
 
           unowned GLib.DBusCallFlags flag1 = GLib.DBusCallFlags.ALLOW_INTERACTIVE_AUTHORIZATION;
@@ -119,15 +85,15 @@ namespace Wakit.Binding
 
           var arguments = new JSC.Value.array_from_garray (c, a);
           var parameters = Marshalling.jsc_value_to_variant (c, type, arguments);
-          var result = yield proxy.call (method_name, parameters, flags, timeout_msec);
+          var result = yield proxy.call (method_name, parameters, flags, -1);
 
         return Marshalling.variant_to_jsc_value (c, result);
         }
 
-      public static unowned Class register (JSC.Context context, GLib.DBusInterfaceInfo dbus_info, string? name = null)
+      public static unowned Class register (JSC.Context context, GLib.DBusInterfaceInfo dbus_info, string? name = null, GLib.Type g_type = typeof (ProxyBase))
         {
 
-          unowned Class klass = IBinding<ProxyBase>.register (context, name ?? dbus_info.name);
+          unowned Class klass = IBinding<ProxyBase>.register (context, name ?? dbus_info.name, g_type);
 
           foreach (unowned var info in dbus_info.methods)
             {
@@ -136,7 +102,7 @@ namespace Wakit.Binding
               var signature = construct_signature (info.in_args);
 
               klass.jsc_class.add_method (info.name, (c, a) =>
-                invoke (((ProxyBase) c)._dbus_proxy, method_name, signature, ((ProxyBase) c)._timeout_msec, a),
+                invoke (((ProxyBase) c)._dbus_proxy, method_name, signature, a),
               typeof (JSC.Value));
             }
 
@@ -144,12 +110,13 @@ namespace Wakit.Binding
             {
 
               if (false == (GLib.DBusPropertyInfoFlags.READABLE in info.flags))
+                IAttributable<ProxyBase>.add_property_no_setter (klass, info.name, info.name);
+
+              else if (false == (GLib.DBusPropertyInfoFlags.WRITABLE in info.flags))
                 IAttributable<ProxyBase>.add_property_no_getter (klass, info.name, info.name);
 
-              if (false == (GLib.DBusPropertyInfoFlags.WRITABLE in info.flags))
-                IAttributable<ProxyBase>.add_property_no_getter (klass, info.name, info.name);
-
-              IAttributable<ProxyBase>.add_property (klass, info.name, info.name);
+              else
+                IAttributable<ProxyBase>.add_property (klass, info.name, info.name);
             }
 
           if (0 < dbus_info.signals.length)
@@ -178,31 +145,19 @@ namespace Wakit.Binding
           unowned var property_info = dbus_info.lookup_property (property_name);
           unowned var type = (GLib.VariantType) property_info.signature;
 
-          GLib.Variant variant = Marshalling.jsc_value_to_variant (context, type, value);
+          var variant = Marshalling.jsc_value_to_variant (context, type, value);
 
-          dbus_proxy.set_cached_property (property_name, variant);
-
-          set_property_async.begin (dbus_proxy, property_name, _timeout_msec, variant, (o, res) =>
-            {
-
-              try
-                { set_property_async.end (res); }
-              catch (GLib.Error error)
-                { unowned uint code = error.code;
-                  unowned string domain = error.domain.to_string ();
-                  unowned string message = error.message.to_string ();
-                  critical ("can not write property: %s: %u: %s", domain, code, message); }
-            });
+          set_property_async.begin (dbus_proxy, property_name, variant, set_property_complete);
         }
 
-      static async void set_property_async (GLib.DBusProxy dbus_proxy, string property_name, int timeout_msec, GLib.Variant value) throws GLib.Error
+      static async GLib.Variant set_property_async (GLib.DBusProxy dbus_proxy, string property_name, GLib.Variant value) throws GLib.Error
         {
 
           unowned GLib.DBusCallFlags flag1 = GLib.DBusCallFlags.ALLOW_INTERACTIVE_AUTHORIZATION;
           unowned GLib.DBusCallFlags flag2 = GLib.DBusCallFlags.NO_AUTO_START;
           unowned GLib.DBusCallFlags flags = flag1 | flag2;
           unowned GLib.DBusInterfaceInfo info = dbus_proxy.get_info ();
-          unowned var method_name = "org.freedesktop.DBus.Properties.Set";
+          unowned string method_name = "org.freedesktop.DBus.Properties.Set";
 
           GLib.Variant v_interface_name = new GLib.Variant.string (info.name);
           GLib.Variant v_property_name = new GLib.Variant.string (property_name);
@@ -211,7 +166,19 @@ namespace Wakit.Binding
 
           var parameters = new GLib.Variant.tuple (a_parameters);
 
-          yield dbus_proxy.call (method_name, parameters, flags, timeout_msec);
+        return yield dbus_proxy.call (method_name, parameters, flags, -1);
+        }
+
+      static void set_property_complete (GLib.Object? source_object, GLib.AsyncResult result)
+        {
+
+          try
+            { set_property_async.end (result); }
+          catch (GLib.Error error)
+            { unowned uint code = error.code;
+              unowned string domain = error.domain.to_string ();
+              unowned string message = error.message.to_string ();
+              critical ("can not write property: %s: %u: %s", domain, code, message); }
         }
     }
 }

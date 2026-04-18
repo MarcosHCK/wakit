@@ -23,7 +23,7 @@ foreach bit: [ ]
   __extension_bindings_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'bridge', 'bridgelane', 'bridgetypes', 'proxybase', 'testing' ]
+foreach bit: [ 'proxybase', 'proxybuilder', 'proxybuildertypes', 'testing' ]
 
   __extension_bindings_src += [ '@0@.vala'.format (bit) ]
 endforeach

@@ -18,37 +18,23 @@
 namespace Wakit.Binding
 {
 
-  internal sealed class BridgeTypes: GLib.Object
+  [Compact (opaque = true)]
+  internal class ProxyBuilderTypes: GLib.HashTable<string, GLib.Type>
     {
 
-      private GLib.HashTable<string, GLib.Type> _types;
-
-      public override void constructed ()
+      public ProxyBuilderTypes ()
         {
-
-          base.constructed ();
 
           unowned GLib.HashFunc<string> hash_func = GLib.str_hash;
           unowned GLib.EqualFunc<string> key_equal_func = GLib.str_equal;
 
-          _types = new GLib.HashTable<string, GLib.Type> (hash_func, key_equal_func);
+          base (hash_func, key_equal_func);
         }
 
       [CCode (cheader_filename = "glib.h", cname = "g_intern_string")]
       extern static unowned string _g_intern_string (string value);
 
-      public unowned GLib.Type lookup (string name)
-        {
-
-          unowned GLib.Type g_type;
-
-          if (! _types.lookup_extended (name, null, out g_type))
-            _types.insert (name, g_type = make_type (name));
-
-        return g_type;
-        }
-
-      private unowned GLib.Type make_type (string name)
+      public new GLib.Type add (JSC.Context context, GLib.DBusInterfaceInfo dbus_info, string name)
         {
 
           unowned GLib.Type derived_type;
@@ -57,23 +43,33 @@ namespace Wakit.Binding
           unowned GLib.Type parent_type = typeof (ProxyBase);
           string tmp_name;
 
-          tmp_name = ("WakitBindingBridgeType%s").printf (name);
+          tmp_name = ("WakitBindingProxyType%u").printf (length);
 
           derived_type = _g_type_register_static_simple (parent_type,
             _g_intern_string (tmp_name),
             ProxyBase.SIZEOF_KLASS,
-            (ClassInitFunc) make_type_class_init,
+            (ClassInitFunc) derived_type_class_init,
             ProxyBase.SIZEOF_INSTANCE,
-            (InstanceInitFunc) make_type_instance_init,
+            (InstanceInitFunc) derived_type_instance_init,
             flags);
+
+          ProxyBase.register (context, dbus_info, tmp_name, derived_type);
+          insert (name, derived_type);
+
         return derived_type;
         }
 
-      static void make_type_class_init (GLib.TypeClass klass, void* class_data)
+      public new bool lookup (string name, out GLib.Type type)
+        {
+
+          return base.lookup_extended (name, null, out type);
+        }
+
+      static void derived_type_class_init (GLib.TypeClass klass, void* class_data)
         {
         }
 
-      static void make_type_instance_init (GLib.TypeInstance instance, GLib.TypeClass klass)
+      static void derived_type_instance_init (GLib.TypeInstance instance, GLib.TypeClass klass)
         {
         }
 

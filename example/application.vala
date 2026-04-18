@@ -43,8 +43,6 @@ namespace Wakit.Example
           var app = new Application ();
 
           app.appbus.postables.add (new InterfaceImpl ());
-          app.extension_host.lanes.add (new ExtensionLane ("org.hck.wakit.Example.Interface", 
-                                                                  "/"));
           app.extension_host.extension_dir = "src/extension/";
 
         return app.run (argv);

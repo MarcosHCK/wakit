@@ -23,24 +23,5 @@ namespace Wakit
 
       public abstract GLib.Variant? extension_data { get; set; }
       public abstract string? extension_dir { get; set; }
-      public abstract ICollection<ExtensionLane> lanes { get; }
-    }
-
-  [Compact (opaque = true)] public class ExtensionLane
-    {
-
-      public string interface_name { get; private set; }
-      public string object_path { get; private set; }
-      public string? property_name { get; private set; }
-      public string? type_name { get; private set; }
-
-      public ExtensionLane (string interface_name, string object_path, string? property_name = null, string? type_name = null)
-        {
-
-          _interface_name = interface_name;
-          _object_path = object_path;
-          _property_name = property_name;
-          _type_name = type_name;
-        }
     }
 }
