@@ -34,7 +34,11 @@ namespace Wakit.Binding
         return result;
         }
 
-      public abstract JSC.Value? get_property (JSC.Context context, string property_name) throws GLib.Error;
+      public virtual JSC.Value? get_property (JSC.Context context, string property_name) throws GLib.Error
+        {
+
+          throw new GLib.IOError.FAILED ("unimplemented property getter");
+        }
 
       JSC.Value? setter (string property_name, JSC.Value value)
         {
@@ -49,7 +53,11 @@ namespace Wakit.Binding
         return result;
         }
 
-      public abstract void set_property (JSC.Context context, string property_name, JSC.Value value) throws GLib.Error;
+      public virtual void set_property (JSC.Context context, string property_name, JSC.Value value) throws GLib.Error
+        {
+
+          throw new GLib.IOError.FAILED ("unimplemented property setter");
+        }
 
       public static void add_property (IBinding.Class klass, string field_name, string? property_name = null)
         {

@@ -18,11 +18,19 @@
 namespace Wakit
 {
 
+  /**
+   * Keep well-known name in sync with host/application.vala
+   * - note: the constant named BUS_NAME on the Application class
+   */
+
   public class WebExtension: GLib.Object, GLib.Initable
     {
 
       private string _bus_address;
       private string _eid;
+      private GenericArray<Binding.BridgeLane> _lanes;
+
+      const string BUS_NAME = "org.hck.wakit.AppBus";
 
       public GLib.DBusConnection appbus { get; }
       public GLib.Variant? extension_data { get; }
@@ -39,7 +47,24 @@ namespace Wakit
         {
 
           base.constructed ();
-          _parameters.get ("(smsm*)", &_eid, &_bus_address, &_extension_data);
+
+          GLib.VariantIter iter;
+          _parameters.get ("(smsa*m*)", out _eid, out _bus_address, out iter, out _extension_data);
+
+          _lanes = new GenericArray<Binding.BridgeLane> ((uint) iter.n_children ());
+
+          for (GLib.Variant item; null != (item = iter.next_value ());)
+            {
+
+              unowned string interface_name;
+              unowned string object_path;
+              unowned string? property_name = null;
+              unowned string? type_name = null;
+
+              item.get ("(&s&sm&sm&s)", out interface_name, out object_path, out property_name, out type_name);
+
+              _lanes.add (new Binding.BridgeLane (interface_name, object_path, property_name, type_name));
+            }
         }
 
       public extern static unowned Wakit.WebExtension get_default ();
@@ -85,6 +110,9 @@ namespace Wakit
       [Signal (run = "last")]
       public virtual signal void registration (JSC.Context context, WebKit.WebPage web_page, WebKit.Frame frame)
         {
+
+          Binding.Bridge.register (context, _lanes.data);
+          context.set_value ("bridge", (new Binding.Bridge (_appbus, BUS_NAME)).to_value (context));
 
           Binding.Testing.register (context).export_global (context);
 

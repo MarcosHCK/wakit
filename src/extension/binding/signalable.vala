@@ -132,7 +132,7 @@ namespace Wakit.Binding
               unowned GLib.Type g_type = typeof (Getter);
               unowned Class? klass;
 
-              if (likely (null != (klass = try_class_for (context, g_type))))
+              if (likely (null != (klass = get_class (context, g_type))))
                 return;
 
               klass = IBinding<Getter>.register (context, "WakitSignalConnector");
@@ -167,7 +167,7 @@ namespace Wakit.Binding
               unowned JSC.Context context = JSC.Context.get_current ();
               unowned GLib.Type g_type = _G_TYPE_FROM_INSTANCE (c);
 
-              context.throw (@"$(class_for (context, g_type).name).disconnect expects a handler id");
+              context.throw (@"$(get_class (context, g_type).name).disconnect expects a handler id");
             }
         return null;
         }
@@ -182,7 +182,7 @@ namespace Wakit.Binding
         {
 
           var binding = new Getter (((ISignalable<T>) c).signal_hub, signal_name);
-          var value = IBinding<Getter>.to_value (JSC.Context.get_current (), binding);
+          var value = binding.to_value (JSC.Context.get_current ());
         return value;
         }
 

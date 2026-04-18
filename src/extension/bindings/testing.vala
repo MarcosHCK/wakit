@@ -23,7 +23,7 @@ namespace Wakit.Binding
 
       public Hub signal_hub { get; protected set; default = new Hub (); }
 
-      public new JSC.Value? IAttributable.get_property (JSC.Context context, string property_name)
+      public new override JSC.Value? IAttributable.get_property (JSC.Context context, string property_name)
         {
 
           message (@"get property $property_name");
@@ -53,7 +53,7 @@ namespace Wakit.Binding
         return klass;
         }
 
-      public new void IAttributable.set_property (JSC.Context context, string property_name, JSC.Value value)
+      public new override void IAttributable.set_property (JSC.Context context, string property_name, JSC.Value value)
         {
 
           message (@"set property $property_name");

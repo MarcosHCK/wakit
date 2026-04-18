@@ -24,7 +24,7 @@ namespace Wakit.Example
       public Application ()
         {
 
-          Object (application_id: "org.hck.Wakit.example",
+          Object (application_id: "org.hck.wakit.Example",
                            flags: GLib.ApplicationFlags.HANDLES_OPEN);
         }
 
@@ -42,6 +42,9 @@ namespace Wakit.Example
 
           var app = new Application ();
 
+          app.appbus.postables.add (new InterfaceImpl ());
+          app.extension_host.lanes.add (new ExtensionLane ("org.hck.wakit.Example.Interface", 
+                                                                  "/"));
           app.extension_host.extension_dir = "src/extension/";
 
         return app.run (argv);

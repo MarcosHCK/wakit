@@ -17,13 +17,13 @@
 
 __extension_bindings_src = [ ]
 
-foreach bit: []
+foreach bit: [ ]
 
-  __extension_bindings_src += [ '@0@.c'.format (bit) ]
+  __extension_bindings_src += [ '@0@.cc'.format (bit) ]
   __extension_bindings_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'testing' ]
+foreach bit: [ 'bridge', 'bridgelane', 'bridgetypes', 'proxybase', 'testing' ]
 
   __extension_bindings_src += [ '@0@.vala'.format (bit) ]
 endforeach

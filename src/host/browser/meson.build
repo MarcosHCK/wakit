@@ -19,13 +19,13 @@ webkit_dep = dependency ('webkitgtk-6.0', required: true)
 
 __host_browser_src = [ ]
 
-foreach lib: [ 'maker' ]
+foreach lib: [ 'lanecollection' ]
 
-  __host_browser_src += [ '@0@.c'.format (lib) ]
+  __host_browser_src += [ '@0@.cc'.format (lib) ]
   __host_browser_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'extensionhost', 'maker', 'widget' ]
+foreach lib: [ 'extensionhost', 'lanecollection', 'maker', 'widget' ]
 
   __host_browser_src += [ '@0@.vala'.format (lib) ]
 endforeach

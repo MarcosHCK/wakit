@@ -102,7 +102,22 @@ namespace Wakit.Binding
       [CCode (cheader_filename = "extension/binding/binding.c")]
       extern const GLib.Quark TYPE_PATH_QUARK;
 
-      public static unowned Class class_for (JSC.Context context, GLib.Type g_type = typeof (T))
+      public new static unowned Class? get_class (JSC.Context context, GLib.Type g_type = typeof (T))
+        {
+
+          unowned Class? ibc_class;
+          unowned string? cdp_path;
+
+          if (unlikely (null == (cdp_path = (string?) g_type.get_qdata (TYPE_PATH_QUARK))))
+            return null;
+
+          if (unlikely (null == (ibc_class = context.get_data<Class?> (cdp_path))))
+            return null;
+
+        return ibc_class;
+        }
+
+      public static unowned Class must_get_class (JSC.Context context, GLib.Type g_type = typeof (T))
         {
 
           unowned Class? ibc_class;
@@ -119,6 +134,7 @@ namespace Wakit.Binding
               unowned string name = (string?) g_type.get_qdata (TYPE_NAME_QUARK);
               error ("trying to query an unregistered type (JSCClass %s)", name);
             }
+
         return ibc_class;
         }
 
@@ -150,28 +166,19 @@ namespace Wakit.Binding
         return backup;
         }
 
-      public static JSC.Value to_value (JSC.Context context, IBinding binding, GLib.Type g_type = typeof (T))
+      public JSC.Value to_value (JSC.Context context)
         {
 
-          unowned var ibc_class = class_for (context, g_type);
+        return IBinding<T>.to_value_static (context, this, get_type ());
+        }
+
+      public static JSC.Value to_value_static (JSC.Context context, IBinding binding, GLib.Type g_type = typeof (T))
+        {
+
+          unowned var ibc_class = get_class (context, g_type);
           unowned var jsc_class = ibc_class.jsc_class;
 
         return new JSC.Value.object (context, binding.ref (), jsc_class);
-        }
-
-      public static unowned Class? try_class_for (JSC.Context context, GLib.Type g_type = typeof (T))
-        {
-
-          unowned Class? ibc_class;
-          unowned string? cdp_path;
-
-          if (unlikely (null == (cdp_path = (string?) g_type.get_qdata (TYPE_PATH_QUARK))))
-            return null;
-
-          if (unlikely (null == (ibc_class = context.get_data<Class?> (cdp_path))))
-            return null;
-
-        return ibc_class;
         }
     }
 }

@@ -15,12 +15,19 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
+__example_src = [ ]
+
+foreach bit: [ 'application', 'interface' ]
+
+  __example_src += [ '@0@.vala'.format (bit) ]
+endforeach
+
 __example_bin = executable ('wakit-example',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Example"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_dep, __host_dep ],
-  sources: 'application.vala')
+  sources: __example_src)
 
 __example_cfg = configuration_data ()
 

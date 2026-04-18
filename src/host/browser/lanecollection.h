@@ -15,3 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #pragma once
+#include <glib.h>
+#include <host/interfaces/wakit-host-interfaces.h>
+
+G_BEGIN_DECLS
+
+  G_GNUC_INTERNAL void wakit_browser_lane_collection_del_impl (GPtrArray* ar, WakitExtensionLane* lane, gboolean needs_sort);
+  G_GNUC_INTERNAL GVariant* wakit_browser_lane_collection_serialize_impl (GPtrArray* ar);
+
+G_END_DECLS
