@@ -17,7 +17,7 @@
 
 __extension_binding_src = [ ]
 
-foreach bit: [ ]
+foreach bit: [ 'signalable' ]
 
   __extension_binding_src += [ '@0@.cc'.format (bit) ]
   __extension_binding_src += [ '@0@.h'.format (bit) ]
@@ -38,6 +38,7 @@ __extension_binding_lib = static_library ('wakit-extension-binding',
   cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Extension.Binding"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+  cpp_pch: 'pch/pch.h',
   dependencies: [ config_vala_dep, webkitext_dep, __extension_binding_deps ],
   sources: __extension_binding_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])

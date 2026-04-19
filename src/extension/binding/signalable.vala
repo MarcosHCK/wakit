@@ -96,8 +96,20 @@ namespace Wakit.Binding
                 emit_group (handlers, @params);
             }
 
-          [CCode (cheader_filename = "extension/binding/signalable.c")]
+          [CCode (cheader_filename = "extension/binding/signalable.h")]
           extern static void emit_group (GLib.Tree<ulong, JSC.Value> handlers, GenericArray<JSC.Value> @params);
+
+          public void emit_vr (string name, GLib.Variant @params) requires (@params.check_format_string ("r", false))
+            {
+
+              unowned Handlers handlers;
+
+              if (likely (null != (handlers = signals.lookup (name))))
+                emit_vr_group (handlers, @params);
+            }
+
+          [CCode (cheader_filename = "extension/binding/signalable.h")]
+          extern static void emit_vr_group (GLib.Tree<ulong, JSC.Value> handlers, GLib.Variant @params);
         }
 
       private class Getter: GLib.Object, IBinding<Getter>
@@ -126,18 +138,26 @@ namespace Wakit.Binding
             return null;
             }
 
-          public static void register (JSC.Context context)
+          public static unowned Class register (JSC.Context context)
             {
 
-              unowned GLib.Type g_type = typeof (Getter);
-              unowned Class? klass;
-
-              if (likely (null != (klass = get_class (context, g_type))))
-                return;
-
-              klass = IBinding<Getter>.register (context, "WakitSignalConnector");
+              unowned Class klass = IBinding<Getter>.register (context, "Wakit.SignalConnector");
 
               klass.jsc_class.add_method ("connect", (JSC.ClassMethodCb) connect_, typeof (JSC.Value));
+
+            return klass;
+            }
+
+          public static unowned Class register_maybe (JSC.Context context)
+            {
+
+              unowned Class klass;
+
+              if (likely (null != (klass = IBinding<Getter>.get_class (context))))
+
+                return klass;
+              else
+                return register (context);
             }
         }
 
@@ -172,12 +192,6 @@ namespace Wakit.Binding
         return null;
         }
 
-      public void emit (string name, GenericArray<JSC.Value> @params)
-        {
-
-          signal_hub.emit (name, @params);
-        }
-
       static JSC.Value? getter (JSC.Class c, string signal_name)
         {
 
@@ -189,7 +203,7 @@ namespace Wakit.Binding
       public static void prepare (IBinding.Class klass, JSC.Context context)
         {
 
-          Getter.register (context);
+          Getter.register_maybe (context);
           klass.jsc_class.add_method ("disconnect", (JSC.ClassMethodCb) disconnect, typeof (JSC.Value));
         }
     }

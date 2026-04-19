@@ -14,21 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-#include <config.h>
+#pragma once
 #include <glib-object.h>
-#include <jsc/jsc.h>
+#include <extension/utility/marshalling.h>
 
-static __inline void wakit_binding_isignalable_hub_emit_group (GTree* handlers, GPtrArray* params);
-static __inline void wakit_binding_isignalable_hub_emit_single (gpointer key G_GNUC_UNUSED, JSCValue* value, GPtrArray* params);
+G_BEGIN_DECLS
 
-static __inline void wakit_binding_isignalable_hub_emit_group (GTree* handlers, GPtrArray* params)
-{
+  G_GNUC_INTERNAL void wakit_binding_isignalable_hub_emit_group (GTree* handlers, GPtrArray* params);
+  G_GNUC_INTERNAL void wakit_binding_isignalable_hub_emit_vr_group (GTree* handlers, GVariant* params);
 
-  g_tree_foreach (handlers, (GTraverseFunc) wakit_binding_isignalable_hub_emit_single, params);
-}
-
-static __inline void wakit_binding_isignalable_hub_emit_single (gpointer key G_GNUC_UNUSED, JSCValue* value, GPtrArray* params)
-{
-
-  g_object_unref (jsc_value_function_callv (value, params->len, (JSCValue**) params->pdata));
-}
+G_END_DECLS

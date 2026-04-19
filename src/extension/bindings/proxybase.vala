@@ -44,6 +44,14 @@ namespace Wakit.Binding
         return builder.free_and_steal ();
         }
 
+      public override void constructed ()
+        {
+
+          base.constructed ();
+          _dbus_proxy.g_properties_changed.connect (on_properties_changed);
+          _dbus_proxy.g_signal.connect (on_signal);
+        }
+
       public new override JSC.Value? get_property (JSC.Context context, string property_name) throws GLib.Error
         {
 
@@ -88,6 +96,16 @@ namespace Wakit.Binding
           var result = yield proxy.call (method_name, parameters, flags, -1);
 
         return Marshalling.variant_to_jsc_value (c, result);
+        }
+
+      private void on_properties_changed (GLib.Variant changed, string[] invalidated)
+        {
+        }
+
+      private void on_signal (string? sender_name, string signal_name, GLib.Variant parameters)
+        {
+
+          _signal_hub.emit_vr (signal_name, parameters);
         }
 
       public static unowned Class register (JSC.Context context, GLib.DBusInterfaceInfo dbus_info, string? name = null, GLib.Type g_type = typeof (ProxyBase))

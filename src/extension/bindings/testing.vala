@@ -87,7 +87,7 @@ namespace Wakit.Binding
 
           if (args.length > 0 && args [0].is_string ())
 
-            emit (args [0].to_string (), _slice_ar (args, 1));
+            _signal_hub.emit (args [0].to_string (), _slice_ar (args, 1));
           else
             JSC.Context.get_current ().throw ("test_post_signal ()'s first argument should be an string");
 

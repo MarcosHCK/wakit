@@ -29,6 +29,9 @@ namespace Wakit.Example
       [DBus (name = "AlwaysThrows")]
       public abstract string always_throws (string value) throws GLib.Error;
 
+      [DBus (name = "EmitSignal1")]
+      public abstract void emit_signal_1 (string value) throws GLib.Error;
+
       [DBus (name = "RandomNumbers")]
       public abstract uint[] random_numbers () throws GLib.Error;
 
@@ -37,6 +40,9 @@ namespace Wakit.Example
 
       [DBus (name = "RandomUUIDs")]
       public abstract string[] random_uuids () throws GLib.Error;
+
+      [DBus (name = "Signal1")]
+      public abstract signal void signal1 (string value);
 
       [DBus (name = "Store")]
       public abstract string store { owned get; set; }
@@ -59,6 +65,12 @@ namespace Wakit.Example
         {
 
           throw new GLib.IOError.FAILED ("got '%s'", value);
+        }
+
+      public void emit_signal_1 (string value) throws GLib.Error
+        {
+
+          signal1 (value);
         }
 
       [DBus (visible = false)]
