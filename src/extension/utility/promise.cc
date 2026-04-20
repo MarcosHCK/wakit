@@ -28,9 +28,9 @@ struct _ExecutorData
 struct _WakitPromise
 {
 
-	JSCContext* _context;
-	JSCValue* _reject;
-	JSCValue* _resolve;
+	JSCContext* context;
+	JSCValue* reject;
+	JSCValue* resolve;
 };
 
 static void create (JSCValue* resolve, JSCValue* reject, struct _ExecutorData* data)
@@ -70,17 +70,17 @@ void wakit_promise_reject (WakitPromise* self, JSCValue* value)
   g_return_if_fail (NULL != self);
   g_return_if_fail (NULL == value || JSC_IS_VALUE (value));
 
-  finish (self->_context, self->_reject, value);
+  finish (self->context, self->reject, value);
 }
 
 extern "C" gpointer wakit_error_new_take (GError* error);
-extern "C" JSCValue* wakit_error_to_value (gpointer error);
+extern "C" JSCValue* wakit_error_to_value (gpointer error, JSCContext* context);
 
-static JSCValue* _gerror_to_jsc (GError* g_error)
+static JSCValue* _gerror_to_jsc (JSCContext* context, GError* g_error)
 {
 
   auto error = wakit_error_new_take (g_error);
-  auto value = wakit_error_to_value (error);
+  auto value = wakit_error_to_value (error, context);
 return (g_object_unref (error), value);
 }
 
@@ -91,7 +91,7 @@ void wakit_promise_reject_gerror (WakitPromise* self, GError* error)
   g_return_if_fail (NULL != error);
   JSCValue* value;
 
-  finish (self->_context, self->_reject, value = _gerror_to_jsc (error));
+  finish (self->context, self->reject, value = _gerror_to_jsc (self->context, error));
 return g_object_unref (value);
 }
 
@@ -102,7 +102,7 @@ void wakit_promise_reject_literal (WakitPromise* self, const gchar* literal)
   g_return_if_fail (NULL != literal);
   JSCValue* value;
 
-  finish (self->_context, self->_reject, value = jsc_value_new_string (self->_context, literal));
+  finish (self->context, self->reject, value = jsc_value_new_string (self->context, literal));
 return g_object_unref (value);
 }
 
@@ -116,10 +116,10 @@ void wakit_promise_reject_printf (WakitPromise* self, const gchar* fmt, ...)
   va_start (l, fmt);
 
   auto message = g_strdup_vprintf (fmt, l);
-  auto value = jsc_value_new_string (self->_context, message);
+  auto value = jsc_value_new_string (self->context, message);
   g_free (message);
 
-  finish (self->_context, self->_reject, value);
+  finish (self->context, self->reject, value);
 
 return (va_end (l), g_object_unref (value));
 }
@@ -130,5 +130,5 @@ void wakit_promise_resolve (WakitPromise* self, JSCValue* value)
   g_return_if_fail (NULL != self);
   g_return_if_fail (NULL == value || JSC_IS_VALUE (value));
 
-  finish (self->_context, self->_resolve, value);
+  finish (self->context, self->resolve, value);
 }
