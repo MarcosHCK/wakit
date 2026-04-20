@@ -18,7 +18,7 @@
 namespace Wakit.Binding
 {
 
-  public class ProxyBase: GLib.Object, IBinding<ProxyBase>, IAttributable<ProxyBase>, ISignalable<ProxyBase>
+  public abstract class ProxyBase: GLib.Object, IBinding<ProxyBase>, IAttributable<ProxyBase>, ISignalable<ProxyBase>
     {
 
       public GLib.DBusProxy dbus_proxy { get; construct set; }
@@ -29,11 +29,6 @@ namespace Wakit.Binding
 
       [CCode (cname = "((guint) sizeof (WakitBindingProxyBase))")]
       internal extern const uint SIZEOF_INSTANCE;
-
-      public ProxyBase (GLib.DBusProxy dbus_proxy)
-        {
-          Object (dbus_proxy: dbus_proxy);
-        }
 
       static string construct_signature (GLib.DBusArgInfo[] args)
         {

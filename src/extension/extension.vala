@@ -54,8 +54,8 @@ namespace Wakit
       public bool init (GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
-          script_world = WebKit.ScriptWorld.get_default ();
-          script_world.window_object_cleared.connect (on_window_object_cleared);
+          _script_world = WebKit.ScriptWorld.get_default ();
+          _script_world.window_object_cleared.connect (on_window_object_cleared);
 
           unowned string address = _bus_address;
           unowned GLib.DBusConnectionFlags flag1 = GLib.DBusConnectionFlags.AUTHENTICATION_CLIENT;
@@ -71,12 +71,30 @@ namespace Wakit
                                                                    GLib.Variant? parameters,
                                                                    GLib.Type g_type);
 
+      [CCode (cheader_filename = "extension/extension.h")]
+      extern const string SETUP_JS;
+
+      [CCode (cheader_filename = "extension/extension.h")]
+      extern const uint SETUP_JS_LEN;
+
       private void on_window_object_cleared (WebKit.WebPage web_page, WebKit.Frame frame)
         {
 
-          var context = frame.get_js_context_for_script_world (script_world);
+          JSC.Context context = frame.get_js_context_for_script_world (_script_world);
 
           registration (context, web_page, frame);
+
+          Binding.ProxyBuilder.register (context);
+          Binding.ProxyLister.register (context);
+
+          var setup = context.evaluate (SETUP_JS, SETUP_JS_LEN);
+
+          var dbus_service = new Binding.DBusService (_appbus, BUS_NAME);
+          var proxyBuilder = (new Binding.ProxyBuilder (dbus_service)).to_value (context);
+          var proxyLister = (new Binding.ProxyLister (dbus_service)).to_value (context);
+          JSC.Value parameters [] = { proxyBuilder, proxyLister };
+
+          setup.function_callv (parameters);
         }
 
       [CCode (cname = "WAKIT_WEB_EXTENSION_GET_CLASS (self)->registration")]
@@ -92,13 +110,6 @@ namespace Wakit
       [Signal (run = "last")]
       public virtual signal void registration (JSC.Context context, WebKit.WebPage web_page, WebKit.Frame frame)
         {
-
-          var ns = new JSC.Value.object (context, null, null);
-
-          context.set_value ("Wakit", ns);
-
-          Binding.ProxyBuilder.register (context);
-          ns.object_set_property ("proxyBuilder", (new Binding.ProxyBuilder (_appbus, BUS_NAME)).to_value (context));
 
           Binding.Testing.register (context).export_global (context);
 

@@ -67,16 +67,6 @@ int main (int argc, char* argv[])
 
   g_test_init (&argc, &argv, NULL);
 
-  g_test_add_<JSCContainer> (TESTPATHROOT "/simple", [](const JSCContainer& container)
-    {
-
-      auto value = jsc_context_evaluate (container.get_context (),
-        "({ 'first': [ 1, 2 ], 'second': [ [], 2 ] })", -1);
-
-      g_variant_unref (marshal (container, G_VARIANT_TYPE ("a{s(ii)}"), value));
-      g_object_unref (value);
-    });
-
   g_test_add_<JSCContainer> (TESTPATHROOT "/basic", [](const JSCContainer& container)
     {
 
@@ -92,6 +82,16 @@ int main (int argc, char* argv[])
 
       g_variant_unref (variant);
       g_variant_unref (variant2);
+    });
+
+  g_test_add_<JSCContainer> (TESTPATHROOT "/object", [](const JSCContainer& container)
+    {
+
+      auto value = jsc_context_evaluate (container.get_context (),
+        "({ 'first': [ 1, 2 ], 'second': [ [], 2 ] })", -1);
+
+      g_variant_unref (marshal (container, G_VARIANT_TYPE ("a{s(ii)}"), value));
+      g_object_unref (value);
     });
 
   g_test_add_<JSCContainer> (TESTPATHROOT "/dict_entry_tuple_maybe_basic", [](const JSCContainer& container)

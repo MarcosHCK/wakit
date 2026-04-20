@@ -15,9 +15,31 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
+xxd_exe = find_program ('xxd', required: false)
+
+if not xxd_exe.found ()
+
+  python = import ('python')
+  python = python.find_installation ('python3')
+
+  xxd_gen = meson.current_source_dir () / 'xxd.py'
+  xxd_gen = generator (python, arguments: [ xxd_gen, '-i', '@EXTRA_ARGS@', '@INPUT@' ], capture: true, output: '@BASENAME@.hex.c')
+else
+
+  xxd_gen = generator (xxd_exe, arguments: [ '-i', '@EXTRA_ARGS@', '@INPUT@' ], capture: true, output: '@BASENAME@.hex.c')
+endif
+
 __extension_utility_src = [ 'marshalling.h',
                             'marshallingpack.cc',
                             'marshallingunpack.cc', ]
+
+foreach bit: [ 'objectserializer' ]
+
+  name = '@0@_js'.format (bit)
+  source = '@0@.js'.format (bit)
+
+  __extension_utility_src += xxd_gen.process (source, extra_args: [ '-n', name ])
+endforeach
 
 foreach bit: [ 'promise' ]
 

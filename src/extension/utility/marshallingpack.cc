@@ -175,18 +175,8 @@ static GVariant* _bytearray_pack (JSCContext* context, const GVariantType* vtype
 return (g_bytes_unref (bytes), variant);
 }
 
-static const char _dictionary_pack_js [] = "(object, serializer) =>"
-"\n" "{"
-"\n" "  try { for (const [ key, value ] of Object.entries (object))"
-"\n" "    {"
-"\n" "      serializer.open ()"
-"\n" "      serializer.add_key (key)"
-"\n" "      serializer.add_value (value)"
-"\n" "      serializer.close ()"
-"\n" "    }}"
-"\n" "  catch (error)"
-"\n" "    { return error }"
-"\n" "}";
+extern unsigned char objectserializer_js [];
+extern unsigned int objectserializer_js_len;
 
 static GVariant* _dictionary_pack (JSCContext* context, const GVariantType* vtype, JSCValue* object, GError** error)
 {
@@ -198,9 +188,7 @@ static GVariant* _dictionary_pack (JSCContext* context, const GVariantType* vtyp
   JSCValue* args [2] { object, serializer };
   GVariant* variant = nullptr;
 
-  auto size = G_N_ELEMENTS (_dictionary_pack_js) - 1;
-
-  auto func = jsc_context_evaluate_with_source_uri (context, _dictionary_pack_js, size,
+  auto func = jsc_context_evaluate_with_source_uri (context, (const char*) objectserializer_js, objectserializer_js_len,
     "code://marshalling/pack", 1);
 
   auto resv = jsc_value_function_callv (func, G_N_ELEMENTS (args), args);
