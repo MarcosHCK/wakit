@@ -34,23 +34,14 @@ namespace Wakit.AppBus
             }
         }
 
-      private GLib.Array<Entry> _ar;
+      private GLib.Array<Entry> _ar = new Array<Entry> (false, false);
+      private bool _touched = false;
 
       public void add (owned IPostable postable)
         {
 
           _ar.append_val (Entry (postable));
-        }
-
-      public override void constructed ()
-        {
-
-          base.constructed ();
-
-          unowned bool clear = false;
-          unowned bool zero_terminated = false;
-
-          _ar = new Array<Entry> (zero_terminated, clear);
+          _touched = true;
         }
 
       public void del (IPostable postable)
@@ -64,11 +55,16 @@ namespace Wakit.AppBus
 
       public bool try_del (IPostable postable, out uint post_id = null)
         {
-          return del_impl (_ar, postable, out post_id);
+
+          bool _result;
+
+          _result = del_impl (_ar, postable, _touched, out post_id);
+          _touched = false;
+        return _result;
         }
 
       [CCode (cheader_filename = "host/appbus/postablecollection.h")]
-      static extern bool del_impl (Array<Entry> ar, IPostable postable, out uint post_id);
+      static extern bool del_impl (Array<Entry> ar, IPostable postable, bool touched, out uint post_id);
 
       public bool post (GLib.DBusConnection connection, string object_path) throws GLib.Error
         {

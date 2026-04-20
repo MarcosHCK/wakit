@@ -21,6 +21,6 @@ typedef struct _WakitIPostable WakitIPostable;
 
 G_BEGIN_DECLS
 
-  G_GNUC_INTERNAL gboolean wakit_app_bus_postable_collection_del_impl (GArray* ar, WakitIPostable* postable, guint* out_post_id);
+  G_GNUC_INTERNAL gboolean wakit_app_bus_postable_collection_del_impl (GArray* ar, WakitIPostable* postable, gboolean touched, guint* out_post_id);
 
 G_END_DECLS

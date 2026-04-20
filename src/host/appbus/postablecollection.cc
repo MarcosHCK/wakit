@@ -33,13 +33,14 @@ static gint compare (struct _Entry* a, struct _Entry* b)
 return a_ > b_ ? 1 : (a_ == b_ ? 0 : -1);
 }
 
-gboolean wakit_app_bus_postable_collection_del_impl (GArray* ar, WakitIPostable* postable, guint* out_post_id)
+gboolean wakit_app_bus_postable_collection_del_impl (GArray* ar, WakitIPostable* postable, gboolean touched, guint* out_post_id)
 {
 
   gboolean found;
   struct _Entry target = { .post_id = 0, .postable = postable };
 
-  g_array_sort (ar, (GCompareFunc) compare);
+  if (touched)
+    g_array_sort (ar, (GCompareFunc) compare);
 
   if (guint index; ! (found = g_array_binary_search (ar, &target, (GCompareFunc) compare, &index)))
 
