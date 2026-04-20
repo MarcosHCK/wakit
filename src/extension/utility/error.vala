@@ -18,7 +18,7 @@
 namespace Wakit
 {
 
-  public class Error: GLib.Object
+  public sealed class Error: GLib.Object
     {
 
       public int code { get; construct; }
@@ -89,6 +89,8 @@ namespace Wakit
 
       public static unowned JSC.Class register (JSC.Context context)
         {
+
+          print ("register (%p)\n", (void*) context);
 
           unowned GLib.DestroyNotify destroy_notify = GLib.Object.unref;
           unowned JSC.Class? parent_class = null;

@@ -18,7 +18,7 @@
 namespace Wakit
 {
 
-  public class ObjectSerializer: GLib.Object
+  internal sealed class ObjectSerializer: GLib.Object
     {
 
       private unowned GLib.VariantType _dict_entry_type;
@@ -32,6 +32,16 @@ namespace Wakit
           _type = (GLib.VariantType) value.dup_string ();
         } }
 
+      class construct
+        {
+
+          if (null == (void*) ObjectSerializer.finish)
+            error ("WTF?");
+
+          if (null == (void*) ObjectSerializer.get_class)
+            error ("WTF?");
+        }
+
       public ObjectSerializer (GLib.VariantType variant_type)
         {
           Object (variant_type: variant_type);
@@ -39,7 +49,6 @@ namespace Wakit
 
       public override void constructed ()
         {
-
 
           _dict_entry_type = _type.element ();
 

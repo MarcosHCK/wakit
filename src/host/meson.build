@@ -46,6 +46,8 @@ __host_deps = [ __common_dep,
                 __host_interfaces_dep.as_link_whole (),
                 __host_process_dep.as_link_whole () ]
 
+__host_fwds = [ __host_interfaces_dep ]
+
 __host_lib = library ('wakit-host',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Host"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
@@ -57,7 +59,7 @@ __host_lib = library ('wakit-host',
   sources: __host_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __common_dep, __host_interfaces_dep ],
+__host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __common_dep, __host_fwds ],
   link_with: __host_lib)
 
 meson.override_dependency ('wakit-host', __host_dep)
