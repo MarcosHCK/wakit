@@ -18,29 +18,18 @@
 namespace Wakit.Browser
 {
 
-  public class Maker: GLib.Object, IBrowser
+  public class Browser: GLib.Object, IBrowser
     {
 
-      public string? application_id { private get; construct; default = null; }
-      public string? application_version { private get; construct; default = null; }
+      public Wakit.BrowserConfig config { construct; }
       public WebKit.WebContext context { get; private set; }
       public WebKit.Settings settings { get; private set; }
       public WebKit.UserContentManager user_content_manager { get; private set; }
 
-      private string application_name { owned get
+      public Browser (BrowserConfig config)
         {
 
-          var name = "Wakit";
-          var appid = (string?) null;
-
-          if (null != (appid = application_id))
-            name = @"$appid $name";
-        return name;
-        }}
-
-      public Maker (string application_id, string? application_version = null)
-        {
-          Object (application_id: application_id, application_version: application_version);
+          Object (config: config);
         }
 
       public override void constructed ()
@@ -53,7 +42,7 @@ namespace Wakit.Browser
 
           _context.set_automation_allowed (false);
           _context.set_cache_model (WebKit.CacheModel.DOCUMENT_BROWSER);
-          _context.set_spell_checking_enabled (false);
+          _context.set_spell_checking_enabled (_config.enable_spell_checking);
 
           _settings = (WebKit.Settings) GLib.Object.new (typeof (WebKit.Settings),
             "allow-file-access-from-file-urls", false,
@@ -63,33 +52,37 @@ namespace Wakit.Browser
             "default-charset", "UTF-8",
             "enable-back-forward-navigation-gestures", false,
             "enable-developer-extras", Config.DEVELOP,
-            "enable_dns_prefetching", false,
-            "enable-fullscreen", false,
+            "enable-dns-prefetching", _config.enable_dns_prefetching,
+            "enable-fullscreen", _config.enable_fullscreen,
             "enable-html5-database", false,
             "enable-html5-local-storage", false,
-            "enable-media-capabilities", false,
-            "enable-media-stream", false,
-            "enable-media", false,
-            "enable-mediasource", false,
+            "enable-media-capabilities", _config.enable_media_capabilities,
+            "enable-media-stream", _config.enable_media_stream,
+            "enable-media", _config.enable_media,
+            "enable-mediasource", _config.enable_mediasource,
             "enable-mock-capture-devices", false,
             "enable-page-cache", false,
             "enable-site-specific-quirks", false,
-            "enable-webaudio", false,
-            "enable-webgl", false,
-            "enable-webrtc", false,
+            "enable-webaudio", _config.enable_webaudio,
+            "enable-webgl", _config.enable_webgl,
+            "enable-webrtc", _config.enable_webrtc,
             "enable-write-console-messages-to-stdout", Config.DEBUG,
             "hardware-acceleration-policy", WebKit.HardwareAccelerationPolicy.NEVER,
-            "javascript_can_access_clipboard", false,
+            "javascript-can-access-clipboard", false,
             "javascript-can-open-windows-automatically", false,
             null);
 
-          _settings.set_user_agent_with_application_details (application_name, application_version);
+          var application_name = make_application_name (_config.application_id);
+
+          _settings.set_user_agent_with_application_details (application_name, _config.application_version);
 
           _user_content_manager = (WebKit.UserContentManager) GLib.Object.new (typeof (WebKit.UserContentManager),
             null);
+
+          _config = null;
         }
 
-      public Wakit.IWebView make_viewer ()
+      public Wakit.IWebView create_view ()
         {
 
           WebKit.WebView _viewer;
@@ -100,7 +93,19 @@ namespace Wakit.Browser
             "web-context", _context,
             null);
 
-        return new Browser.Widget (_viewer);
+        return new Wakit.Browser.Widget (_viewer);
+        }
+
+      static string make_application_name (string? application_id)
+        {
+
+          unowned string name = "Wakit";
+
+          if (null == application_id)
+
+            return name;
+          else
+            return @"$application_id $name";
         }
     }
 }

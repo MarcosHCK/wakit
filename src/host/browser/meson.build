@@ -15,6 +15,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
+json_dep = dependency ('json-glib-1.0', required: true)
 webkit_dep = dependency ('webkitgtk-6.0', required: true)
 
 __host_browser_src = [ ]
@@ -25,7 +26,7 @@ foreach lib: [ ]
   __host_browser_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'extensionhost', 'maker', 'widget' ]
+foreach lib: [ 'browser', 'extensionhost', 'widget' ]
 
   __host_browser_src += [ '@0@.vala'.format (lib) ]
 endforeach
@@ -40,7 +41,7 @@ __host_browser_lib = static_library ('wakit-host-browser',
   cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Browser"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_vala_dep, webkit_dep, __host_browser_deps ],
+  dependencies: [ config_vala_dep, json_dep, webkit_dep, __host_browser_deps ],
   sources: __host_browser_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 

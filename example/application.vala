@@ -52,7 +52,7 @@ namespace Wakit.Example
         {
 
           var window = new Gtk.ApplicationWindow (this);
-          var web_view = browser.make_viewer ();
+          var web_view = browser.create_view ();
 
           window.set_child (web_view);
           window.set_default_size (800, 600);

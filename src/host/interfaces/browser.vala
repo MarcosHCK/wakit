@@ -21,6 +21,6 @@ namespace Wakit
   public interface IBrowser: GLib.Object
     {
 
-      public abstract Wakit.IWebView make_viewer ();
+      public abstract Wakit.IWebView create_view ();
     }
 }

@@ -28,12 +28,13 @@ namespace Wakit
 
       private AppBus.Bus _appbus_bus;
       private AppBus.Watcher _appbus_watcher;
+      private Browser.Browser _browser_browser;
       private Browser.ExtensionHost _browser_extension_host;
-      private Browser.Maker _browser_maker;
       private GLib.Queue<DeferredUrl?> _deferred_open;
 
       public IAppBus appbus { get { return _appbus_bus; } }
-      public IBrowser browser { get { return _browser_maker; } }
+      public IBrowser browser { get { return _browser_browser; } }
+      public BrowserConfig? browser_config { construct; }
       public IExtensionHost extension_host { get { return _browser_extension_host; } }
       public bool ready { get; private set; default = false; }
 
@@ -49,8 +50,13 @@ namespace Wakit
 
           _appbus_watcher.crashed.connect (on_appbus_crashed);
 
-          _browser_maker = new Browser.Maker (application_id);
-          _browser_extension_host = new Browser.ExtensionHost (_browser_maker.context);
+          _browser_config = _browser_config ?? (BrowserConfig) GLib.Object.new (typeof (BrowserConfig),
+            "application-id", application_id,
+            null);
+
+          _browser_browser = new Browser.Browser (_browser_config);
+          _browser_config = null;
+          _browser_extension_host = new Browser.ExtensionHost (_browser_browser.context);
           _deferred_open = new GLib.Queue<DeferredUrl?> ();
           _ready = false;
         }
@@ -151,10 +157,10 @@ namespace Wakit
             {
 
             case "nonce-tcp": if (null != (opt = address.lookup_option ("noncefile")))
-              _browser_maker.context.add_path_to_sandbox (opt.value, true); break;
+              _browser_browser.context.add_path_to_sandbox (opt.value, true); break;
 
             case "unix": if (null != (opt = address.lookup_option ("path")))
-              _browser_maker.context.add_path_to_sandbox (opt.value, true); break;
+              _browser_browser.context.add_path_to_sandbox (opt.value, true); break;
             }
 
           _browser_extension_host.bus_address = _appbus_watcher.address;
