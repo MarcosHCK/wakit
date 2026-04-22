@@ -37,7 +37,7 @@ if true
 
   jscompiler_gen = meson.current_source_dir () / 'jscompiler.py'
   jscompiler_gen = generator (python, arguments: [ jscompiler_gen,
-                                                   '-b', meson.current_build_dir (),
+                                                   '-b', '@BUILD_DIR@',
                                                    '--esbuild', esbuild_exe.full_path (),
                                                    '--xxd', xxd_exe,
                                                    '@EXTRA_ARGS@', '@INPUT@', '@OUTPUT@' ],
@@ -51,7 +51,7 @@ __extension_utility_src = [ 'marshalling.h',
 foreach bit: [ 'objectserializer' ]
 
   name = '@0@_js'.format (bit)
-  source = '@0@.js'.format (bit)
+  source = '@0@.ts'.format (bit)
 
   __extension_utility_src += jscompiler_gen.process (source, extra_args: [ '-n', name ])
 endforeach

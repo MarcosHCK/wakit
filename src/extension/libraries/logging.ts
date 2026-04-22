@@ -15,14 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * @template T
- * @param {T} value
- * @param {(value: T) => boolean} checker
- * @param {string | ((value: T) => string) | undefined} message
- * @returns {T}
- */
-function assert (value, checker, message = undefined)
+export type CodeLoc = [string,[string,number,number]]
+export type Message<T> = string | ((value: T) => string) | undefined
+
+function assert<T> (value: T, checker: (value: T) => boolean = (value: T) => undefined !== value,
+                              message: Message<T> = undefined)
 {
 
   if (checker (value))
@@ -35,20 +32,11 @@ function assert (value, checker, message = undefined)
     throw new Error (message ?? 'precondition fails')
 }
 
-/**
- * @typedef {[string,[string,number,number]]} CodeLoc
- */
-
-/**
- * @param {ErrorConstructor} ctor
- * @returns {CodeLoc}
- */
-export const makeCodeloc = (ctor) => function (at = 1)
+export const makeCodeloc = (ctor: ErrorConstructor) => function (at = 1): CodeLoc
 {
 
   const error = ctor ();
-  /** @type {string} */
-  const stack = assert (error.stack, v => v !== undefined, 'missing stack field');
+  const stack = assert (error.stack, v => v !== undefined, 'missing stack field') !;
 
   const lines = assert (stack.split ('\n'), v => v.length > at, 'too few stack level')
   const level = lines [at]
@@ -61,14 +49,16 @@ export const makeCodeloc = (ctor) => function (at = 1)
 
   const dd_fragments = assert (at_fragments [1].split (':'), v => v.length >= 3, 'malformed stack level line')
 
-  /** @type {string} */
-  const file_uri = Array.from ({ length: dd_fragments.length - 2 }).reduce ((a, _, i) => (a == '' ? a : a + ':') + dd_fragments [i], '')
+  const file_uri = Array.from ({ length: dd_fragments.length - 2 }).reduce<string> ((a, _, i) => (a == '' ? a : a + ':') + dd_fragments [i], '')
 
   const column = assert (Number (dd_fragments [dd_fragments.length - 1]), v => !isNaN (v), 'malformed stack location bit')
   const line = assert (Number (dd_fragments [dd_fragments.length - 2]), v => !isNaN (v), 'malformed stack location bit')
 
 return [ func_name, [ file_uri, line, column ] ]
 }
+
+type CodeLocFunction = (at?: number) => CodeLoc
+type LogFunction = (domain: string, level: number, ...args: any) => void
 
 /**
  * @param {(level?: number) => CodeLoc} codeloc 
@@ -77,7 +67,7 @@ return [ func_name, [ file_uri, line, column ] ]
  * @param {string} priority 
  * @returns 
  */
-export const makeLogFunc = (codeloc, level, log, priority) => function (...args)
+export const makeLogFunc = (codeloc: CodeLocFunction, level: number, log: LogFunction, priority: string) => function (...args: unknown[])
 {
 
   const domain = 'Wakit.Javascript'

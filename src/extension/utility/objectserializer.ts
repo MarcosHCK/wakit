@@ -15,23 +15,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const makeBridge = async (proxyBuilder, proxyLister) =>
+export type Serializer =
+{
+  add_key: (key: string) => void,
+  add_value: (value: unknown) => void,
+  close: () => void,
+  open: () => void,
+}
+
+function perform (object: object, serializer: Serializer)
 {
 
-  const object_path = '/org/hck/wakit/AppBus'
-
-  /** @type {string[]} */
-  const interfaces = await proxyLister.list_path (object_path)
-  const typenames = interfaces.map (v => { let l = v.split ('.'); return l [l.length - 1] })
-  const types = Object.fromEntries (Array.from ({ length: interfaces.length }).map ((_, i) => ([ typenames[i], interfaces[i] ])))
-
-  /** @type {{ [typename: string]: object }} */
-  const proxies = { }
-
-  for (const [ typename, interface_name ] of Object.entries (types))
+  for (const [ key, value ] of Object.entries (object))
     {
-      proxies [typename] = await proxyBuilder.create (interface_name, object_path)
+      serializer.open ()
+      serializer.add_key (key)
+      serializer.add_value (value)
+      serializer.close ()
     }
+}
 
-  globalThis.bridge = proxies
+export function serialize (object: object, serializer: Serializer)
+{
+
+  try
+    { perform (object, serializer) }
+  catch (error)
+    { return error }
 }

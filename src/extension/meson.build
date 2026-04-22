@@ -37,7 +37,7 @@ endforeach
 foreach bit: [ 'extension' ]
 
   name = '@0@_js'.format (bit)
-  source = '@0@.js'.format (bit)
+  source = '@0@.ts'.format (bit)
 
   __extension_src += jscompiler_gen.process (source, extra_args: [ '-n', name ])
 endforeach
