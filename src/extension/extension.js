@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-async (proxyBuilder, proxyLister) =>
+export const makeBridge = async (proxyBuilder, proxyLister) =>
 {
 
   const object_path = '/org/hck/wakit/AppBus'

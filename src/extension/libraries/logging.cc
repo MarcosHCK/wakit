@@ -162,7 +162,7 @@ static JSCValue* make_codeloc (JSCContext* context, JSCValue* ctr)
 {
 
   auto error = jsc_context_get_value (context, "Error");
-  auto generator = jsc_value_object_get_property (ctr, "codeloc");
+  auto generator = jsc_value_object_get_property (ctr, "makeCodeloc");
 
   JSCValue* args [] = { error };
   JSCValue* result = jsc_value_function_callv (generator, G_N_ELEMENTS (args), args);
@@ -175,7 +175,7 @@ static JSCValue* make_log_func (JSCContext* context, JSCValue* log, JSCValue* co
 {
 
   auto level = jsc_value_new_number (context, flags);
-  auto generator = jsc_value_object_get_property (ctr, "log_func");
+  auto generator = jsc_value_object_get_property (ctr, "makeLogFunc");
 
   JSCValue* args [] = { g_object_ref (codeloc), level, g_object_ref (log),
                         jsc_value_new_string (context, log_level_to_priority (flags)) };

@@ -188,8 +188,11 @@ static GVariant* _dictionary_pack (JSCContext* context, const GVariantType* vtyp
   JSCValue* args [2] { object, serializer };
   GVariant* variant = nullptr;
 
-  auto func = jsc_context_evaluate_with_source_uri (context, (const char*) objectserializer_js, objectserializer_js_len,
+  auto module = jsc_context_evaluate_with_source_uri (context, (const char*) objectserializer_js, objectserializer_js_len,
     "code://marshalling/pack", 1);
+
+  auto func = jsc_value_object_get_property (module, "serialize");
+  g_object_unref (module);
 
   auto resv = jsc_value_function_callv (func, G_N_ELEMENTS (args), args);
   g_object_unref (func);

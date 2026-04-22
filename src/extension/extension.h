@@ -17,12 +17,12 @@
 #pragma once
 #include <glib.h>
 
-#define WAKIT_WEB_EXTENSION_SETUP_JS ((const gchar*) setup_js)
-#define WAKIT_WEB_EXTENSION_SETUP_JS_LEN ((gsize) setup_js_len)
+#define WAKIT_WEB_EXTENSION_JS_CODE ((const gchar*) extension_js)
+#define WAKIT_WEB_EXTENSION_JS_CODE_LEN ((gsize) extension_js_len)
 
 G_BEGIN_DECLS
 
-  extern unsigned char setup_js [];
-  extern unsigned int setup_js_len;
+  extern unsigned char extension_js [];
+  extern unsigned int extension_js_len;
 
 G_END_DECLS

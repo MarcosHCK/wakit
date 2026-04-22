@@ -34,12 +34,12 @@ foreach bit: []
   __extension_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'setup' ]
+foreach bit: [ 'extension' ]
 
   name = '@0@_js'.format (bit)
   source = '@0@.js'.format (bit)
 
-  __extension_src += xxd_gen.process (source, extra_args: [ '-n', name ])
+  __extension_src += jscompiler_gen.process (source, extra_args: [ '-n', name ])
 endforeach
 
 foreach bit: [ 'extension', 'module' ]

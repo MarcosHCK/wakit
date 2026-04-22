@@ -27,7 +27,7 @@ function perform (object, serializer)
     }
 }
 
-(object, serializer) =>
+export function serialize (object, serializer)
 {
   try
     { perform (object, serializer) }

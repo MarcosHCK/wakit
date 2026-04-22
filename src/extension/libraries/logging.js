@@ -39,13 +39,11 @@ function assert (value, checker, message = undefined)
  * @typedef {[string,[string,number,number]]} CodeLoc
  */
 
-({
-
 /**
  * @param {ErrorConstructor} ctor
  * @returns {CodeLoc}
  */
-'codeloc': (ctor) => function (at = 1)
+export const makeCodeloc = (ctor) => function (at = 1)
 {
 
   const error = ctor ();
@@ -70,7 +68,7 @@ function assert (value, checker, message = undefined)
   const line = assert (Number (dd_fragments [dd_fragments.length - 2]), v => !isNaN (v), 'malformed stack location bit')
 
 return [ func_name, [ file_uri, line, column ] ]
-},
+}
 
 /**
  * @param {(level?: number) => CodeLoc} codeloc 
@@ -79,7 +77,7 @@ return [ func_name, [ file_uri, line, column ] ]
  * @param {string} priority 
  * @returns 
  */
-'log_func': (codeloc, level, log, priority) => function (...args)
+export const makeLogFunc = (codeloc, level, log, priority) => function (...args)
 {
 
   const domain = 'Wakit.Javascript'
@@ -95,6 +93,4 @@ return [ func_name, [ file_uri, line, column ] ]
                    'MESSAGE', message, ]
 
 return log (domain, level, ...fields)
-},
-
-})
+}

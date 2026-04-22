@@ -72,10 +72,10 @@ namespace Wakit
                                                                    GLib.Type g_type);
 
       [CCode (cheader_filename = "extension/extension.h")]
-      extern const string SETUP_JS;
+      extern const string JS_CODE;
 
       [CCode (cheader_filename = "extension/extension.h")]
-      extern const uint SETUP_JS_LEN;
+      extern const uint JS_CODE_LEN;
 
       private void on_window_object_cleared (WebKit.WebPage web_page, WebKit.Frame frame)
         {
@@ -89,7 +89,7 @@ namespace Wakit
           Binding.ProxyBuilder.register (context);
           Binding.ProxyLister.register (context);
 
-          var setup = context.evaluate_with_source_uri (SETUP_JS, SETUP_JS_LEN,
+          var setup = context.evaluate_with_source_uri (JS_CODE, JS_CODE_LEN,
             "wakit:///extension/extension.js", 1);
 
           var dbus_service = new Binding.DBusService (_appbus, BUS_NAME);
@@ -97,7 +97,7 @@ namespace Wakit
           var proxyLister = (new Binding.ProxyLister (dbus_service)).to_value (context);
           JSC.Value parameters [] = { proxyBuilder, proxyLister };
 
-          setup.function_callv (parameters);
+          setup.object_get_property ("makeBridge").function_callv (parameters);
         }
 
       [CCode (cname = "WAKIT_WEB_EXTENSION_GET_CLASS (self)->registration")]

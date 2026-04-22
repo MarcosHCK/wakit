@@ -15,10 +15,11 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 from argparse import ArgumentParser
+from chunked import chunked
 from itertools import chain
 from pathlib import Path
 from re import compile, ASCII
-from sys import stdin, stdout, stderr
+from sys import stdin, stdout
 from typing import BinaryIO, Iterator, TextIO
 
 class Arguments:
@@ -80,13 +81,8 @@ def phase2 (input: BinaryIO, output: str, arguments: Arguments):
     phase3 (input, stdout, arguments) # type: ignore
   else:
 
-    with Path (output).open ('rt') as stream:
+    with Path (output).open ('wt') as stream:
       phase3 (input, stream, arguments)
-
-def chunked (input: BinaryIO, chunk_siz: int = 1024):
-
-  while 0 < (got := len (chunk := input.read (chunk_siz))):
-    yield (chunk, got)
 
 def grouped (input: Iterator[tuple[bytes,int]], group_siz: int = 16):
 
@@ -118,6 +114,11 @@ def grouped (input: Iterator[tuple[bytes,int]], group_siz: int = 16):
 
     yield chain (accumulator)
 
+def write_byte (b: int|str):
+
+  n = b if isinstance (b, int) else ord (b)
+  return f'0x{n:02x}'
+
 def write_bytes (input: BinaryIO, output: TextIO, indent: str, arguments: Arguments):
 
   count = 0
@@ -133,7 +134,7 @@ def write_bytes (input: BinaryIO, output: TextIO, indent: str, arguments: Argume
 
       count += len (piece)
 
-      for byte in map (lambda b: f'0x{b:02x}', piece):
+      for byte in map (write_byte, piece):
 
         if first:
 

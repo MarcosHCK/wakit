@@ -22,11 +22,26 @@ if not xxd_exe.found ()
   python = import ('python')
   python = python.find_installation ('python3')
 
-  xxd_gen = meson.current_source_dir () / 'xxd.py'
-  xxd_gen = generator (python, arguments: [ xxd_gen, '-i', '@EXTRA_ARGS@', '@INPUT@' ], capture: true, output: '@BASENAME@.hex.c')
+  xxd_exe = python.full_path () + ' ' + meson.current_source_dir () / 'xxd.py'
 else
 
-  xxd_gen = generator (xxd_exe, arguments: [ '-i', '@EXTRA_ARGS@', '@INPUT@' ], capture: true, output: '@BASENAME@.hex.c')
+  xxd_exe = xxd_exe.full_path ()
+endif
+
+esbuild_exe = find_program ('esbuild', required: true)
+
+if true
+
+  python = import ('python')
+  python = python.find_installation ('python3')
+
+  jscompiler_gen = meson.current_source_dir () / 'jscompiler.py'
+  jscompiler_gen = generator (python, arguments: [ jscompiler_gen,
+                                                   '-b', meson.current_build_dir (),
+                                                   '--esbuild', esbuild_exe.full_path (),
+                                                   '--xxd', xxd_exe,
+                                                   '@EXTRA_ARGS@', '@INPUT@', '@OUTPUT@' ],
+                                      output: '@BASENAME@.hex.c')
 endif
 
 __extension_utility_src = [ 'marshalling.h',
@@ -38,7 +53,7 @@ foreach bit: [ 'objectserializer' ]
   name = '@0@_js'.format (bit)
   source = '@0@.js'.format (bit)
 
-  __extension_utility_src += xxd_gen.process (source, extra_args: [ '-n', name ])
+  __extension_utility_src += jscompiler_gen.process (source, extra_args: [ '-n', name ])
 endforeach
 
 foreach bit: [ 'promise' ]

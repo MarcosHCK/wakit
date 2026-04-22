@@ -33,7 +33,7 @@ foreach bit: [ 'logging' ]
   name = '@0@_js'.format (bit)
   source = '@0@.js'.format (bit)
 
-  __extension_libraries_src += xxd_gen.process (source, extra_args: [ '-n', name ])
+  __extension_libraries_src += jscompiler_gen.process (source, extra_args: [ '-n', name ])
 endforeach
 
 __extension_libraries_deps = [ __common_dep,
