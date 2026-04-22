@@ -82,12 +82,15 @@ namespace Wakit
 
           JSC.Context context = frame.get_js_context_for_script_world (_script_world);
 
+          context.set_value ("logging", Libraries.Logging.register (context));
+
           registration (context, web_page, frame);
 
           Binding.ProxyBuilder.register (context);
           Binding.ProxyLister.register (context);
 
-          var setup = context.evaluate (SETUP_JS, SETUP_JS_LEN);
+          var setup = context.evaluate_with_source_uri (SETUP_JS, SETUP_JS_LEN,
+            "wakit:///extension/extension.js", 1);
 
           var dbus_service = new Binding.DBusService (_appbus, BUS_NAME);
           var proxyBuilder = (new Binding.ProxyBuilder (dbus_service)).to_value (context);

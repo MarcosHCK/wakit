@@ -15,37 +15,41 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-gio_dep = dependency ('gio-2.0', required: true)
+__extension_libraries_src = [ ]
 
-subdir ('appbus')
+foreach bit: [ 'logging' ]
 
-__common_src = [ 'bits.h', 'boxing.h', 'mixin.h' ]
-
-foreach lib: [ 'enum' ]
-
-  __common_src += [ '@0@.cc'.format (lib) ]
-  __common_src += [ '@0@.h'.format (lib) ]
+  __extension_libraries_src += [ '@0@.cc'.format (bit) ]
+  __extension_libraries_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach lib: [ 'enum', 'timeoutcancellable' ]
+foreach bit: [ 'logging' ]
 
-  __common_src += [ '@0@.vala'.format (lib) ]
+  __extension_libraries_src += [ '@0@.vala'.format (bit) ]
 endforeach
 
-__common_deps = [ __common_appbus_dep.as_link_whole () ]
+foreach bit: [ 'logging' ]
 
-__common_lib = library ('wakit-common',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Common"', '-DG_LOG_USE_STRUCTURED=1',
+  name = '@0@_js'.format (bit)
+  source = '@0@.js'.format (bit)
+
+  __extension_libraries_src += xxd_gen.process (source, extra_args: [ '-n', name ])
+endforeach
+
+__extension_libraries_deps = [ __common_dep,
+                              __extension_utility_dep, ]
+
+__extension_libraries_lib = static_library ('wakit-extension-libraries',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Extension.Libraries"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Common"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Extension.Libraries"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_dep, gio_dep, __common_deps ],
-  sources: __common_src,
+  cpp_pch: 'pch/pch.h',
+  dependencies: [ config_vala_dep, webkitext_dep, __extension_libraries_deps ],
+  sources: __extension_libraries_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__common_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  link_with: __common_lib)
-
-meson.override_dependency ('wakit-common', __common_dep)
+__extension_libraries_dep = declare_dependency (dependencies: [ config_dep, webkitext_dep ],
+  link_with: __extension_libraries_lib)

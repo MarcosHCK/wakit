@@ -45,7 +45,7 @@ __testing_dep = declare_dependency (dependencies: [ config_dep, glib_dep ],
   include_directories: include_directories ('.'),
   link_with: __testing_lib)
 
-foreach bit: [ 'extension' ]
+foreach bit: [ 'common', 'extension' ]
 
   subdir (bit)
 endforeach

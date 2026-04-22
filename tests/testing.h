@@ -16,12 +16,39 @@
  */
 #pragma once
 #include <array>
+#include <cstddef>
 #include <exception>
 #include <functional>
-#include <glib.h>
+#include <glib-object.h>
 #include <string>
 #include <type_traits>
 #include <vector>
+
+G_BEGIN_DECLS
+
+  typedef struct _TestingRefCountMonitor TestingRefCountMonitor;
+
+  GType testing_ref_count_monitor_get_type (void) G_GNUC_CONST;
+
+  static inline TestingRefCountMonitor* testing_ref_count_monitor_new (gboolean* destroyed)
+    {
+
+      return (TestingRefCountMonitor*) g_object_new (testing_ref_count_monitor_get_type (),
+        "destroyed", destroyed,
+        NULL);
+    }
+
+  static inline TestingRefCountMonitor* testing_ref_count_monitor_ref (TestingRefCountMonitor* monitor)
+    {
+      return g_object_ref (monitor);
+    }
+
+  static inline void testing_ref_count_monitor_unref (TestingRefCountMonitor* monitor)
+    {
+      return g_object_unref (monitor);
+    }
+
+G_END_DECLS
 
 namespace testing
 {
@@ -99,7 +126,9 @@ namespace testing
         };
 
       inline constexpr bool get_dtor_ed () const noexcept { return _flag; };
+
       inline able make_tester () { return able (_flag); }
+      inline able* new_tester () { return new able (_flag); }
     };
 
   #define g_assert_cmp(s1,cmp,s2) (G_GNUC_EXTENSION ({ \

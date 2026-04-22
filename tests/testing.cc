@@ -26,6 +26,53 @@
 #include <utility>
 using namespace testing;
 
+struct _TestingRefCountMonitor { GObject parent; gboolean* destroyed; };
+struct _TestingRefCountMonitorClass { GObjectClass parent; };
+
+typedef struct _TestingRefCountMonitorClass TestingRefCountMonitorClass;
+G_DEFINE_TYPE (TestingRefCountMonitor, testing_ref_count_monitor, G_TYPE_OBJECT)
+
+static void testing_ref_count_monitor_class_finalize (GObject* pself)
+{
+
+  auto self = (TestingRefCountMonitor*) pself;
+  self->destroyed = (self->destroyed == NULL) ? NULL : (*self->destroyed = TRUE, nullptr);
+G_OBJECT_CLASS (testing_ref_count_monitor_parent_class)->finalize (pself);
+}
+
+static void testing_ref_count_monitor_class_set_property (GObject* pself, guint property_id, const GValue* value, GParamSpec* pspec)
+{
+
+  switch (auto self = (TestingRefCountMonitor*) pself; property_id)
+    {
+
+    case 1: self->destroyed = (gboolean*) g_value_get_pointer (value);
+      break;
+
+    default: G_OBJECT_WARN_INVALID_PROPERTY_ID (pself, property_id, pspec);
+      break;
+    }
+}
+
+static void testing_ref_count_monitor_class_init (TestingRefCountMonitorClass* klass)
+{
+
+  G_OBJECT_CLASS (klass)->finalize = testing_ref_count_monitor_class_finalize;
+  G_OBJECT_CLASS (klass)->set_property = testing_ref_count_monitor_class_set_property;
+
+  constexpr auto flag1 = (GParamFlags) G_PARAM_CONSTRUCT_ONLY;
+  constexpr auto flag2 = (GParamFlags) G_PARAM_STATIC_STRINGS;
+  constexpr auto flag3 = (GParamFlags) G_PARAM_WRITABLE;
+  constexpr auto flags = (GParamFlags) (flag1 | flag2 | flag3);
+
+  g_object_class_install_property (G_OBJECT_CLASS (klass), 1, g_param_spec_pointer ("destroyed", "destroyed", "destroyed", flags));
+}
+
+static void testing_ref_count_monitor_init (TestingRefCountMonitor* self)
+{
+  self->destroyed = NULL;
+}
+
 static void __call_function (gconstpointer data)
 {
 

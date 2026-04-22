@@ -24,6 +24,7 @@ subdir ('utility')
 # level 1
 subdir ('binding')
 subdir ('bindings')
+subdir ('libraries')
 
 __extension_src = [ 'extension.cc', 'extension.hh' ]
 
@@ -49,6 +50,7 @@ endforeach
 __extension_deps = [ __common_dep,
                      __extension_binding_dep.as_link_whole (),
                      __extension_bindings_dep.as_link_whole (),
+                     __extension_libraries_dep.as_link_whole (),
                      __extension_utility_dep.as_link_whole (), ]
 
 __extension_lib = library ('wakit-extension',
