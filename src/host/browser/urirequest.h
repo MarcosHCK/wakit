@@ -14,17 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+#include <glib.h>
+#include <host/interfaces/wakit-host-interfaces.h>
+#include <libsoup/soup-message-headers.h>
 
-namespace Wakit
-{
+G_BEGIN_DECLS
 
-  public interface IBrowser: GLib.Object
+  static __inline void wakit_browser_uri_request_headers_foreach_impl (SoupMessageHeaders* headers, WakitIUriRequestHeadersForeachHeader foreach, gpointer user_data)
     {
-
-      [CCode (scope = "notify")]
-      public delegate void UriRequestResolver (IUriRequest request);
-
-      public abstract Wakit.IWebView create_view ();
-      public abstract void register_uri_scheme (string scheme, owned UriRequestResolver resolver);
+      soup_message_headers_foreach (headers, foreach, user_data);
     }
-}
+
+G_END_DECLS

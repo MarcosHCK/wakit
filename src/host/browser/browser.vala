@@ -107,5 +107,15 @@ namespace Wakit.Browser
           else
             return @"$application_id $name";
         }
+
+      public void register_uri_scheme (string scheme, owned UriRequestResolver resolver)
+        {
+
+          _context.register_uri_scheme (scheme, (_request) =>
+            {
+              var request = new UriRequest (_request);
+              resolver (request);
+            });
+        }
     }
 }
