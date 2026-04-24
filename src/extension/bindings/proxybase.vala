@@ -90,7 +90,11 @@ namespace Wakit.Binding
           var parameters = Marshalling.jsc_value_to_variant (c, type, arguments);
           var result = yield proxy.call (method_name, parameters, flags, -1);
 
-        return Marshalling.variant_to_jsc_value (c, result);
+          if (result.n_children () != 1)
+
+            return Marshalling.variant_to_jsc_value (c, result);
+          else
+            return Marshalling.variant_to_jsc_value (c, result.get_child_value (0));
         }
 
       private void on_properties_changed (GLib.Variant changed, string[] invalidated)
