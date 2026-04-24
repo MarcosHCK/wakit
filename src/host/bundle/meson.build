@@ -15,37 +15,37 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-basepath = meson.current_source_dir ()
-testpathroot = '/org/hck/wakit'
+__host_bundle_src = [ ]
 
-glib_dep = dependency ('glib-2.0', required: true)
+foreach lib: [ ]
 
-__testing_src = [ 'bits.h' ]
-
-foreach lib: [ 'testing' ]
-
-  __testing_src += [ '@0@.cc'.format (lib) ]
-  __testing_src += [ '@0@.h'.format (lib) ]
+  __host_bundle_src += [ '@0@.cc'.format (lib) ]
+  __host_bundle_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-__testing_lib = static_library ('testing',
-  c_args: [ '-DG_LOG_DOMAIN="Testing"', '-DG_LOG_USE_STRUCTURED=1',
+foreach lib: [ 'alias', 'bundle', 'register' ]
+
+  __host_bundle_src += [ '@0@.vala'.format (lib) ]
+endforeach
+
+foreach lib: [ '', 'absolute', 'regex', 'verbatim' ]
+
+  __host_bundle_src += [ '@0@alias.vala'.format (lib) ]
+endforeach
+
+__host_bundle_deps = [ __common_dep,
+                       __host_interfaces_dep ]
+
+__host_bundle_lib = static_library ('wakit-host-bundle',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Bundle"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Testing"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Bundle"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_pch: 'pch/pch.h',
-  build_by_default: false,
-  dependencies: [ config_dep, glib_dep ],
-  include_directories: include_directories ('.'),
-  sources: __testing_src)
+  dependencies: [ config_vala_dep, gio_dep, __host_bundle_deps ],
+  sources: __host_bundle_src,
+  vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__testing_dep = declare_dependency (dependencies: [ config_dep, glib_dep ],
-  include_directories: include_directories ('.'),
-  link_with: __testing_lib)
-
-foreach bit: [ 'common', 'extension', 'host' ]
-
-  subdir (bit)
-endforeach
+__host_bundle_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
+  link_with: __host_bundle_lib)

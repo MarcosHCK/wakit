@@ -26,6 +26,7 @@ subdir ('process')
 # level 2
 subdir ('appbus')
 subdir ('browser')
+subdir ('bundle')
 
 __host_src = [ ]
 
@@ -43,10 +44,12 @@ endforeach
 __host_deps = [ __common_dep,
                 __host_appbus_dep.as_link_whole (),
                 __host_browser_dep.as_link_whole (),
+                __host_bundle_dep.as_link_whole (),
                 __host_interfaces_dep.as_link_whole (),
                 __host_process_dep.as_link_whole () ]
 
-__host_fwds = [ __host_interfaces_dep ]
+__host_fwds = [ __host_bundle_dep,
+                __host_interfaces_dep ]
 
 __host_lib = library ('wakit-host',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Host"', '-DG_LOG_USE_STRUCTURED=1',

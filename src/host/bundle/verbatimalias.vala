@@ -15,16 +15,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit
+namespace Wakit.Bundle
 {
 
-  public interface IBrowser: GLib.Object
+  public sealed class VerbatimAlias: Alias
     {
 
-      [CCode (scope = "notified")]
-      public delegate void UriRequestResolver (IUriRequest request);
+      public override bool matches (string str, size_t length)
+        {
+          return true;
+        }
 
-      public abstract Wakit.IWebView create_view ();
-      public abstract void register_uri_scheme (string scheme, owned UriRequestResolver resolver);
+      public override string replace (string str, size_t length)
+        {
+          return str;
+        }
     }
 }

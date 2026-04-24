@@ -15,16 +15,5 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit
-{
-
-  public interface IBrowser: GLib.Object
-    {
-
-      [CCode (scope = "notified")]
-      public delegate void UriRequestResolver (IUriRequest request);
-
-      public abstract Wakit.IWebView create_view ();
-      public abstract void register_uri_scheme (string scheme, owned UriRequestResolver resolver);
-    }
-}
+#include <host/bundle/wakit-host-bundle.h>
+#include <tests/testing.h>
