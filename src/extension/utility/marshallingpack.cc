@@ -308,7 +308,7 @@ static inline GVariant* _typearray_make (const GVariantType* type, JSCValue* val
 
   memcpy (back, data, size);
 
-return g_variant_new_from_data (type, back, size, false, (GDestroyNotify) g_aligned_free, orig);
+return g_variant_new_from_data (type, back, size, false, (GDestroyNotify) g_free, orig);
 }
 
 static GVariant* _typearray_pack (JSCContext* context, const GVariantType* child_type, JSCValue* value)
