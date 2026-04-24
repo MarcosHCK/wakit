@@ -36,15 +36,117 @@ namespace Wakit.Browser
           _web_view.hexpand = true;
           _web_view.vexpand = true;
 
+          _web_view.decide_policy.connect (on_decide_policy);
+          _web_view.permission_request.connect (on_permission_request);
           _web_view.web_process_terminated.connect (on_web_process_terminated);
 
           attach (_web_view, 0, 0);
+        }
+
+      private Gtk.Window? get_toplevel ()
+        {
+
+          Gtk.Widget? widget = null;
+
+          for (widget = get_parent (); null != widget && ! (widget is Gtk.Window); widget = widget.get_parent ())
+            ;
+        return (Gtk.Window?) widget;
         }
 
       public void open_uri (GLib.File file, string hint)
         {
 
           _web_view.load_uri (file.get_uri ());
+        }
+
+      private bool on_decide_policy (WebKit.WebView webview, WebKit.PolicyDecision decision_base, WebKit.PolicyDecisionType type)
+        {
+
+          switch (type)
+        {
+
+          case WebKit.PolicyDecisionType.NAVIGATION_ACTION:
+            { unowned WebKit.NavigationPolicyDecision decision = decision_base as WebKit.NavigationPolicyDecision;
+              return on_decide_policy_navigation_action (webview, decision); }
+
+          case WebKit.PolicyDecisionType.NEW_WINDOW_ACTION:
+            { unowned WebKit.NavigationPolicyDecision decision = decision_base as WebKit.NavigationPolicyDecision;
+              return on_decide_policy_new_window_action (webview, decision); }
+
+          default: return false;
+        } }
+
+      static void on_decide_policy_ask (Gui.Message message, Gtk.Window parent, WebKit.PolicyDecision decision)
+        {
+
+          message.choose.begin (parent, null, (o, result) =>
+            on_decide_policy_complete (o, result, decision));
+        }
+
+      static void on_decide_policy_complete (GLib.Object? o, GLib.AsyncResult result, WebKit.PolicyDecision decision)
+        {
+
+          try
+            { 
+
+              if (Gui.MessageResponse.YES == ((Gui.Message) o).choose.end (result))
+
+                decision.use ();
+              else
+                decision.ignore ();
+            }
+          catch (GLib.Error error)
+            {
+
+              unowned uint code = error.code;
+              unowned string domain = error.domain.to_string ();
+              unowned string message = error.message.to_string ();
+
+              warning ("can not retrieve policy choice: %s: %u: %s", domain, code, message);
+              decision.ignore ();
+            }
+        }
+
+      private bool on_decide_policy_navigation_action (WebKit.WebView webview, WebKit.NavigationPolicyDecision decision)
+        {
+
+          unowned var action = decision.navigation_action;
+
+          if (! action.is_redirect ())
+            {
+              decision.use ();
+              return true;
+            }
+
+          WebKit.URIRequest? request;
+
+          if (null == (request = action.get_request ()))
+            {
+              decision.ignore ();
+              return true;
+            }
+
+          var message = new Gui.Message.question ("%s wants to redirect to %s", webview.get_uri (),
+                                                                                request.get_uri ());
+
+          on_decide_policy_ask (message, get_toplevel (), decision);
+        return true;
+        }
+
+      private bool on_decide_policy_new_window_action (WebKit.WebView webview, WebKit.NavigationPolicyDecision decision)
+        {
+
+          decision.ignore ();
+          warning ("pop-up window blocked");
+        return true;
+        }
+
+      private bool on_permission_request (WebKit.WebView webview, WebKit.PermissionRequest request)
+        {
+
+          request.deny ();
+          warning ("permission request (type %s) denied", request.get_type ().name ());
+        return true;
         }
 
       private void on_web_process_terminated (WebKit.WebView webview, WebKit.WebProcessTerminationReason reason)

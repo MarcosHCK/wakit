@@ -41,6 +41,7 @@ foreach bit: [ 'browser' ]
 endforeach
 
 __host_browser_deps = [ __common_dep,
+                        __host_gui_dep,
                         __host_interfaces_dep ]
 
 __host_browser_lib = static_library ('wakit-host-browser',
