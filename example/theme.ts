@@ -14,19 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+import { createTheme } from '@mantine/core'
 
-namespace Wakit
-{
-
-  public interface IBrowser: GLib.Object
-    {
-
-      [CCode (scope = "notified")]
-      public delegate void UriRequestResolver (IUriRequest request);
-
-      public abstract Wakit.IWebView create_view ();
-      public abstract void register_uri_scheme (string scheme, owned UriRequestResolver resolver);
-      public abstract void register_uri_scheme_as_local (string scheme);
-      public abstract void register_uri_scheme_as_secure (string scheme);
-    }
-}
+export const theme = createTheme ({})

@@ -54,8 +54,8 @@ namespace Wakit.Browser
             "enable-developer-extras", Config.DEVELOP,
             "enable-dns-prefetching", _config.enable_dns_prefetching,
             "enable-fullscreen", _config.enable_fullscreen,
-            "enable-html5-database", false,
-            "enable-html5-local-storage", false,
+            "enable-html5-database", _config.enable_html5_database,
+            "enable-html5-local-storage", _config.enable_html5_local_storage,
             "enable-media-capabilities", _config.enable_media_capabilities,
             "enable-media-stream", _config.enable_media_stream,
             "enable-media", _config.enable_media,
@@ -116,6 +116,18 @@ namespace Wakit.Browser
               var request = new UriRequest (_request);
               resolver (request);
             });
+        }
+
+      public void register_uri_scheme_as_local (string scheme)
+        {
+
+          _context.get_security_manager ().register_uri_scheme_as_local (scheme);
+        }
+
+      public void register_uri_scheme_as_secure (string scheme)
+        {
+
+          _context.get_security_manager ().register_uri_scheme_as_secure (scheme);
         }
     }
 }

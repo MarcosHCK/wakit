@@ -34,6 +34,8 @@ namespace Wakit
       public bool auto_load_images { get; construct set; default = true; }
       public bool enable_dns_prefetching { get; construct set; default = false; }
       public bool enable_fullscreen { get; construct set; default = false; }
+      public bool enable_html5_database { get; construct set; default = true; }
+      public bool enable_html5_local_storage { get; construct set; default = true; }
       public bool enable_media { get; construct set; default = false; }
       public bool enable_mediasource { get; construct set; default = false; }
       public bool enable_media_stream { get; construct set; default = false; }

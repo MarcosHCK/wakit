@@ -15,18 +15,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit
+module.exports =
 {
 
-  public interface IBrowser: GLib.Object
+  plugins:
     {
-
-      [CCode (scope = "notified")]
-      public delegate void UriRequestResolver (IUriRequest request);
-
-      public abstract Wakit.IWebView create_view ();
-      public abstract void register_uri_scheme (string scheme, owned UriRequestResolver resolver);
-      public abstract void register_uri_scheme_as_local (string scheme);
-      public abstract void register_uri_scheme_as_secure (string scheme);
-    }
+      'postcss-nested':
+        { },
+      'postcss-extend-rule':
+        { },
+      'postcss-preset-mantine':
+        { autoRem: true, },
+    },
 }

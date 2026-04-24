@@ -14,19 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { Home } from '@wakit-example/components/Home'
+import ReactDOM from 'react-dom/client'
 
-namespace Wakit
-{
+export const App = () => <BrowserRouter>
 
-  public interface IBrowser: GLib.Object
-    {
+  <Routes>
+    <Route path='/' Component={Home} />
+  </Routes>
+</BrowserRouter>
 
-      [CCode (scope = "notified")]
-      public delegate void UriRequestResolver (IUriRequest request);
-
-      public abstract Wakit.IWebView create_view ();
-      public abstract void register_uri_scheme (string scheme, owned UriRequestResolver resolver);
-      public abstract void register_uri_scheme_as_local (string scheme);
-      public abstract void register_uri_scheme_as_secure (string scheme);
-    }
-}
+ReactDOM.createRoot (document.getElementsByTagName ('body') [0]).render (<App />)
