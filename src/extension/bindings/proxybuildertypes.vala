@@ -25,16 +25,13 @@ namespace Wakit.Binding
       public ProxyBuilderTypes ()
         {
 
-          unowned GLib.HashFunc<string> hash_func = GLib.str_hash;
-          unowned GLib.EqualFunc<string> key_equal_func = GLib.str_equal;
-
-          base (hash_func, key_equal_func);
+          base (GLib.str_hash, GLib.str_equal);
         }
 
       [CCode (cheader_filename = "glib.h", cname = "g_intern_string")]
       extern static unowned string _g_intern_string (string value);
 
-      public new GLib.Type add (JSC.Context context, GLib.DBusInterfaceInfo dbus_info, string name)
+      public new GLib.Type add (GLib.DBusInterfaceInfo dbus_info, string name)
         {
 
           unowned GLib.Type derived_type;
@@ -53,16 +50,8 @@ namespace Wakit.Binding
             (InstanceInitFunc) derived_type_instance_init,
             flags);
 
-          ProxyBase.register (context, dbus_info, tmp_name, derived_type);
           insert (name, derived_type);
-
         return derived_type;
-        }
-
-      public new bool lookup (string name, out GLib.Type type)
-        {
-
-          return base.lookup_extended (name, null, out type);
         }
 
       static void derived_type_class_init (GLib.TypeClass klass, void* class_data)

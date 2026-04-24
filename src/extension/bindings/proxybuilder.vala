@@ -18,11 +18,12 @@
 namespace Wakit.Binding
 {
 
+  private static ProxyBuilderTypes? types = null;
+
   public sealed class ProxyBuilder: GLib.Object, IBinding<ProxyBuilder>, IInvocable<ProxyBuilder>
     {
 
       public DBusService dbus_service { get; construct; }
-      private ProxyBuilderTypes _types = new ProxyBuilderTypes ();
 
       public ProxyBuilder (DBusService dbus_service)
         {
@@ -46,8 +47,14 @@ namespace Wakit.Binding
           unowned var info = yield _dbus_service.lookup_info (object_path, interface_name);
           unowned var type = GLib.Type.INVALID;
 
-          if (! _types.lookup (interface_name, out type))
-            type = _types.add (context, info, interface_name);
+          if (unlikely (null == types))
+            types = new ProxyBuilderTypes ();
+
+          if (! types.lookup_extended (interface_name, null, out type))
+            type = types.add (info, interface_name);
+
+          if (null == IBinding<ProxyBase>.get_class (context, type))
+            ProxyBase.register (context, info, type.name (), type);
 
           var dbus_proxy = yield _dbus_service.make_proxy (interface_name, object_path, flags);
           var proxy = GLib.Object.new (type, "dbus-proxy", dbus_proxy, null);
