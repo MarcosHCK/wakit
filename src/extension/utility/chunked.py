@@ -14,11 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
-from typing import IO, TypeVar
+from typing import overload, Any, Generator, IO, Union
 
-T = TypeVar ('T', IO[bytes], IO[str])
+@overload
+def chunked (input: IO[bytes], chunk_siz: int = 1024) -> Generator[tuple[bytes,int], Any, None]:
+  ...
 
-def chunked (input: T, chunk_siz: int = 1024):
+@overload
+def chunked (input: IO[str], chunk_siz: int = 1024) -> Generator[tuple[str,int], Any, None]:
+  ...
+
+def chunked (input: Union[IO[bytes], IO[str]], chunk_siz: int = 1024):
 
   while 0 < (got := len (chunk := input.read (chunk_siz))):
     yield (chunk, got)

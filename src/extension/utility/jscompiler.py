@@ -15,18 +15,24 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 from argparse import ArgumentParser
+from chunked import chunked
 from pathlib import Path
 from subprocess import Popen, PIPE
 from typing import TextIO
-from chunked import chunked
 from xxd import make_name
 
 def esbuild (bin: str, args: list[str]):
 
   executable = (bins := bin.split (' ')) [0]
-  subprocess = Popen ([ *bins, *args ], executable = executable)
+  subprocess = Popen ([ *bins, *args ], executable = executable, stderr = PIPE)
 
   if 0 != (code := subprocess.wait ()):
+
+    from sys import stderr
+    assert subprocess.stderr
+
+    for (chunk, _) in chunked (subprocess.stderr):
+      stderr.write (chunk.decode ('utf-8'))
 
     raise Exception (f'bad return value from esbuild ({code})')
 
