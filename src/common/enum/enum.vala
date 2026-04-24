@@ -28,7 +28,7 @@ namespace Wakit
       public extern static GLib.Quark quark ();
     }
 
-  [CCode (cheader_filename = "common/enum.h")] namespace Enum
+  [CCode (cheader_filename = "common/enum/enum.h")] namespace Enum
     {
 
       [CCode (simple_generics = true)]

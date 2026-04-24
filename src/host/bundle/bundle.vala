@@ -21,10 +21,8 @@ namespace Wakit.Bundle
   public sealed class Bundle: GLib.Object
     {
 
-      public GLib.List<weak Alias> aliases { owned get { return _aliases.copy (); } }
+      public ICollection<Alias> aliases { get; }
       public GLib.Resource bundle { get; construct; }
-
-      private GLib.List<Alias> _aliases = new GLib.List<Alias> ();
 
       public Bundle (GLib.Resource resource)
         {
@@ -39,10 +37,11 @@ namespace Wakit.Bundle
           Object (bundle: resource);
         }
 
-      public void add_alias (Alias alias)
+      public override void constructed ()
         {
 
-          _aliases.append (alias);
+          base.constructed ();
+          _aliases = new ListCollection<Alias> ();
         }
 
       public GLib.InputStream? lookup (string path) throws GLib.Error
@@ -50,7 +49,7 @@ namespace Wakit.Bundle
 
           size_t length = path.length;
 
-          foreach (unowned var alias in _aliases)
+          foreach (unowned var alias in ((ListCollection<Alias>) _aliases).list)
             {
 
               if (! alias.matches (path, length))
@@ -71,7 +70,7 @@ namespace Wakit.Bundle
 
           size_t length = path.length;
 
-          foreach (unowned var alias in _aliases)
+          foreach (unowned var alias in ((ListCollection<Alias>) _aliases).list)
             {
 
               if (! alias.matches (path, length))

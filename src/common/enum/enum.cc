@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
-#include <common/enum.h>
+#include <common/enum/enum.h>
 
 extern "C" GQuark wakit_enum_error_quark (void) G_GNUC_CONST;
 

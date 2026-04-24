@@ -52,7 +52,7 @@ namespace Wakit.Bundle
           catch (GLib.RegexError error)
             {
 
-              unowned string code = Enum.to_string ((GLib.RegexError) error.code);
+              unowned string code = Enum.to_string ((GLib.RegexError) error.code, typeof (GLib.RegexError));
               unowned string domain = error.domain.to_string ();
               unowned string message = error.message.to_string ();
 
@@ -83,7 +83,7 @@ namespace Wakit.Bundle
           catch (GLib.RegexError error)
             {
 
-              unowned string code = Enum.to_string ((GLib.RegexError) error.code);
+              unowned string code = Enum.to_string ((GLib.RegexError) error.code, typeof (GLib.RegexError));
               unowned string domain = error.domain.to_string ();
               unowned string message = error.message.to_string ();
 

@@ -63,10 +63,11 @@ namespace Wakit.Example
                 { var bundle = new Bundle.Bundle.from_file (filename);
                   var pattern = new GLib.Regex ("^/$", GLib.RegexCompileFlags.OPTIMIZE,
                                                                 GLib.RegexMatchFlags.DEFAULT);
-                  bundle.add_alias (new Bundle.RegexAlias (pattern, "/index.html"));
-                  bundle.add_alias (new Bundle.VerbatimAlias ());
+                  bundle.aliases.add (new Bundle.RegexAlias (pattern, "/index.html"));
+                  bundle.aliases.add (new Bundle.VerbatimAlias ());
                   Bundle.register_uri_scheme_in_bundle ("app", browser, bundle);
-                  browser.register_uri_scheme_as_local ("app"); }
+                  browser.register_uri_scheme_as_local ("app");
+                  extension_host.secure_schemes.add ("app"); }
               catch (GLib.Error error)
                 {
                   unowned uint code = error.code;
@@ -86,6 +87,7 @@ namespace Wakit.Example
 
               browser.register_uri_scheme ("app", r => resolve_tree (r, directory));
               browser.register_uri_scheme_as_local ("app");
+              extension_host.secure_schemes.add ("app");
             }
 
           if (null == (value = options.lookup_value ("with-frame", (GLib.VariantType) "b")) || !value.get_boolean ())

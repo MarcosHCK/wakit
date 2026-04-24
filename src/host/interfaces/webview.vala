@@ -48,7 +48,7 @@ namespace Wakit
              && terminated_actv == terminated_real)
             {
 
-              string str = Enum.to_string<WebViewTerminationReason> (reason);
+              string str = Enum.to_string (reason, typeof (WebViewTerminationReason));
               critical ("WebView web process was terminated (reason = %s)", str);
             }
         }

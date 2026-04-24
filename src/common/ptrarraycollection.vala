@@ -18,11 +18,20 @@
 namespace Wakit
 {
 
-  public interface IExtensionHost: GLib.Object
+  public sealed class PtrArrayCollection<T>: GLib.Object, ICollection<T>
     {
 
-      public abstract GLib.Variant? extension_data { get; set; }
-      public abstract string? extension_dir { get; set; }
-      public abstract ICollection<string> secure_schemes { get; }
+      public GenericArray<T> array { get { return _array; } }
+      private GenericArray<T> _array = new GenericArray<T> ();
+
+      public void add (owned T value)
+        {
+          _array.add ((owned) value);
+        }
+
+      public void del (T value)
+        {
+          _array.remove (value);
+        }
     }
 }

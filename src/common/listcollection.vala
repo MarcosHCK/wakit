@@ -18,11 +18,20 @@
 namespace Wakit
 {
 
-  public interface IExtensionHost: GLib.Object
+  public sealed class ListCollection<T>: GLib.Object, ICollection<T>
     {
 
-      public abstract GLib.Variant? extension_data { get; set; }
-      public abstract string? extension_dir { get; set; }
-      public abstract ICollection<string> secure_schemes { get; }
+      public GLib.List<T> list { get { return _list; } }
+      private GLib.List<T> _list = new GLib.List<T> ();
+
+      public void add (owned T value)
+        {
+          _list.append ((owned) value);
+        }
+
+      public void del (T value)
+        {
+          _list.remove (value);
+        }
     }
 }

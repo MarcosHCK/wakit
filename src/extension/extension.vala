@@ -28,6 +28,7 @@ namespace Wakit
 
       private string _bus_address;
       private string _eid;
+      private GenericSet<string> _secure_schemes;
 
       const string BUS_NAME = "org.hck.wakit.AppBus";
 
@@ -46,7 +47,20 @@ namespace Wakit
         {
 
           base.constructed ();
-          _parameters.get ("(smsm*)", out _eid, out _bus_address, out _extension_data);
+          unowned GLib.HashFunc<string> hash_func = GLib.str_hash;
+          unowned GLib.EqualFunc<string> equal_func = GLib.str_equal;
+
+          _secure_schemes = new GenericSet<string> (hash_func, equal_func);
+
+          GLib.VariantIter secure_schemes_iter;
+
+          _parameters.get ("(smsasm*)", out _eid, 
+                                        out _bus_address,
+                                        out secure_schemes_iter,
+                                        out _extension_data);
+
+          for (GLib.Variant? value; null != (value = secure_schemes_iter.next_value ());)
+            _secure_schemes.add (value.get_string ());
         }
 
       public extern static unowned Wakit.WebExtension get_default ();
@@ -66,6 +80,14 @@ namespace Wakit
         return true;
         }
 
+      static bool is_secure (WebKit.Frame frame, GenericSet<string> secure_schemes)
+        {
+
+          var scheme = GLib.Uri.parse_scheme (frame.get_uri ());
+          var found = secure_schemes.contains (scheme);
+        return found;
+        }
+
       public extern static unowned Wakit.WebExtension new_default (WebKit.WebProcessExtension wk_extension,
                                                                    [CCode (type = "const GVariant*")]
                                                                    GLib.Variant? parameters,
@@ -81,6 +103,9 @@ namespace Wakit
         {
 
           JSC.Context context = frame.get_js_context_for_script_world (_script_world);
+
+          if (! is_secure (frame, _secure_schemes))
+            return;
 
           context.set_value ("logging", Libraries.Logging.register (context));
 

@@ -15,29 +15,33 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__common_appbus_src = [ ]
+gobject_dep = dependency ('gobject-2.0', required: true)
 
-foreach lib: [ ]
+__common_enum_src = [ ]
 
-  __common_appbus_src += [ '@0@.c'.format (lib) ]
-  __common_appbus_src += [ '@0@.h'.format (lib) ]
+foreach lib: [ 'enum' ]
+
+  __common_enum_src += [ '@0@.cc'.format (lib) ]
+  __common_enum_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ ]
+foreach lib: [ 'enum' ]
 
-  __common_appbus_src += [ '@0@.vala'.format (lib) ]
+  __common_enum_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-__common_appbus_lib = static_library ('wakit-common-appbus',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
+__common_enum_deps = [ ]
+
+__common_enum_lib = static_library ('wakit-common-enum',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Enum"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Common.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Enum"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_dep, gio_dep ],
-  sources: __common_appbus_src,
+  dependencies: [ config_dep, gobject_dep ],
+  sources: __common_enum_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__common_appbus_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  link_with: __common_appbus_lib)
+__common_enum_dep = declare_dependency (dependencies: [ config_dep, gobject_dep ],
+  link_with: __common_enum_lib)

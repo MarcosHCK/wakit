@@ -17,6 +17,8 @@
 
 gio_dep = dependency ('gio-2.0', required: true)
 
+subdir ('enum')
+
 xxd_exe = find_program ('xxd', required: false)
 
 if not xxd_exe.found ()
@@ -50,22 +52,22 @@ if true
                                       output: '@PLAINNAME@.c')
 endif
 
-subdir ('appbus')
-
 __common_src = [ 'bits.h', 'boxing.h', 'mixin.h' ]
 
-foreach lib: [ 'enum' ]
+foreach lib: [ ]
 
   __common_src += [ '@0@.cc'.format (lib) ]
   __common_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'enum', 'timeoutcancellable' ]
+foreach lib: [ 'collection', 'listcollection', 'ptrarraycollection', 'timeoutcancellable' ]
 
   __common_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-__common_deps = [ __common_appbus_dep.as_link_whole () ]
+__common_deps = [ __common_enum_dep.as_link_whole () ]
+
+__common_fwds = [ __common_enum_dep ]
 
 __common_lib = library ('wakit-common',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Common"', '-DG_LOG_USE_STRUCTURED=1',
@@ -78,7 +80,7 @@ __common_lib = library ('wakit-common',
   sources: __common_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__common_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
+__common_dep = declare_dependency (dependencies: [ config_dep, gio_dep, __common_fwds ],
   link_with: __common_lib)
 
 meson.override_dependency ('wakit-common', __common_dep)

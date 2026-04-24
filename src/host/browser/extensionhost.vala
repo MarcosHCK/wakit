@@ -25,6 +25,7 @@ namespace Wakit.Browser
       public WebKit.WebContext context { get; construct; }
       public GLib.Variant? extension_data { get; set; }
       public string? extension_dir { get; set; }
+      public ICollection<string> secure_schemes { get; }
 
       public ExtensionHost (WebKit.WebContext context)
         {
@@ -36,6 +37,7 @@ namespace Wakit.Browser
 
           base.constructed ();
           _context.initialize_web_process_extensions.connect (on_initialize_web_process_extensions);
+          _secure_schemes = new PtrArrayCollection<string> ();
         }
 
       private void on_initialize_web_process_extensions ()
@@ -45,6 +47,7 @@ namespace Wakit.Browser
             {
               new GLib.Variant.take_string ( GLib.Uuid.string_random ()),
               new GLib.Variant.maybe (GLib.VariantType.STRING, _bus_address),
+              new GLib.Variant.strv (((PtrArrayCollection<string>) _secure_schemes).array.data),
               new GLib.Variant.maybe (null != _extension_data ? _extension_data.get_type () : GLib.VariantType.BOOLEAN, _extension_data),
             };
 
