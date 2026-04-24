@@ -22,10 +22,6 @@ foreach bit: [ 'application', 'interface' ]
   __example_src += [ '@0@.vala'.format (bit) ]
 endforeach
 
-import ('gnome').compile_resources ('wakit-example-bundle',
-  'bundle.xml',
-  gresource_bundle: true)
-
 __example_bin = executable ('wakit-example',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Example"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),

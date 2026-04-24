@@ -60,6 +60,7 @@ namespace Wakit.Example
                   var pattern = new GLib.Regex ("^/$", GLib.RegexCompileFlags.OPTIMIZE,
                                                                 GLib.RegexMatchFlags.DEFAULT);
                   bundle.add_alias (new Bundle.RegexAlias (pattern, "/index.html"));
+                  bundle.add_alias (new Bundle.VerbatimAlias ());
                   Bundle.register_uri_scheme_in_bundle ("app", browser, bundle); }
               catch (GLib.Error error)
                 {
