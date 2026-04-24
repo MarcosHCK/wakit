@@ -25,7 +25,8 @@ namespace Wakit.Example
         {
 
           Object (application_id: "org.hck.wakit.Example",
-                           flags: GLib.ApplicationFlags.HANDLES_OPEN);
+                           flags: GLib.ApplicationFlags.HANDLES_OPEN,
+                         version: Config.PACKAGE_VERSION);
         }
 
       public override void activate ()

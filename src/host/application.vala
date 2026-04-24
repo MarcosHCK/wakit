@@ -52,6 +52,7 @@ namespace Wakit
 
           _browser_config = _browser_config ?? (BrowserConfig) GLib.Object.new (typeof (BrowserConfig),
             "application-id", application_id,
+            "application-version", get_version (),
             null);
 
           _browser_browser = new Browser.Browser (_browser_config);
