@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { createTheme, MantineColorScheme, MantineThemeOverride } from '@mantine/core'
+import { Route, Routes } from 'react-router-dom'
+import { Home } from '@wakit-example/components/Home'
 
-export const defaultColorScheme: MantineColorScheme = 'auto'
+export const Router = () => <Routes>
 
-export const theme: MantineThemeOverride = createTheme ({})
+  <Route path='/' Component={Home} />
+</Routes>

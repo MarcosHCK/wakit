@@ -14,15 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Home } from '@wakit-example/components/Home'
-import ReactDOM from 'react-dom/client'
+import { forwardRef } from 'react'
+import { useImage } from '@wakit-example/hooks/useImage'
 
-export const App = () => <BrowserRouter>
+type Ct = HTMLImageElement
+type Cp = React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>
 
-  <Routes>
-    <Route path='/' Component={Home} />
-  </Routes>
-</BrowserRouter>
+// eslint-disable-next-line react/display-name
+export const AppIcon = forwardRef<Ct, Cp> ((props, ref) =>
+{
 
-ReactDOM.createRoot (document.getElementsByTagName ('body') [0]).render (<App />)
+  const img = useImage ('/favicon.ico')
+  // eslint-disable-next-line @next/next/no-img-element
+return <img alt='icon' {...props} ref={ref} src={img?.src} />
+})

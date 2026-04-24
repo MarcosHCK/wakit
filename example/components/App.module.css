@@ -1,0 +1,44 @@
+/* Copyright (C) 2025-2026 MarcosHCK
+ * This file is part of wakit.
+ *
+ * wakit is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * wakit is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+.appShellHeaderGroup
+{
+  align-items: center;
+  justify-content: space-between;
+  max-height: var(--app-shell-header-height);
+  min-height: 100%;
+  padding-left: var(--mantine-spacing-lg);
+  padding-right: var(--mantine-spacing-lg);
+}
+
+.appShellMain
+{
+  --app-shell-main-left-padding: 13px;
+  --app-shell-main-right-padding: 13px;
+
+  padding-left: var(--app-shell-main-left-padding);
+  padding-right: var(--app-shell-main-right-padding);
+}
+
+.appShellMainCol
+{
+  --app-shell-main-col-top-padding: calc(var(--app-shell-header-offset, 0rem) + var(--app-shell-padding));
+  --app-shell-main-col-bottom-padding: calc(var(--app-shell-footer-offset, 0rem) + var(--app-shell-padding));
+  --app-shell-main-col-height: calc(100vh - var(--app-shell-main-col-top-padding) - var(--app-shell-main-col-bottom-padding));
+
+  min-height: var(--app-shell-main-col-height);
+}
