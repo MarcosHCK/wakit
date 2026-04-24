@@ -18,7 +18,7 @@
 namespace Wakit.Example
 {
 
-  public class Application: Wakit.Application
+  public sealed class Application: Wakit.Application
     {
 
       public Application ()
@@ -31,10 +31,46 @@ namespace Wakit.Example
       public override void activate ()
         {
 
-          GLib.File file = GLib.File.new_for_uri ("about:blank");
+          GLib.File file = GLib.File.new_for_uri ("app:///");
           GLib.File files [1] = { file };
 
           open (files, "");
+        }
+
+      public override void constructed ()
+        {
+
+          base.constructed ();
+          add_main_option ("bundle", 0, 0, GLib.OptionArg.FILENAME, "bundle.gresource", "Application bundle to serve");
+        }
+
+      public override int handle_local_options (GLib.VariantDict options)
+        {
+
+          GLib.Variant? value = null;
+
+          if (null != (value = options.lookup_value ("bundle", (GLib.VariantType) "ay")))
+            {
+
+              var filename = value.get_bytestring ();
+
+              try
+                { var bundle = new Bundle.Bundle.from_file (filename);
+                  var pattern = new GLib.Regex ("^/$", GLib.RegexCompileFlags.OPTIMIZE,
+                                                                GLib.RegexMatchFlags.DEFAULT);
+                  bundle.add_alias (new Bundle.RegexAlias (pattern, "/index.html"));
+                  Bundle.register_uri_scheme_in_bundle ("app", browser, bundle); }
+              catch (GLib.Error error)
+                {
+                  unowned uint code = error.code;
+                  unowned string domain = error.domain.to_string ();
+                  unowned string message = error.message.to_string ();
+
+                  printerr ("Wakit.Bundle.Bundle.from_file ()!: %s: %u: %s", domain, code, message);
+                  return -1;
+                }
+            }
+        return base.handle_local_options (options);
         }
 
       public static int main (string[] argv)
