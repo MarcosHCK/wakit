@@ -15,45 +15,14 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-xxd_exe = find_program ('xxd', required: false)
-
-if not xxd_exe.found ()
-
-  python = import ('python')
-  python = python.find_installation ('python3')
-
-  xxd_exe = python.full_path () + ' ' + meson.current_source_dir () / 'xxd.py'
-else
-
-  xxd_exe = xxd_exe.full_path ()
-endif
-
-esbuild_exe = find_program ('esbuild', required: true)
-
-if true
-
-  python = import ('python')
-  python = python.find_installation ('python3')
-
-  jscompiler_gen = meson.current_source_dir () / 'jscompiler.py'
-  jscompiler_gen = generator (python, arguments: [ jscompiler_gen,
-                                                   '-b', '@BUILD_DIR@',
-                                                   '--esbuild', esbuild_exe.full_path (),
-                                                   '--xxd', xxd_exe,
-                                                   '@EXTRA_ARGS@', '@INPUT@', '@OUTPUT@' ],
-                                      output: '@BASENAME@.hex.c')
-endif
-
 __extension_utility_src = [ 'marshalling.h',
                             'marshallingpack.cc',
                             'marshallingunpack.cc', ]
 
 foreach bit: [ 'objectserializer' ]
 
-  name = '@0@_js'.format (bit)
-  source = '@0@.ts'.format (bit)
-
-  __extension_utility_src += jscompiler_gen.process (source, extra_args: [ '-n', name ])
+  __extension_utility_src += jscompiler_gen.process ('@0@.ts'.format (bit),
+                                 extra_args: [ '-n', '@0@_js'.format (bit) ])
 endforeach
 
 foreach bit: [ 'promise' ]

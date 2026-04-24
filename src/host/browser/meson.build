@@ -31,6 +31,15 @@ foreach lib: [ 'browser', 'extensionhost', 'urirequest', 'widget' ]
   __host_browser_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
+foreach bit: [ 'browser' ]
+
+  __host_browser_src += jscompiler_gen.process ('@0@.css'.format (bit),
+                            extra_args: [ '-n', '@0@_css'.format (bit) ])
+
+  __host_browser_src += jscompiler_gen.process ('@0@.ts'.format (bit),
+                            extra_args: [ '-n', '@0@_js'.format (bit) ])
+endforeach
+
 __host_browser_deps = [ __common_dep,
                         __host_interfaces_dep ]
 

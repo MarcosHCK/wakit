@@ -40,7 +40,7 @@ export const App = ({ root }: { root: HTMLDivElement }) => <BrowserRouter>
     <AppShell header={{ height: headerHeightPx }}
                 padding='md'>
 
-      <AppShell.Header>
+      <AppShell.Header data-wakit-drag-area>
 
         <Group className={css.appShellHeaderGroup}>
 

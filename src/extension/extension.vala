@@ -89,8 +89,8 @@ namespace Wakit
           Binding.ProxyBuilder.register (context);
           Binding.ProxyLister.register (context);
 
-          var setup = context.evaluate_with_source_uri (JS_CODE, JS_CODE_LEN,
-            "wakit:///extension/extension.js", 1);
+          var setup = context.evaluate_with_source_uri (JS_CODE, JS_CODE_LEN - 1,
+            "wakit:///extension/extension.ts", 1);
 
           var dbus_service = new Binding.DBusService (_appbus, BUS_NAME);
           var proxyBuilder = (new Binding.ProxyBuilder (dbus_service)).to_value (context);

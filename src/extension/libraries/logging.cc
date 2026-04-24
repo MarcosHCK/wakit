@@ -66,8 +66,8 @@ JSCValue* wakit_libraries_logging_register (JSCContext* context)
   auto lib = jsc_value_new_object (context, nullptr, nullptr);
   auto log = jsc_value_new_function_variadic (context, "log", G_CALLBACK (log_callback), flags_class, g_type_class_unref, G_TYPE_NONE);
 
-  auto ctr = jsc_context_evaluate_with_source_uri (context, (const gchar*) logging_js, logging_js_len,
-    "wakit:///extension/libraries/logging.js", 1);
+  auto ctr = jsc_context_evaluate_with_source_uri (context, (const gchar*) logging_js, logging_js_len - 1,
+    "wakit:///extension/libraries/logging.ts", 1);
 
   JSCValue* codeloc;
   jsc_value_object_set_property (lib, "codeloc", (codeloc = make_codeloc (context, ctr)));

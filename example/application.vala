@@ -21,6 +21,8 @@ namespace Wakit.Example
   public sealed class Application: Wakit.Application
     {
 
+      private bool with_frame = true;
+
       public Application ()
         {
 
@@ -44,6 +46,7 @@ namespace Wakit.Example
           base.constructed ();
           add_main_option ("bundle", 0, 0, GLib.OptionArg.FILENAME, "Application bundle to serve", "FILE");
           add_main_option ("tree", 0, 0, GLib.OptionArg.FILENAME, "Application tree to serve", "DIRECTORY");
+          add_main_option ("with-frame", 0, 0, GLib.OptionArg.NONE, "Preserve the system's window frame", null);
         }
 
       public override int handle_local_options (GLib.VariantDict options)
@@ -85,6 +88,11 @@ namespace Wakit.Example
               browser.register_uri_scheme_as_local ("app");
             }
 
+          if (null == (value = options.lookup_value ("with-frame", (GLib.VariantType) "b")) || !value.get_boolean ())
+            {
+              with_frame = false;
+            }
+
         return base.handle_local_options (options);
         }
 
@@ -104,6 +112,15 @@ namespace Wakit.Example
 
           var window = new Gtk.ApplicationWindow (this);
           var web_view = browser.create_view ();
+
+          if (! with_frame)
+            {
+
+              var bar = new Gtk.HeaderBar ();
+
+              bar.visible = false;
+              window.set_titlebar (bar);
+            }
 
           window.set_child (web_view);
           window.set_default_size (800, 600);
