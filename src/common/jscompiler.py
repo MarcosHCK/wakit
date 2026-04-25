@@ -16,6 +16,8 @@
 #
 from argparse import ArgumentParser
 from compiler import esbuild, xxd
+from depfile import Depfile
+from depmod import depmod
 from pathlib import Path
 from xxd import make_name
 
@@ -27,39 +29,51 @@ if __name__ == '__main__':
   parser.add_argument ('output', default = '-', metavar = 'output', nargs = '?', type = str)
 
   parser.add_argument ('-b', default = '.', metavar = 'dir', type = str)
+  parser.add_argument ('--dep', default = None, metavar = 'file', type = str)
   parser.add_argument ('--esbuild', default = 'esbuild', metavar = 'bin', type = str)
   parser.add_argument ('-n', default = None, metavar = 'dir', type = str)
+  parser.add_argument ('--tmp', default = None, metavar = 'dir', type = str)
   parser.add_argument ('--xxd', default = 'xxd', metavar = 'bin', type = str)
 
   args = parser.parse_args ()
+
   base = Path (args.b)
+  priv = base if not (tmp := args.tmp) else Path (tmp)
 
   input_file = Path (args.input)
-  input_vec = input_file.name.split ('.')
+  input_vec = (name := input_file.name).split ('.')
 
   match (ext := input_vec [-1]):
 
     case 'css':
       esbuild_args = [ ]
       extra_data = None
-      final_ext = '.min.css'
   
     case 'js' | 'ts':
       esbuild_args = [ '--bundle', '--format=iife', '--global-name=__module__' ]
       extra_data = b'__module__'
-      final_ext = '.min.js'
 
     case _:
       raise Exception (f'unknown file type {ext}')
 
-  if 2 > len (input_vec):
+  meta_file = priv / f'{name}.meta.json'
+  module_file = priv / f'{name}.min.js'
+  output_file = Path (args.output)
 
-    module_file = base / (input_vec [0] + final_ext)
-  else:
-    module_file = base / ('.'.join (input_vec [:-1]) + final_ext)
+  if not not args.dep:
+
+    esbuild_args.append (f'--metafile={meta_file}')
 
   esbuild (args.esbuild, [ '--minify', *esbuild_args,
                            f'--outfile={str (module_file.absolute ())}', str (input_file.absolute ()) ])
+
+  if not not (file := args.dep):
+
+    with Depfile (Path (file)) as depfile:
+
+      # depfile.add_step (output_file, [ module_file ])
+      # depfile.add_step (module_file, (Path (f) for f in depmod (meta_file)))
+      depfile.add_step (output_file, (Path (f) for f in depmod (meta_file)))
 
   variable_name = args.n if None != args.n else make_name (args.input)
 

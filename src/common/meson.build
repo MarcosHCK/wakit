@@ -46,9 +46,11 @@ if true
   jscompiler_gen = meson.current_source_dir () / 'jscompiler.py'
   jscompiler_gen = generator (python, arguments: [ jscompiler_gen,
                                                    '-b', '@BUILD_DIR@',
+                                                   '--dep', '@DEPFILE@',
                                                    '--esbuild', esbuild_exe.full_path (),
                                                    '--xxd', xxd_exe,
                                                    '@EXTRA_ARGS@', '@INPUT@', '@OUTPUT@' ],
+                                      depfile: '@PLAINNAME@.deps',
                                       output: '@PLAINNAME@.c')
 endif
 
