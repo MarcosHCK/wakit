@@ -127,6 +127,7 @@ namespace Wakit.Example
           window.set_child (web_view);
           window.set_default_size (800, 600);
 
+          web_view.bind_toplevel (window);
           web_view.open_uri (file, hint);
 
           window.present ();

@@ -102,14 +102,14 @@ namespace Wakit
       private void on_window_object_cleared (WebKit.WebPage web_page, WebKit.Frame frame)
         {
 
-          JSC.Context context = frame.get_js_context_for_script_world (_script_world);
-
           if (! is_secure (frame, _secure_schemes))
             return;
 
-          context.set_value ("logging", Libraries.Logging.register (context));
+          JSC.Context context = frame.get_js_context_for_script_world (_script_world);
 
           registration (context, web_page, frame);
+
+          context.set_value ("logging", Libraries.Logging.register (context));
 
           Binding.ProxyBuilder.register (context);
           Binding.ProxyLister.register (context);
@@ -123,6 +123,10 @@ namespace Wakit
           JSC.Value parameters [] = { proxyBuilder, proxyLister };
 
           setup.object_get_property ("makeBridge").function_callv (parameters);
+
+          Binding.BrowserWindow.register (context, "Wakit.Binding.BrowserWindow");
+
+          context.set_value ("browserWindow", (new Binding.BrowserWindow (web_page)).to_value (context));
         }
 
       [CCode (cname = "WAKIT_WEB_EXTENSION_GET_CLASS (self)->registration")]

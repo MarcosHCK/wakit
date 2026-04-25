@@ -28,6 +28,8 @@ namespace Wakit
   public interface IWebView: Gtk.Widget
     {
 
+      public abstract void bind_toplevel (Gtk.Window? toplevel);
+
       public abstract void open_uri (GLib.File uri, string hint);
 
       [CCode (cname = "WAKIT_IWEB_VIEW_GET_INTERFACE (self)->terminated")]

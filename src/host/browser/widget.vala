@@ -18,14 +18,48 @@
 namespace Wakit.Browser
 {
 
+  /**
+   * Keep *_NAME_* constants in sync with extension/bindings/browserwindow.vala
+   * - note: at the start of the class definition
+   */
+
   public class Widget: Gtk.Grid, IWebView
     {
 
+      public bool maximized { get; set; }
       public WebKit.WebView web_view { get; construct; }
+
+      private WidgetBinding? _binding = null;
+
+      const string METHOD_NAME_CLOSE = "Wakit.BrowserWindow.Close";
+      const string METHOD_NAME_DRAG = "Wakit.BrowserWindow.Drag";
+      const string METHOD_NAME_MAXIMIZE = "Wakit.BrowserWindow.Maximize";
+      const string METHOD_NAME_MINIMIZE = "Wakit.BrowserWindow.Minimize";
+
+      const string SIGNAL_NAME_CLOSE = "Wakit.BrowserWindow.Close";
+      const string SIGNAL_NAME_MAXIMIZED = "Wakit.BrowserWindow.Maximized";
+      const string SIGNAL_NAME_MINIMIZED = "Wakit.BrowserWindow.Minimized";
+
+      ~Widget ()
+        {
+
+          if (null != _binding)
+            _binding.toplevel?.weak_unref (unbind_toplevel);
+        }
 
       public Widget (WebKit.WebView web_view)
         {
           Object (web_view: web_view);
+        }
+
+      public void bind_toplevel (Gtk.Window? toplevel)
+        {
+
+          _binding = null; if (null == toplevel)
+            return;
+
+          _binding = new WidgetBinding (this, toplevel);
+          toplevel.weak_ref (unbind_toplevel);
         }
 
       public override void constructed ()
@@ -38,19 +72,35 @@ namespace Wakit.Browser
 
           _web_view.decide_policy.connect (on_decide_policy);
           _web_view.permission_request.connect (on_permission_request);
+          _web_view.user_message_received.connect (on_user_message_received);
           _web_view.web_process_terminated.connect (on_web_process_terminated);
+
+          notify ["maximized"].connect (on_notify_maximized);
 
           attach (_web_view, 0, 0);
         }
 
-      private Gtk.Window? get_toplevel ()
+      [CCode (cname = "WAKIT_BROWSER_WIDGET_GET_CLASS (self)->close")]
+      extern const uintptr close_actv;
+
+      [CCode (cname = "wakit_browser_widget_real_close")]
+      extern const uintptr close_real;
+
+      [CCode (cname = "wakit_browser_widget_signals[WAKIT_BROWSER_WIDGET_CLOSE_SIGNAL]")]
+      extern const uint close_sid;
+
+      [HasEmitter, Signal (action = true, run = "last")]
+      public virtual signal void close ()
         {
 
-          Gtk.Widget? widget = null;
+          if (! GLib.Signal.has_handler_pending (this, close_sid, 0, true)
+             && close_actv == close_real)
+            {
 
-          for (widget = get_parent (); null != widget && ! (widget is Gtk.Window); widget = widget.get_parent ())
-            ;
-        return (Gtk.Window?) widget;
+              GLib.warning_once ("Your application does not implement "
+                               + "wakit_browser_widget_close() and has no handlers connected "
+                               + "to the 'close' signal. It should do one of these.");
+            }
         }
 
       public void open_uri (GLib.File file, string hint)
@@ -129,7 +179,7 @@ namespace Wakit.Browser
           var message = new Gui.Message.question ("%s wants to redirect to %s", webview.get_uri (),
                                                                                 request.get_uri ());
 
-          on_decide_policy_ask (message, get_toplevel (), decision);
+          on_decide_policy_ask (message, _binding?.toplevel, decision);
         return true;
         }
 
@@ -141,12 +191,63 @@ namespace Wakit.Browser
         return true;
         }
 
+      private void on_notify_maximized () requires (null != _web_view)
+        {
+
+          var parameters = new GLib.Variant ("(b)", maximized);
+          var message = new WebKit.UserMessage (SIGNAL_NAME_MAXIMIZED, parameters);
+
+          _web_view.send_message_to_page.begin (message, null);
+        }
+
       private bool on_permission_request (WebKit.WebView webview, WebKit.PermissionRequest request)
         {
 
           request.deny ();
           warning ("permission request (type %s) denied", request.get_type ().name ());
         return true;
+        }
+
+      private bool on_user_message_received (WebKit.UserMessage message)
+        {
+
+          unowned var name = message.get_name ();
+          GLib.Variant result;
+
+          try
+            { GLib.Variant parameters = message.get_parameters ();
+              GLib.Variant? value = on_user_message_received_inner (name, parameters);
+              if (null == value) return false;
+              result = IpcResult.pack_value (value); }
+          catch (GLib.Error error)
+            { result = IpcResult.pack_error (error); }
+
+          message.send_reply (new WebKit.UserMessage (name, result));
+        return true;
+        }
+
+      static void on_user_message_received_check (GLib.Variant parameters, string format_string) throws GLib.Error
+        {
+
+          if (! parameters.check_format_string (format_string, false))
+            throw new GLib.IOError.INVALID_ARGUMENT ("invalid command parameters");
+        }
+
+      private GLib.Variant? on_user_message_received_inner (string name, GLib.Variant parameters) throws GLib.Error
+        {
+
+          switch (name)
+            {
+
+            case METHOD_NAME_CLOSE: close ();
+              return new GLib.Variant.boolean (true);;
+
+            case METHOD_NAME_DRAG: on_user_message_received_check (parameters, "(b)");
+              { bool drag = parameters.get_child_value (0).get_boolean ();
+                print ("drag = %s\n", drag ? "true" : "false");
+                return new GLib.Variant.boolean (true);; }
+            }
+        return null;
         }
 
       private void on_web_process_terminated (WebKit.WebView webview, WebKit.WebProcessTerminationReason reason)
@@ -161,6 +262,10 @@ namespace Wakit.Browser
             }
 
           terminated (_reason);
+        }
+
+      private void unbind_toplevel ()
+        {
         }
     }
 }

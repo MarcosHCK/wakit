@@ -60,7 +60,7 @@ foreach lib: [ ]
   __common_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'collection', 'listcollection', 'ptrarraycollection', 'timeoutcancellable' ]
+foreach lib: [ 'collection', 'ipcresult', 'listcollection', 'ptrarraycollection', 'timeoutcancellable' ]
 
   __common_src += [ '@0@.vala'.format (lib) ]
 endforeach
