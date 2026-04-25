@@ -45,7 +45,7 @@ if __name__ == '__main__':
       final_ext = '.min.css'
   
     case 'js' | 'ts':
-      esbuild_args = [ '--format=iife', '--global-name=__module__' ]
+      esbuild_args = [ '--bundle', '--format=iife', '--global-name=__module__' ]
       extra_data = b'__module__'
       final_ext = '.min.js'
 

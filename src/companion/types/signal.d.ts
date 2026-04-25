@@ -14,13 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-*[data-wakit-drag-area]
+export interface IWithSignals
 {
-  -webkit-user-select: none;
+  disconnect: (handler_id: number) => void,
 }
 
-*[data-wakit-drag-area]:where([data-wakit-drag-area-active])
+export interface SignalSpec<T extends any[], R = any>
 {
-  cursor: grabbing;
+  connect: (handler: (...args: T) => R) => number,
 }

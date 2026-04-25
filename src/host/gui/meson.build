@@ -23,7 +23,7 @@ foreach bit: []
   __host_gui_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'message' ]
+foreach bit: [ 'dragger', 'message' ]
 
   __host_gui_src += [ '@0@.vala'.format (bit) ]
 endforeach

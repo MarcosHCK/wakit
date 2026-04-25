@@ -14,3 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+import { DataAttrWatcher } from './DataAttrWatcher'
+import { DragController } from './DragController'
+
+const dragControllers = new Map<HTMLElement, DragController> ()
+
+const dataDragAreaWatcher = new DataAttrWatcher ('data-wakit-drag-area', elements =>
+{
+
+  for (const element of elements) if (element instanceof HTMLElement)
+
+    { const attr = element.getAttribute ('data-wakit-drag-area')
+      const span = Number (attr)
+
+      dragControllers.set (element, new DragController (element, !isNaN (span) ? span : undefined)) }
+  else
+    console.warn (element, "invalid use of attribute 'data-wakit-drag-area'")
+})

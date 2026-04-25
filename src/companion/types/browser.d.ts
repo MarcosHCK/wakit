@@ -14,13 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+/* eslint-disable @typescript-eslint/no-namespace */
+import { SignalSpec } from './signal'
 
-*[data-wakit-drag-area]
+declare global
 {
-  -webkit-user-select: none;
+
+  namespace browserWindow
+    {
+
+      function close (): void;
+      function disconnect (signal_id: number): void;
+      function drag (should: boolean): Promise<void>;
+      function maximize (value?: boolean): Promise<void>;
+      function minimize (value?: boolean): Promise<void>;
+      const onClose: SignalSpec<[]>;
+      const onMaximized: SignalSpec<[ boolean ]>;
+      const onMinimized: SignalSpec<[ boolean ]>;
+    }
 }
 
-*[data-wakit-drag-area]:where([data-wakit-drag-area-active])
-{
-  cursor: grabbing;
-}
+export { }

@@ -30,6 +30,7 @@ namespace Wakit.Browser
       public WebKit.WebView web_view { get; construct; }
 
       private WidgetBinding? _binding = null;
+      private Gui.Dragger _dragger = new Gui.Dragger ();
 
       const string METHOD_NAME_CLOSE = "Wakit.BrowserWindow.Close";
       const string METHOD_NAME_DRAG = "Wakit.BrowserWindow.Drag";
@@ -77,6 +78,7 @@ namespace Wakit.Browser
 
           notify ["maximized"].connect (on_notify_maximized);
 
+          add_controller (_dragger.controller);
           attach (_web_view, 0, 0);
         }
 
@@ -243,9 +245,8 @@ namespace Wakit.Browser
               return new GLib.Variant.boolean (true);;
 
             case METHOD_NAME_DRAG: on_user_message_received_check (parameters, "(b)");
-              { bool drag = parameters.get_child_value (0).get_boolean ();
-                print ("drag = %s\n", drag ? "true" : "false");
-                return new GLib.Variant.boolean (true);; }
+              { _dragger.drag = parameters.get_child_value (0).get_boolean ();
+                return new GLib.Variant.boolean (true); }
             }
         return null;
         }

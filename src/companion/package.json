@@ -1,0 +1,23 @@
+{
+  "author": "MarcosHCK <marcoshck16@gmail.com>",
+  "description": "A companion universal module for Wakit clients",
+  "files": [
+    "dist",
+    "types"
+  ],
+  "keywords": [
+    "wakit",
+    "companion"
+  ],
+  "license": "GPL-3.0-or-later",
+  "main": "./dist/index.js",
+  "name": "@wakit/companion",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MarcosHCK/Wakit.git"
+  },
+  "scripts": {
+  },
+  "types": "./types/index.d.ts",
+  "version": "0.0.0"
+}
