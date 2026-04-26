@@ -14,8 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
-from pathlib import Path
-from typing import TypedDict
+from typing import IO, TypedDict
 import json
 
 __all__ = [ 'depmod', 'Metafile',
@@ -38,12 +37,9 @@ class Metafile (TypedDict):
 
   inputs: dict[str, MetafileInput]
 
-def depmod (meta: Path):
+def depmod (stream: IO[bytes] | IO[str]):
 
-  data: Metafile
-
-  with meta.open ('rt') as stream:
-    data = json.load (fp = stream)
+  data: Metafile = json.load (fp = stream)
 
   if not (inputs := data.get ('inputs', None)):
     raise Exception ('invalid build meta file')

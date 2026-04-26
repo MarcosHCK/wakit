@@ -19,12 +19,6 @@ __extension_utility_src = [ 'marshalling.h',
                             'marshallingpack.cc',
                             'marshallingunpack.cc', ]
 
-foreach bit: [ 'objectserializer' ]
-
-  __extension_utility_src += jscompiler_gen.process ('@0@.ts'.format (bit),
-                                 extra_args: [ '-n', '@0@_js'.format (bit) ])
-endforeach
-
 foreach bit: [ 'promise' ]
 
   __extension_utility_src += [ '@0@.cc'.format (bit) ]

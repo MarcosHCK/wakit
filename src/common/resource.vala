@@ -15,31 +15,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type Serializer =
-{
-  add_key: (key: string) => void,
-  add_value: (value: unknown) => void,
-  close: () => void,
-  open: () => void,
-}
-
-function perform (object: object, serializer: Serializer)
+namespace Wakit
 {
 
-  for (const [ key, value ] of Object.entries (object))
+  public static GLib.Bytes lookup_build_resource (GLib.Resource resource, string path)
     {
-      serializer.open ()
-      serializer.add_key (key)
-      serializer.add_value (value)
-      serializer.close ()
+
+      try
+        {
+          return resource.lookup_data (path, 0);
+        }
+      catch (GLib.ResourceError.NOT_FOUND error)
+        {
+          GLib.error ("missing build resource '%s'", path);
+        }
+      catch (GLib.Error error)
+        {
+          unowned uint code = error.code;
+          unowned string domain = error.domain.to_string ();
+          unowned string message = error.message.to_string ();
+
+          GLib.error ("can not open build resource '%s': %s: %u: %s", path, domain, code, message);
+        }
     }
-}
-
-export function serialize (object: object, serializer: Serializer)
-{
-
-  try
-    { perform (object, serializer) }
-  catch (error)
-    { return error }
 }

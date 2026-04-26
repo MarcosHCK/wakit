@@ -93,11 +93,8 @@ namespace Wakit
                                                                    GLib.Variant? parameters,
                                                                    GLib.Type g_type);
 
-      [CCode (cheader_filename = "extension/extension.h")]
-      extern const string JS_CODE;
-
-      [CCode (cheader_filename = "extension/extension.h")]
-      extern const uint JS_CODE_LEN;
+      [CCode (cheader_filename = "glib.h", cname = "g_bytes_get_data")]
+      extern static unowned void* _g_bytes_get_data (GLib.Bytes bytes, out size_t size);
 
       private void on_window_object_cleared (WebKit.WebPage web_page, WebKit.Frame frame)
         {
@@ -114,7 +111,14 @@ namespace Wakit
           Binding.ProxyBuilder.register (context);
           Binding.ProxyLister.register (context);
 
-          var setup = context.evaluate_with_source_uri (JS_CODE, JS_CODE_LEN - 1,
+          unowned var resource = Resource.peek ();
+
+          var bytes = lookup_build_script (resource, "/org/hck/wakit/extension/extension.min.js");
+
+          unowned var size = (size_t) 0;
+          unowned var code = (string) _g_bytes_get_data (bytes, out size);
+
+          var setup = context.evaluate_with_source_uri (code, (ssize_t) size,
             "wakit:///extension/extension.ts", 1);
 
           var dbus_service = new Binding.DBusService (_appbus, BUS_NAME);

@@ -21,6 +21,12 @@ config_vala_dep = declare_dependency (dependencies: config_dep, sources: 'config
 
 base_dir = meson.current_build_dir ()
 
+# level 0
+subdir ('scripts')
+
+# level 1
 subdir ('common')
+
+# level 2
 subdir ('extension')
 subdir ('host')

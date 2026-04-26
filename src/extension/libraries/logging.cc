@@ -17,7 +17,9 @@
 #include <config.h>
 #include <common/boxing.h>
 #include <common/mixin.h>
+#include <common/wakit-common.h>
 #include <extension/libraries/logging.h>
+#include <extension/resource.h>
 #include <span>
 #include <type_traits>
 
@@ -53,8 +55,7 @@ static JSCValue* make_codeloc (JSCContext* context, JSCValue* ctr);
 static JSCValue* make_log_func (JSCContext* context, JSCValue* logfunc, JSCValue* codeloc, JSCValue* ctr, GLogLevelFlags flags);
 static JSCValue* make_log_level (JSCContext* context, GFlagsClass* flags_class);
 
-extern unsigned char logging_js [];
-extern unsigned int logging_js_len;
+extern "C" GResource* wakit_libraries__get_resource ();
 
 JSCValue* wakit_libraries_logging_register (JSCContext* context)
 {
@@ -66,8 +67,14 @@ JSCValue* wakit_libraries_logging_register (JSCContext* context)
   auto lib = jsc_value_new_object (context, nullptr, nullptr);
   auto log = jsc_value_new_function_variadic (context, "log", G_CALLBACK (log_callback), flags_class, g_type_class_unref, G_TYPE_NONE);
 
-  auto ctr = jsc_context_evaluate_with_source_uri (context, (const gchar*) logging_js, logging_js_len - 1,
+  auto resource = wakit_libraries__get_resource ();
+  auto bytes = wakit_lookup_build_script (resource, "/org/hck/wakit/extension/libraries/logging.min.js");
+
+  gsize size = 0;
+
+  auto ctr = jsc_context_evaluate_with_source_uri (context, (const gchar*) g_bytes_get_data (bytes, &size), size,
     "wakit:///extension/libraries/logging.ts", 1);
+  g_bytes_unref (bytes);
 
   JSCValue* codeloc;
   jsc_value_object_set_property (lib, "codeloc", (codeloc = make_codeloc (context, ctr)));

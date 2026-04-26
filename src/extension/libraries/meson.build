@@ -23,18 +23,31 @@ foreach bit: [ 'logging' ]
   __extension_libraries_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'logging' ]
+foreach bit: [ 'logging', 'resources' ]
 
   __extension_libraries_src += [ '@0@.vala'.format (bit) ]
 endforeach
 
+__extension_libraries_bundle = []
+
 foreach bit: [ 'logging' ]
 
-  name = '@0@_js'.format (bit)
-  source = '@0@.ts'.format (bit)
-
-  __extension_libraries_src += jscompiler_gen.process (source, extra_args: [ '-n', name ])
+  __extension_libraries_bundle += esbuild_js_gen.process ('@0@.ts'.format (bit))
 endforeach
+
+__extension_libraries_src += custom_target ('wakit-extension-libraries-resources',
+  command: [ python_exe,
+             mkresources_py,
+             '--basedir', '@PRIVATE_DIR@',
+             '--bin', resources_exe.full_path (),
+             '--dep', '@DEPFILE@',
+             '--header', '@OUTPUT0@',
+             '--source', '@OUTPUT1@',
+             '--name', 'wakit_libraries_',
+             '-s', '/org/hck/wakit/extension/libraries/', '@INPUT@' ],
+  depfile: 'resources.deps',
+  input: __extension_libraries_bundle,
+  output: [ 'resources.bundle.h', 'resources.bundle.c' ])
 
 __extension_libraries_deps = [ __common_dep,
                               __extension_utility_dep, ]

@@ -15,42 +15,45 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 from argparse import ArgumentParser
+from argparse import Namespace
 from chunked import chunked
+from codecs import escape_decode
+from grouped import grouped
 from itertools import chain
 from pathlib import Path
 from re import compile, ASCII
-from sys import stdin, stdout
-from typing import BinaryIO, Iterator, TextIO
-
-class Arguments:
-
-  def __init__ (self, c: int, C: bool, l: int, n: str) -> None:
-
-    self._column_bytes = c
-    self._capitalize_name = C
-    self._length = l
-    self._variable_name = n
-
-  @property
-  def capitalize_name (self):
-
-    return self._capitalize_name
-
-  @property
-  def column_bytes (self):
-
-    return self._column_bytes
-
-  @property
-  def variable_name (self):
-
-    if not self._capitalize_name:
-
-      return self._variable_name
-    else:
-      return self._variable_name.upper ()
+from tool import tool
+from typing import Iterable
 
 escape_re = compile ('([a-zA-Z0-9_]+)', flags = ASCII)
+
+def dump (input: Iterable[bytes], name: str, cols: int):
+
+  yield f'unsigned char {name}[] = {{'
+
+  count = yield from dump_bytes (input, cols)
+
+  yield '\n};\n\n'
+  yield f'unsigned int {name}_len = {count};\n'
+
+def dump_bytes (input: Iterable[bytes], cols: int):
+
+  count = 0
+
+  for group in grouped (input, cols):
+
+    yield '\n\t'
+
+    for piece in group:
+
+      count += len (piece)
+
+      for piece in (f'0x{b:02x}' for b in piece):
+
+        yield piece
+        yield ', '
+
+  return count
 
 def make_name (input: str):
 
@@ -64,101 +67,46 @@ def make_name (input: str):
 
     return '_'.join (iter)
 
-def phase1 (input: str, output: str, arguments: Arguments):
+def parse_extra (extra: str | None = None) -> list[bytes]:
 
-  if '-' == input:
+  if not extra:
+    return []
 
-    phase2 (stdin, output, arguments) # type: ignore
+  value, _ = escape_decode (extra)
+
+  if isinstance (value, bytes):
+
+    return [ value ]
   else:
+    return [ str (value).encode () ]
 
-    with Path (input).open ('rb') as stream:
-      phase2 (stream, output, arguments)
+def write (input: Iterable[bytes], output: str, args: Namespace):
 
-def phase2 (input: BinaryIO, output: str, arguments: Arguments):
+  extra = parse_extra (args.extra)
+  name = args.n if None != args.n else make_name (args.input)
+
+  if not args.bin:
+
+    write_not_xxd (chain (input, extra), output, name, args.c)
+  else:
+    write_yes_xxd (chain (input, extra), output, name, args.c)
+
+def write_not_xxd (input: Iterable[bytes], output: str, name: str, cols: int):
+
+  pieces = dump (input, name, cols)
 
   if '-' == output:
 
-    phase3 (input, stdout, arguments) # type: ignore
+    from sys import stdout
+    stdout.writelines (pieces)
   else:
 
     with Path (output).open ('wt') as stream:
-      phase3 (input, stream, arguments)
+      stream.writelines (pieces)
 
-def grouped (input: Iterator[tuple[bytes,int]], group_siz: int = 16):
+def write_yes_xxd (input: Iterable[bytes], output: str, name: str, cols: int):
 
-  accumulator: list[bytes] = []
-  reserved = 0
-
-  for (chunk, got) in input:
-
-    taken = 0
-
-    while 0 < got - taken:
-
-      take = min (got - taken, group_siz - reserved)
-      byte = chunk [taken: taken + take]
-
-      reserved += take
-      taken += take
-
-      accumulator.append (byte)
-
-      if reserved == group_siz:
-
-        reserved = 0
-
-        yield chain (accumulator)
-        accumulator.clear ()
-
-  if reserved > 0:
-
-    yield chain (accumulator)
-
-def write_byte (b: int|str):
-
-  n = b if isinstance (b, int) else ord (b)
-  return f'0x{n:02x}'
-
-def write_bytes (input: BinaryIO, output: TextIO, indent: str, arguments: Arguments):
-
-  count = 0
-
-  for iter in grouped (chunked (input, 1024), arguments.column_bytes):
-
-    output.write ('\n' if 0 == count else ',\n')
-    output.write (indent)
-
-    first = True
-
-    for piece in iter:
-
-      count += len (piece)
-
-      for byte in map (write_byte, piece):
-
-        if first:
-
-          first = False
-          output.write (byte)
-        else:
-          output.write (', ')
-          output.write (byte)
-
-  return count
-
-def phase3 (input: BinaryIO, output: TextIO, arguments: Arguments):
-
-  output.write ('')
-
-  output.write ('\n')
-  output.write (f'unsigned char {arguments.variable_name}[] = {{')
-
-  count = write_bytes (input, output, '  ', arguments)
-
-  output.write ('\n};\n\n')
-
-  suffix = 'len' if not arguments.capitalize_name else 'LEN'
-  output.write (f'unsigned int {arguments.variable_name}_{suffix} = {count};\n')
+  tool (args.bin, [ '-i', '-c', str (cols), '-n', name, '-', output ], input)
 
 if __name__ == '__main__':
 
@@ -168,15 +116,21 @@ if __name__ == '__main__':
   parser.add_argument ('output', default = '-', metavar = 'output', nargs = '?', type = str)
 
   parser.add_argument ('-c', default = 16, metavar = 'cols', type = int)
-  parser.add_argument ('-C', action = 'store_true')
-  parser.add_argument ('-i', action = 'store_true')
-  parser.add_argument ('-l', metavar = 'cols', type = int)
   parser.add_argument ('-n', default = None, metavar = 'name', type = str)
 
+  parser.add_argument ('--bin', default = None, metavar = 'bin', type = str)
+  parser.add_argument ('--extra', default = None, metavar = 'bytes', type = str)
+
   args = parser.parse_args ()
-  arguments = Arguments (args.c, args.C, args.l, args.n if None != args.n else make_name (args.input))
 
-  if not args.i:
-    raise Exception ('should have use -i')
+  if '-' == args.input:
 
-  phase1 (args.input, args.output, arguments)
+    from sys import stdin
+    stream = (b.encode () for b,_ in chunked (stdin))
+
+    write (stream, args.output, args)
+  else:
+
+    with Path (args.input).open ('rb') as stream:
+
+      write ((b for b,_ in chunked (stream)), args.output, args)

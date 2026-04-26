@@ -20,25 +20,38 @@ webkit_dep = dependency ('webkitgtk-6.0', required: true)
 
 __host_browser_src = [ ]
 
-foreach lib: [ ]
+foreach bit: [ ]
 
-  __host_browser_src += [ '@0@.cc'.format (lib) ]
-  __host_browser_src += [ '@0@.h'.format (lib) ]
+  __host_browser_src += [ '@0@.cc'.format (bit) ]
+  __host_browser_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach lib: [ 'browser', 'extensionhost', 'urirequest', 'widget', 'widgetbinding' ]
+foreach bit: [ 'browser', 'extensionhost', 'resource', 'urirequest', 'widget', 'widgetbinding' ]
 
-  __host_browser_src += [ '@0@.vala'.format (lib) ]
+  __host_browser_src += [ '@0@.vala'.format (bit) ]
 endforeach
+
+__host_browser_bundle = []
 
 foreach bit: [ 'browser' ]
 
-  __host_browser_src += jscompiler_gen.process ('@0@.css'.format (bit),
-                            extra_args: [ '-n', '@0@_css'.format (bit) ])
-
-  __host_browser_src += jscompiler_gen.process ('@0@.ts'.format (bit),
-                            extra_args: [ '-n', '@0@_js'.format (bit) ])
+  __host_browser_bundle += esbuild_css_gen.process ('@0@.css'.format (bit))
+  __host_browser_bundle += esbuild_js_gen.process ('@0@.ts'.format (bit))
 endforeach
+
+__host_browser_src += custom_target ('wakit-host-browser-resources',
+  command: [ python_exe,
+             mkresources_py,
+             '--basedir', '@PRIVATE_DIR@',
+             '--bin', resources_exe.full_path (),
+             '--dep', '@DEPFILE@',
+             '--header', '@OUTPUT0@',
+             '--source', '@OUTPUT1@',
+             '--name', 'wakit_browser_',
+             '-s', '/org/hck/wakit/browser/', '@INPUT@' ],
+  depfile: 'resources.deps',
+  input: __host_browser_bundle,
+  output: [ 'resources.bundle.h', 'resources.bundle.c' ])
 
 __host_browser_deps = [ __common_dep,
                         __host_gui_dep,

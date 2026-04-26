@@ -18,12 +18,6 @@
 namespace Wakit.Browser
 {
 
-  [CCode (cheader_filename = "host/browser/browser.h")]
-  extern const string CSS_CODE;
-
-  [CCode (cheader_filename = "host/browser/browser.h")]
-  extern const string JS_CODE;
-
   public class Browser: GLib.Object, IBrowser
     {
 
@@ -87,12 +81,17 @@ namespace Wakit.Browser
 
           string allow_list [] = { "app:///*" };
 
-          _user_content_manager.add_script (new WebKit.UserScript (JS_CODE,
+          unowned var resource = Resource.peek ();
+
+          GLib.Bytes css = lookup_build_resource (resource, "/org/hck/wakit/browser/browser.min.css");
+          GLib.Bytes js = lookup_build_resource (resource, "/org/hck/wakit/browser/browser.min.js");
+
+          _user_content_manager.add_script (new WebKit.UserScript ((string) js.get_data (),
                                                                    WebKit.UserContentInjectedFrames.ALL_FRAMES,
                                                                    WebKit.UserScriptInjectionTime.END,
                                                                    allow_list, null));
 
-          _user_content_manager.add_style_sheet (new WebKit.UserStyleSheet (CSS_CODE,
+          _user_content_manager.add_style_sheet (new WebKit.UserStyleSheet ((string) css.get_data (),
                                                                             WebKit.UserContentInjectedFrames.ALL_FRAMES,
                                                                             WebKit.UserStyleLevel.USER,
                                                                             allow_list, null));

@@ -19,41 +19,6 @@ gio_dep = dependency ('gio-2.0', required: true)
 
 subdir ('enum')
 
-xxd_exe = find_program ('xxd', required: false)
-
-if not xxd_exe.found ()
-
-  python = import ('python')
-  python = python.find_installation ('python3')
-
-  xxd_gen = meson.current_source_dir () / 'xxd.py'
-  xxd_gen = generator (python, arguments: [ xxd_gen, '-i', '@EXTRA_ARGS@', '@INPUT@' ], capture: true, output: '@PLAINNAME@.c')
-
-  xxd_exe = python.full_path () + ' ' + meson.current_source_dir () / 'xxd.py'
-else
-
-  xxd_gen = generator (xxd_exe, arguments: [ '-i', '@EXTRA_ARGS@', '@INPUT@' ], capture: true, output: '@PLAINNAME@.c')
-  xxd_exe = xxd_exe.full_path ()
-endif
-
-esbuild_exe = find_program ('esbuild', required: true)
-
-if true
-
-  python = import ('python')
-  python = python.find_installation ('python3')
-
-  jscompiler_gen = meson.current_source_dir () / 'jscompiler.py'
-  jscompiler_gen = generator (python, arguments: [ jscompiler_gen,
-                                                   '-b', '@BUILD_DIR@',
-                                                   '--dep', '@DEPFILE@',
-                                                   '--esbuild', esbuild_exe.full_path (),
-                                                   '--xxd', xxd_exe,
-                                                   '@EXTRA_ARGS@', '@INPUT@', '@OUTPUT@' ],
-                                      depfile: '@PLAINNAME@.deps',
-                                      output: '@PLAINNAME@.c')
-endif
-
 __common_src = [ 'bits.h', 'boxing.h', 'mixin.h' ]
 
 foreach lib: [ ]
@@ -62,7 +27,7 @@ foreach lib: [ ]
   __common_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'collection', 'ipcresult', 'listcollection', 'ptrarraycollection', 'timeoutcancellable' ]
+foreach lib: [ 'collection', 'ipcresult', 'listcollection', 'ptrarraycollection', 'resource', 'timeoutcancellable' ]
 
   __common_src += [ '@0@.vala'.format (lib) ]
 endforeach

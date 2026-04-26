@@ -14,21 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
-#include <glib.h>
 
-#define WAKIT_BROWSER_CSS_CODE ((const gchar*) browser_css)
-#define WAKIT_BROWSER_CSS_CODE_LEN ((gsize) browser_css_len)
+namespace Wakit.Browser
+{
 
-#define WAKIT_BROWSER_JS_CODE ((const gchar*) browser_js)
-#define WAKIT_BROWSER_JS_CODE_LEN ((gsize) browser_js_len)
-
-G_BEGIN_DECLS
-
-  extern unsigned char browser_css [];
-  extern unsigned int browser_css_len;
-
-  extern unsigned char browser_js [];
-  extern unsigned int browser_js_len;
-
-G_END_DECLS
+  namespace Resource
+    {
+      [CCode (cname = "wakit_browser__get_resource")]
+      public extern static unowned GLib.Resource @peek ();
+    }
+}

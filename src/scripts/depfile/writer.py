@@ -16,41 +16,32 @@
 #
 from pathlib import Path
 from types import TracebackType
-from typing import Iterable, TextIO
+from typing import Iterable
+from writer import Writer as _Writer
 
-__all__ = [ 'Depfile' ]
+__all__ = [ 'Writer' ]
 
-class Depfile:
+class Writer (_Writer[str]):
 
   def __init__ (self, output: Path, base: Path | None = None) -> None:
 
+    super (Writer, self).__init__ (output, 't')
+
     self.base = base if not not base else Path ('.')
     self.first = True
-    self.output: Path = output
-    self.stream: TextIO | None = None
 
-  def __enter__ (self):
+  def __exit__ (self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None:
 
-    self.stream = self.output.open ('wt')
-    self.stream.__enter__ ()
-    return self
+    if not not (stream := self.stream):
+      stream.write ('\n')
 
-  def __exit__ (self, exc_type: type[BaseException] | None,
-                      exc_val: BaseException | None,
-                      exc_tb: TracebackType | None) -> None:
-
-    if not not (self.stream):
-
-      if not exc_val:
-        self.stream.write ('\n')
-
-      self.stream.__exit__ (exc_type, exc_val, exc_tb)
+    return super ().__exit__ (exc_type, exc_val, exc_tb)
 
   def add_step (self, result: Path, inputs: Iterable[Path]):
 
     if not self.first:
 
-      self.write ('\n')
+      self.write ('\n\n')
     else:
       self.first = False
 
@@ -61,11 +52,3 @@ class Depfile:
 
       self.write (' ')
       self.write (str (file))
-
-  def write (self, text: str):
-
-    if not not (stream := self.stream):
-
-      stream.write (text)
-    else:
-      raise Exception ("broken stream")

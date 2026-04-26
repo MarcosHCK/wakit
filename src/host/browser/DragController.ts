@@ -35,7 +35,7 @@ export class DragController
       this.init ()
     }
 
-  private addCallback<T extends () => void> (type: keyof HTMLElementEventMap, callback: T):
+  private addCallback<T extends (...args: any[]) => void> (type: keyof HTMLElementEventMap, callback: T):
       [ keyof HTMLElementEventMap, T ]
     {
 
@@ -72,14 +72,14 @@ export class DragController
 
       logging.debug (`add drag controller (${this._debounce} ms debounce)`)
 
-      this._element.addEventListener (...this.addCallback ('mousedown', () =>
+      this._element.addEventListener (...this.addCallback ('mousedown', (ev: Event) =>
         {
 
           this.disposeTimeout ()
           this._timeout = setTimeout (() => this._down = true, this._debounce)
         }))
 
-      this._element.addEventListener (...this.addCallback ('mousemove', () =>
+      this._element.addEventListener (...this.addCallback ('mousemove', (ev: Event) =>
         {
 
           if (this._down)
@@ -89,7 +89,7 @@ export class DragController
             }
         }))
 
-      this._element.addEventListener (...this.addCallback ('mouseup', () =>
+      this._element.addEventListener (...this.addCallback ('mouseup', (ev: Event) =>
         {
 
           this.disposeTimeout (); if (this._down)
