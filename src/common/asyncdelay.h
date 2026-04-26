@@ -14,3 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+#include <gio/gio.h>
+
+G_BEGIN_DECLS
+
+  void wakit_async_delay (guint timeout, int priority, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data);
+  gboolean wakit_async_delay_finish (GAsyncResult* result, GError** error);
+
+G_END_DECLS

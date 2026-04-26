@@ -21,13 +21,13 @@ subdir ('enum')
 
 __common_src = [ 'bits.h', 'boxing.h', 'mixin.h' ]
 
-foreach lib: [ ]
+foreach lib: [ 'asyncdelay' ]
 
   __common_src += [ '@0@.cc'.format (lib) ]
   __common_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'collection', 'ipcresult', 'listcollection', 'ptrarraycollection', 'resource', 'timeoutcancellable' ]
+foreach lib: [ 'asyncdelay', 'collection', 'ipcresult', 'listcollection', 'ptrarraycollection', 'resource', 'timeoutcancellable' ]
 
   __common_src += [ '@0@.vala'.format (lib) ]
 endforeach
