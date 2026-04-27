@@ -23,6 +23,60 @@ namespace Wakit.Binding
 
       public abstract Hub signal_hub { get; protected set; }
 
+      class Connector: GLib.Object, IBinding<Connector>, IInvocable<Connector>
+        {
+
+          public Hub hub { construct; }
+          public string signal_name { construct; }
+
+          public Connector (Hub hub, string signal_name)
+            {
+              Object (hub: hub, signal_name: signal_name);
+            }
+
+          static JSC.Value? connect_ (Connector c, GenericArray<JSC.Value> a)
+            {
+
+              if (a.length > 0 && a [0].is_function ())
+
+                { ulong id = c._hub.connect (c._signal_name, a [0]);
+                  return new JSC.Value.number (JSC.Context.get_current (), (double) id); }
+              else
+                { string got = a.length < 1 ? "nothing" : a [0].to_string ();
+                  JSC.Context.get_current ().throw (@"expected callable argument, got $(got)"); }
+            return null;
+            }
+
+          static JSC.Value? get_name (Connector c)
+            {
+
+              JSC.Context context = JSC.Context.get_current ();
+            return new JSC.Value.string (context, c._signal_name);
+            }
+
+          public static unowned Class register (JSC.Context context)
+            {
+
+              unowned Class klass = IBinding<Connector>.register (context, "Wakit.Binding.ISignalable.Connector");
+
+              klass.jsc_class.add_method ("connect", (JSC.ClassMethodCb) connect_, typeof (JSC.Value));
+              klass.jsc_class.add_property ("name", typeof (JSC.Value), (JSC.ClassGetPropertyCb) get_name, null);
+            return klass;
+            }
+
+          public static unowned Class register_maybe (JSC.Context context)
+            {
+
+              unowned Class klass;
+
+              if (likely (null != (klass = IBinding<Connector>.get_class (context))))
+
+                return klass;
+              else
+                return register (context);
+            }
+        }
+
       public class Hub: GLib.Object
         {
 
@@ -112,64 +166,11 @@ namespace Wakit.Binding
           extern static void emit_vr_group (GLib.Tree<ulong, JSC.Value> handlers, GLib.Variant @params);
         }
 
-      private class Getter: GLib.Object, IBinding<Getter>
-        {
-
-          public Hub hub { construct; }
-          public string signal_name { construct; }
-
-          public Getter (Hub hub, string signal_name)
-            {
-              Object (hub: hub, signal_name: signal_name);
-            }
-
-          static JSC.Value? connect_ (JSC.Class c, GenericArray<JSC.Value> a)
-            {
-
-              unowned Getter getter = (Getter) c;
-
-              if (a.length > 0 && a [0].is_function ())
-
-                { ulong id = getter._hub.connect (getter._signal_name, a [0]);
-                  return new JSC.Value.number (JSC.Context.get_current (), (double) id); }
-              else
-                { string got = a.length < 1 ? "nothing" : a [0].to_string ();
-                  JSC.Context.get_current ().throw (@"expected callable argument, got $(got)"); }
-            return null;
-            }
-
-          public static unowned Class register (JSC.Context context)
-            {
-
-              unowned Class klass = IBinding<Getter>.register (context, "Wakit.SignalConnector");
-
-              klass.jsc_class.add_method ("connect", (JSC.ClassMethodCb) connect_, typeof (JSC.Value));
-
-            return klass;
-            }
-
-          public static unowned Class register_maybe (JSC.Context context)
-            {
-
-              unowned Class klass;
-
-              if (likely (null != (klass = IBinding<Getter>.get_class (context))))
-
-                return klass;
-              else
-                return register (context);
-            }
-        }
-
       public static void add_signal (IBinding.Class klass, string field_name, string? signal_name = null)
         {
 
           signal_name = signal_name ?? field_name;
-
-          JSC.ClassGetPropertyCb? getter = c => getter (c, signal_name);
-          JSC.ClassSetPropertyCb? setter = null;
-
-          klass.jsc_class.add_property (field_name, typeof (JSC.Value), (owned) getter, (owned) setter);
+          klass.jsc_class.add_property (field_name, typeof (JSC.Value), c => getter (c, signal_name), null);
         }
 
       [CCode (cheader_filename = "glib-object.h", cname = "G_TYPE_FROM_INSTANCE")]
@@ -178,7 +179,7 @@ namespace Wakit.Binding
       static JSC.Value? disconnect (JSC.Class c, GenericArray<JSC.Value> a)
         {
 
-          if (a.length == 0 || false == a [0].is_number ())
+          if (a.length > 0)
 
             ((ISignalable) c).signal_hub.disconnect ((ulong) a [0].to_double ());
           else
@@ -195,7 +196,7 @@ namespace Wakit.Binding
       static JSC.Value? getter (JSC.Class c, string signal_name)
         {
 
-          var binding = new Getter (((ISignalable<T>) c).signal_hub, signal_name);
+          var binding = new Connector (((ISignalable<T>) c).signal_hub, signal_name);
           var value = binding.to_value (JSC.Context.get_current ());
         return value;
         }
@@ -203,7 +204,7 @@ namespace Wakit.Binding
       public static void prepare (IBinding.Class klass, JSC.Context context)
         {
 
-          Getter.register_maybe (context);
+          Connector.register_maybe (context);
           klass.jsc_class.add_method ("disconnect", (JSC.ClassMethodCb) disconnect, typeof (JSC.Value));
         }
     }

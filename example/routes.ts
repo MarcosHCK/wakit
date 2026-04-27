@@ -14,17 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { forwardRef } from 'react'
-import { useImage } from '@wakit-example/hooks/useImage'
+import { type ComponentType } from 'react'
+import React from 'react'
 
-type Ct = HTMLImageElement
-type Cp = React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>
-
-// eslint-disable-next-line react/display-name
-export const AppIcon = forwardRef<Ct, Cp> ((props, ref) =>
+export interface RouteConfig
 {
+  Component: React.LazyExoticComponent<ComponentType<{}>>;
+  path: string;
+}
 
-  const img = useImage ('/favicon.ico')
-  // eslint-disable-next-line @next/next/no-img-element
-return <img alt='icon' {...props} ref={ref} src={img?.src} />
-})
+export const routes: RouteConfig[] =
+[
+  { path: '/',
+    Component: React.lazy (() => import ('@wakit-example/pages/home')), }
+]

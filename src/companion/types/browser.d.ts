@@ -23,11 +23,10 @@ declare global
   namespace browserWindow
     {
 
-      function close (): void;
+      function close (): Promise<boolean>;
       function disconnect (signal_id: number): void;
-      function drag (should: boolean): Promise<void>;
-      function maximize (value?: boolean): Promise<void>;
-      function minimize (value?: boolean): Promise<void>;
+      function maximize (value?: boolean): Promise<boolean>;
+      function minimize (value?: boolean): Promise<boolean>;
       const onClose: SignalSpec<[]>;
       const onMaximized: SignalSpec<[ boolean ]>;
       const onMinimized: SignalSpec<[ boolean ]>;

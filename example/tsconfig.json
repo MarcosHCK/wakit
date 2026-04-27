@@ -18,6 +18,8 @@
     }
   },
   "include": [ "**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx",
+               "../src/companion/types/*.d.ts",
                ".eslintrc.js" ],
+  "typeRoots": [ "../src/companion/types/" ],
   "exclude": [ "node_modules" ]
 }

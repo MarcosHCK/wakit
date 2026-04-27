@@ -14,11 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+import { Center, useMantineTheme } from '@mantine/core'
+import { useImage } from '@wakit-example/hooks/useImage'
 
-export const Home = () =>
+export function Brand ({ size = 24, title }: { size?: number, title?: string })
 {
 
-  return <>
-    <p>Hello World!</p>
-  </>
+  const data = useImage ('/favicon.ico')
+  const theme = useMantineTheme ()
+
+  return  <Center>
+            <img alt='ICON' height={size} src={data?.src} style={{ borderRadius: '100%' }} width={size} />
+          { title && <>
+            <span style={{ padding: '0.25rem' }} />
+            <span style={{ fontSize: theme.fontSizes.xl, fontWeight: 'bold' }} >{ title }</span> </> }
+          </Center>
 }

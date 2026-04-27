@@ -15,8 +15,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+.appShellHeaderBox
+{
+
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--mantine-spacing-xs);
+}
+
 .appShellHeaderGroup
 {
+
   align-items: center;
   justify-content: space-between;
   max-height: var(--app-shell-header-height);
@@ -27,6 +36,7 @@
 
 .appShellMain
 {
+
   --app-shell-main-left-padding: 13px;
   --app-shell-main-right-padding: 13px;
 
@@ -36,9 +46,31 @@
 
 .appShellMainCol
 {
+
   --app-shell-main-col-top-padding: calc(var(--app-shell-header-offset, 0rem) + var(--app-shell-padding));
   --app-shell-main-col-bottom-padding: calc(var(--app-shell-footer-offset, 0rem) + var(--app-shell-padding));
   --app-shell-main-col-height: calc(100vh - var(--app-shell-main-col-top-padding) - var(--app-shell-main-col-bottom-padding));
 
   min-height: var(--app-shell-main-col-height);
+}
+
+.controlButton
+{
+
+  --button-color: var(--mantine-color-text) !important;
+  --button-hover-color: var(--mantine-color-text) !important;
+  --button-padding-x: 0px;
+}
+
+.controlButtonContainer
+{
+
+  height: var(--button-size);
+  width: var(--button-size);
+}
+
+.killNavLinkMargin
+{
+
+  margin-right: calc((-1)*var(--mantine-spacing-sm));
 }

@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { Route, Routes } from 'react-router-dom'
-import { Home } from '@wakit-example/components/Home'
 
-export const Router = () => <Routes>
+export default function Page ()
+{
 
-  <Route path='/' Component={Home} />
-</Routes>
+  return <>
+    <p>Hello World!</p>
+  </>
+}

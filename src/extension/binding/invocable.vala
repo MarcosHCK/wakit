@@ -22,7 +22,7 @@ namespace Wakit.Binding
     {
 
       [CCode (scope = "notify")]
-      public delegate JSC.Value MethodCallback<T> (T instance, GenericArray<JSC.Value> args);
+      public delegate JSC.Value? MethodCallback<T> (T instance, GenericArray<JSC.Value> args);
 
       public static void add_method (IBinding.Class klass, string name, owned MethodCallback<T> callback)
         {

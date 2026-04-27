@@ -22,7 +22,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin'
 async function createWebpackConfig ()
 {
 
-  const entries = { 'app': './app.ts' }
+  const entries = { 'app': './app.tsx' }
   const baseConfig = await _createWebpackConfig ()
 
   const config: Configuration =
