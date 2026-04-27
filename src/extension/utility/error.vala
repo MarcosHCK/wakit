@@ -90,8 +90,6 @@ namespace Wakit
       public static unowned JSC.Class register (JSC.Context context)
         {
 
-          print ("register (%p)\n", (void*) context);
-
           unowned GLib.DestroyNotify destroy_notify = GLib.Object.unref;
           unowned JSC.Class? parent_class = null;
           unowned JSC.ClassVTable? vtable = null;

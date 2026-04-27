@@ -47,20 +47,12 @@ namespace Wakit.Binding
             return null;
             }
 
-          static JSC.Value? get_name (Connector c)
-            {
-
-              JSC.Context context = JSC.Context.get_current ();
-            return new JSC.Value.string (context, c._signal_name);
-            }
-
           public static unowned Class register (JSC.Context context)
             {
 
               unowned Class klass = IBinding<Connector>.register (context, "Wakit.Binding.ISignalable.Connector");
 
               klass.jsc_class.add_method ("connect", (JSC.ClassMethodCb) connect_, typeof (JSC.Value));
-              klass.jsc_class.add_property ("name", typeof (JSC.Value), (JSC.ClassGetPropertyCb) get_name, null);
             return klass;
             }
 
@@ -170,7 +162,7 @@ namespace Wakit.Binding
         {
 
           signal_name = signal_name ?? field_name;
-          klass.jsc_class.add_property (field_name, typeof (JSC.Value), c => getter (c, signal_name), null);
+          klass.jsc_class.add_property (field_name, typeof (JSC.Value), c => getter ((ISignalable<T> ) c, signal_name), null);
         }
 
       [CCode (cheader_filename = "glib-object.h", cname = "G_TYPE_FROM_INSTANCE")]
@@ -193,19 +185,34 @@ namespace Wakit.Binding
         return null;
         }
 
-      static JSC.Value? getter (JSC.Class c, string signal_name)
+      static JSC.Value? getter (ISignalable<T> c, string signal_name)
         {
 
           var binding = new Connector (((ISignalable<T>) c).signal_hub, signal_name);
-          var value = binding.to_value (JSC.Context.get_current ());
-        return value;
+          var object = binding.to_value (JSC.Context.get_current ());
+
+        return object;
         }
+
+      sealed class ConnectorKeeper: GLib.Object
+        { }
 
       public static void prepare (IBinding.Class klass, JSC.Context context)
         {
 
-          Connector.register_maybe (context);
+          unowned var _klass = Connector.register_maybe (context);
           klass.jsc_class.add_method ("disconnect", (JSC.ClassMethodCb) disconnect, typeof (JSC.Value));
+
+          /*
+           * WebKitGTK6 (specifically javascriptcore) has a weird bug, where a JSCClass's prototype (the
+           * actual thing used by the engine to back the instances, not the object the C API returns)
+           * isn't actually held by the JSCClass. If there are no instances and the GC pops, the prototype
+           * will be erased and any further instantiation (even using the same JSCClass) will get an empty
+           * prototype (all methods and properties gone). Will keep a dummy instance here.
+           */
+          var keeper = new JSC.Value.object (context, new ConnectorKeeper (), _klass.jsc_class);
+
+          context.get_global_object ().object_define_property_data ("__connector_keeper__", 0, keeper);
         }
     }
 }

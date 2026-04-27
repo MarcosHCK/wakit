@@ -35,7 +35,7 @@ namespace Wakit.Binding
 
           public JSC.Value ctor { get; private set; }
           public string ctor_name { get; private set; }
-          public JSC.Class jsc_class { get; private set; }
+          public unowned JSC.Class jsc_class { get; private set; }
           public string name { get { return _jsc_class.get_name (); } }
 
           internal Class (JSC.Class jsc_class)
@@ -147,12 +147,13 @@ namespace Wakit.Binding
       [CCode (cheader_filename = "glib.h", cname = "g_intern_string")]
       extern static unowned string _g_intern_string (string value);
 
-      public static unowned Class register_full (JSC.Context context, string? name = null, GLib.Type g_type = typeof (T), JSC.Class? parent_class = null, JSC.ClassVTable? vtable = null, GLib.DestroyNotify? notify = GLib.Object.unref)
+      public static unowned Class register_full (JSC.Context context, string? name = null, GLib.Type g_type = typeof (T), JSC.Class? parent_class = null, JSC.ClassVTable? vtable = null)
         {
 
           name = null == name ? g_type.name () : _g_intern_string (name);
 
-          var jsc_class = context.register_class (name, parent_class, vtable, notify);
+          unowned var jsc_class = context.register_class (name, parent_class, vtable, GLib.Object.unref);
+
           var ibc_class = new Class (jsc_class);
           var cdp_path = @"wakit-binding-for-$(g_type.name ())";
 
