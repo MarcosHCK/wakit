@@ -63,7 +63,7 @@ namespace Wakit.Example
                 { var bundle = new Bundle.Bundle.from_file (filename);
                   var pattern = new GLib.Regex ("^/$", GLib.RegexCompileFlags.OPTIMIZE,
                                                                 GLib.RegexMatchFlags.DEFAULT);
-                  bundle.aliases.add (new Bundle.RegexAlias (pattern, "/index.html"));
+                  bundle.aliases.add (new Bundle.RegexAlias (pattern, "/app.html"));
                   bundle.aliases.add (new Bundle.VerbatimAlias ());
                   Bundle.register_uri_scheme_in_bundle ("app", browser, bundle);
                   browser.register_uri_scheme_as_local ("app");

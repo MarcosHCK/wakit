@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
+from glob import glob
 from pathlib import Path, PurePath
 from typing import Generator, Iterable, Literal, NamedTuple
 from typing import overload
@@ -73,6 +74,16 @@ class File (NamedTuple):
   compressed: bool
   preprocess: str | None
   path: PurePath
+
+  def __eq__ (self, value):
+
+    if not isinstance (value, File):
+      return False
+
+    return self.path == value.path
+
+  def __hash__ (self):
+    return hash (self.path)
 
 class Input:
 
@@ -180,6 +191,10 @@ class Resources (dict[Path,set[File]]):
         case 'compressed': compressed = option.value # type: ignore
         case 'preprocess': preprocess = option.value # type: ignore
 
-    for file in iterdir (Path (input.file)):
+    for file in (Path (p) for p in glob (str (input.file))):
+
+      if not file.is_file ():
+        raise Exception (f"invalid file found '{file}'")
 
       yield File (alias, compressed, preprocess, file)
+

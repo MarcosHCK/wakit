@@ -28,7 +28,6 @@ if __name__ == '__main__':
   parser.add_argument ('--bin', default = 'glib-compile-resources', metavar = 'bin', type = str)
 
   parser.add_argument ('-b', '--basedir', default = '.', metavar = 'dir', type = str)
-  parser.add_argument ('-i', metavar = 'dir', nargs = '+', type = str)
   parser.add_argument ('-o', '--output', default = 'bundle.gresource', metavar = 'file', nargs = '?', type = str)
 
   (args, resources) = parse_args (parser)
