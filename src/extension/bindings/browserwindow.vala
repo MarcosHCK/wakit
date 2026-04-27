@@ -33,7 +33,6 @@ namespace Wakit.Binding
       private GLib.WeakRef _web_page;
 
       const string METHOD_NAME_CLOSE = "Wakit.BrowserWindow.Close";
-      const string METHOD_NAME_DRAG = "Wakit.BrowserWindow.Drag";
       const string METHOD_NAME_MAXIMIZE = "Wakit.BrowserWindow.Maximize";
       const string METHOD_NAME_MINIMIZE = "Wakit.BrowserWindow.Minimize";
 
@@ -157,8 +156,6 @@ namespace Wakit.Binding
 
           IInvocable<BrowserWindow>.add_method (klass, "close",
             (c, a) => c.invoke (a, METHOD_NAME_CLOSE, "()"));
-          IInvocable<BrowserWindow>.add_method (klass, "drag",
-            (c, a) => c.invoke (a, METHOD_NAME_DRAG, "(b)"));
           IInvocable<BrowserWindow>.add_method (klass, "maximize",
             (c, a) => c.invoke (a, METHOD_NAME_MAXIMIZE, "(mb)"));
           IInvocable<BrowserWindow>.add_method (klass, "minimize",

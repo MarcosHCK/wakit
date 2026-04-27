@@ -29,11 +29,9 @@ namespace Wakit.Browser
       public bool maximized { get; set; }
       public WebKit.WebView web_view { get; construct; }
 
-      private WidgetBinding? _binding = null;
       private DragController _drag_controller;
 
       const string METHOD_NAME_CLOSE = "Wakit.BrowserWindow.Close";
-      const string METHOD_NAME_DRAG = "Wakit.BrowserWindow.Drag";
       const string METHOD_NAME_MAXIMIZE = "Wakit.BrowserWindow.Maximize";
       const string METHOD_NAME_MINIMIZE = "Wakit.BrowserWindow.Minimize";
 
@@ -41,26 +39,9 @@ namespace Wakit.Browser
       const string SIGNAL_NAME_MAXIMIZED = "Wakit.BrowserWindow.Maximized";
       const string SIGNAL_NAME_MINIMIZED = "Wakit.BrowserWindow.Minimized";
 
-      ~Widget ()
-        {
-
-          if (null != _binding)
-            _binding.toplevel?.weak_unref (unbind_toplevel);
-        }
-
       public Widget (WebKit.WebView web_view)
         {
           Object (web_view: web_view);
-        }
-
-      public void bind_toplevel (Gtk.Window? toplevel)
-        {
-
-          _binding = null; if (null == toplevel)
-            return;
-
-          _binding = new WidgetBinding (this, toplevel);
-          toplevel.weak_ref (unbind_toplevel);
         }
 
       public override void constructed ()
@@ -84,27 +65,12 @@ namespace Wakit.Browser
           attach (_web_view, 0, 0);
         }
 
-      [CCode (cname = "WAKIT_BROWSER_WIDGET_GET_CLASS (self)->close")]
-      extern const uintptr close_actv;
-
-      [CCode (cname = "wakit_browser_widget_real_close")]
-      extern const uintptr close_real;
-
-      [CCode (cname = "wakit_browser_widget_signals[WAKIT_BROWSER_WIDGET_CLOSE_SIGNAL]")]
-      extern const uint close_sid;
-
-      [HasEmitter, Signal (action = true, run = "last")]
-      public virtual signal void close ()
+      public Gtk.Window? get_toplevel ()
         {
 
-          if (! GLib.Signal.has_handler_pending (this, close_sid, 0, true)
-             && close_actv == close_real)
-            {
-
-              GLib.warning_once ("Your application does not implement "
-                               + "wakit_browser_widget_close() and has no handlers connected "
-                               + "to the 'close' signal. It should do one of these.");
-            }
+          unowned Gtk.Native? native = get_native ();
+          unowned Gtk.Window? window = ! (native is Gtk.Window) ? null : (Gtk.Window) native;
+        return window;
         }
 
       public void open_uri (GLib.File file, string hint)
@@ -183,7 +149,7 @@ namespace Wakit.Browser
           var message = new Gui.Message.question ("%s wants to redirect to %s", webview.get_uri (),
                                                                                 request.get_uri ());
 
-          on_decide_policy_ask (message, _binding?.toplevel, decision);
+          on_decide_policy_ask (message, get_toplevel (), decision);
         return true;
         }
 
@@ -244,7 +210,9 @@ namespace Wakit.Browser
             {
 
             case METHOD_NAME_CLOSE: close ();
-              return new GLib.Variant.boolean (true);;
+              return new GLib.Variant.boolean (true);
+            case METHOD_NAME_MAXIMIZE: on_user_message_received_check (parameters, "(mb)");
+              return new GLib.Variant.boolean (true);
             }
         return null;
         }
@@ -261,10 +229,6 @@ namespace Wakit.Browser
             }
 
           terminated (_reason);
-        }
-
-      private void unbind_toplevel ()
-        {
         }
     }
 }
