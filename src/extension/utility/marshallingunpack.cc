@@ -17,34 +17,10 @@
 #include <config.h>
 #include <extension/utility/marshalling.h>
 
+static inline GPtrArray* _container_unpack (JSCContext* context, GVariant* variant);
 static inline JSCValue* _typearray_string (JSCContext* context, GVariant* variant);
 static inline JSCValue* _typearray_unpack (JSCContext* context, GVariant* variant, JSCTypedArrayType type);
 #define _g_variant_unref0(var) ((NULL == var) ? NULL : (var = (g_variant_unref (var), nullptr)))
-
-GPtrArray* wakit_marshalling_container_to_jsc_values (JSCContext* context, GVariant* variant)
-{
-
-  g_return_val_if_fail (NULL != variant, NULL);
-  g_return_val_if_fail (JSC_IS_CONTEXT (context), NULL);
-
-  const auto type = g_variant_get_type (variant);
-  g_return_val_if_fail (g_variant_type_is_definite (type), NULL);
-  g_return_val_if_fail (g_variant_type_is_container (type), NULL);
-
-  auto array = g_ptr_array_sized_new (g_variant_n_children (variant));
-  auto child = (GVariant*) nullptr;
-  auto iter = GVariantIter { 0 };
-
-  g_ptr_array_set_free_func (array, g_object_unref);
-
-  for (g_variant_iter_init (&iter, variant); nullptr != (child = g_variant_iter_next_value (&iter));)
-    {
-
-      g_ptr_array_add (array, wakit_marshalling_variant_to_jsc_value (context, child));
-      g_variant_unref (child);
-    }
-return array;
-}
 
 JSCValue* wakit_marshalling_variant_to_jsc_value (JSCContext* context, GVariant* variant)
 {
@@ -72,7 +48,7 @@ JSCValue* wakit_marshalling_variant_to_jsc_value (JSCContext* context, GVariant*
     case '{':
       {
 
-        auto array = wakit_marshalling_container_to_jsc_values (context, variant);
+        auto array = _container_unpack (context, variant);
         auto value = jsc_value_new_array_from_garray (context, array);
 
         return_ (g_ptr_array_unref (array), value);
@@ -97,7 +73,7 @@ JSCValue* wakit_marshalling_variant_to_jsc_value (JSCContext* context, GVariant*
           case 'y': return_ (_typearray_string (context, variant));
           case 'x': return_ (_typearray_unpack (context, variant, JSC_TYPED_ARRAY_INT64));
 
-          default: { auto array = wakit_marshalling_container_to_jsc_values (context, variant);
+          default: { auto array = _container_unpack (context, variant);
                      auto value = jsc_value_new_array_from_garray (context, array);
             return_ (g_ptr_array_unref (array), value); }
       } }
@@ -142,6 +118,24 @@ JSCValue* wakit_marshalling_variant_to_jsc_value (JSCContext* context, GVariant*
       g_error ("unknown variant type '%s', fix this!", g_variant_get_type_string (variant));
     }
   break; } while (TRUE);
+}
+
+static GPtrArray* _container_unpack (JSCContext* context, GVariant* variant)
+{
+
+  auto array = g_ptr_array_sized_new (g_variant_n_children (variant));
+  auto child = (GVariant*) nullptr;
+  auto iter = GVariantIter { 0 };
+
+  g_ptr_array_set_free_func (array, g_object_unref);
+
+  for (g_variant_iter_init (&iter, variant); nullptr != (child = g_variant_iter_next_value (&iter));)
+    {
+
+      g_ptr_array_add (array, wakit_marshalling_variant_to_jsc_value (context, child));
+      g_variant_unref (child);
+    }
+return array;
 }
 
 static inline JSCValue* _typearray_string (JSCContext* context, GVariant* variant)

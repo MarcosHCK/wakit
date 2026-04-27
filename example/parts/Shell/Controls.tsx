@@ -47,8 +47,8 @@ export function Controls ()
 
   return <Group gap={3} justify='end'>
 
-    <Control onClick={() => collect (browserWindow.minimize (true))}> <FiMinus /> </Control>
-    <Control onClick={() => collect (browserWindow.maximize (true))}> { ! maximized ? <FiMaximize2 /> : <FiMinimize2 /> } </Control>
+    <Control onClick={() => collect (browserWindow.minimize ())}> <FiMinus /> </Control>
+    <Control onClick={() => collect (browserWindow.maximize ())}> { ! maximized ? <FiMaximize2 /> : <FiMinimize2 /> } </Control>
     <Control onClick={() => collect (browserWindow.close ())}> <FiX /> </Control>
   </Group>
 }

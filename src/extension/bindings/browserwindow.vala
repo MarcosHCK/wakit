@@ -72,6 +72,7 @@ namespace Wakit.Binding
 
               var arguments = new JSC.Value.array_from_garray (context, a);
               var parameters = Marshalling.jsc_value_to_variant (context, type, arguments);
+
               message = new WebKit.UserMessage (name, parameters);
             }
           catch (GLib.Error error)

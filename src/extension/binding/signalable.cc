@@ -15,13 +15,46 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
+#include <cstddef>
 #include <extension/binding/signalable.h>
 #include <map>
 
-static void emit_single (gpointer key G_GNUC_UNUSED, JSCValue* value, GPtrArray* params)
+static G_DEFINE_QUARK (wakit-binding-isignalable-hub-emit-single-invoker-quark,
+                       invoker);
+
+static JSCValue* get_invoker (JSCContext* context)
 {
 
-  g_object_unref (jsc_value_function_callv (value, params->len, (JSCValue**) params->pdata));
+  static const char code [] = "(f,a) =>"
+    "f (...a)";
+
+  auto invoker = (JSCValue*) nullptr;
+  auto weakref = (JSCWeakValue*) g_object_get_qdata ((GObject*) context, invoker_quark ());
+
+  if (G_UNLIKELY (NULL == weakref 
+               || NULL == (invoker = jsc_weak_value_get_value (weakref))))
+    {
+
+      invoker = jsc_context_evaluate_with_source_uri (context, code, G_N_ELEMENTS (code) - 1,
+        "wakit:///extension/binding/signalable.js", 1);
+
+      weakref = jsc_weak_value_new (invoker);
+
+      g_object_set_qdata_full ((GObject*) context, invoker_quark (), weakref, g_object_unref);
+    }
+return invoker;
+}
+
+static void emit_single (gpointer key G_GNUC_UNUSED, JSCValue* value, JSCValue* params)
+{
+
+  auto context = jsc_value_get_context (value);
+  auto invoker = get_invoker (context);
+
+  JSCValue* parameters [] = { value, params };
+
+  g_object_unref (jsc_value_function_callv (invoker, G_N_ELEMENTS (parameters), parameters));
+  g_object_unref (invoker);
 }
 
 void wakit_binding_isignalable_hub_emit_group (GTree* handlers, GPtrArray* params)
@@ -33,7 +66,7 @@ void wakit_binding_isignalable_hub_emit_group (GTree* handlers, GPtrArray* param
 struct _EmitVrData
 {
 
-  std::map<guintptr, GPtrArray*> map;
+  std::map<guintptr, JSCValue*> map;
   GVariant* params;
 
   inline _EmitVrData (GVariant* _params) noexcept:
@@ -45,12 +78,12 @@ struct _EmitVrData
     {
 
       for (const auto& [ _, ar ]: map)
-        g_ptr_array_unref (ar);
+        g_object_unref (ar);
     }
 
-  inline GPtrArray* to_jsc_values (JSCContext* context) const noexcept
+  inline JSCValue* to_jsc_values (JSCContext* context) const noexcept
     {
-      return wakit_marshalling_container_to_jsc_values (context, params);
+      return wakit_marshalling_variant_to_jsc_value (context, params);
     }
 };
 
@@ -59,7 +92,7 @@ static void emit_vr_single (gpointer key G_GNUC_UNUSED, JSCValue* value, struct 
 
   auto context = jsc_value_get_context (value);
   auto& map = data->map;
-  auto params = (GPtrArray*) nullptr;
+  auto params = (JSCValue*) nullptr;
 
   if (auto iter = map.find ((guintptr) context); iter != map.end ())
 

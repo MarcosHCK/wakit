@@ -63,31 +63,14 @@ GVariant* wakit_marshalling_jsc_value_to_variant (JSCContext* context, const GVa
     case '{':
       {
 
-        auto v_children = g_variant_type_n_items (vtype);
-        auto j_children = (decltype (v_children)) 0;
+        if (! jsc_value_is_object (value))
 
-        if (! jsc_value_is_array (value))
-          
           return (g_set_error_literal (error, WAKIT_MARSHALLING_ERROR,
                                               WAKIT_MARSHALLING_ERROR_ARRAY_EXPECTED,
-                    "tuple/dict-entry expansion needs an array argument"), nullptr);
-        else
-          {
+                    "tuple/dict-entry expansion needs an array/object argument"), nullptr);
 
-            auto val = jsc_value_object_get_property (value, "length");
-            auto vai = jsc_value_to_int32 (val);
-
-            g_object_unref ((j_children = vai, val));
-          }
-
-        if (j_children == v_children)
-
-          switch (vt) { case '(': return _tuple_pack<'('> (context, vtype, value, error);
-                        case '{': return _tuple_pack<'{'> (context, vtype, value, error); }
-        else
-          return (g_set_error_literal (error, WAKIT_MARSHALLING_ERROR,
-                                              WAKIT_MARSHALLING_ERROR_ARRAY_EXPECTED,
-                  j_children < v_children ? "too few values" : "too many values"), nullptr);
+        switch (vt) { case '(': return _tuple_pack<'('> (context, vtype, value, error);
+                      case '{': return _tuple_pack<'{'> (context, vtype, value, error); }
       }
 
     case 'a':
@@ -428,7 +411,7 @@ static GPtrArray* _valuearray_take (JSCContext* context, const GVariantType* vty
   GError* tmperr = nullptr;
   g_ptr_array_set_free_func (ar, (GDestroyNotify) g_variant_unref);
 
-  for (decltype (length) i = 0; i < length; ++i, ti = _iter_next (vtype, ti))
+  for (decltype (length) i = 0; nullptr != ti; ++i, ti = _iter_next (vtype, ti))
     {
 
       auto item = jsc_value_object_get_property_at_index (value, i);
