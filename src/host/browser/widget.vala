@@ -211,7 +211,15 @@ namespace Wakit.Browser
 
             case METHOD_NAME_CLOSE: close ();
               return new GLib.Variant.boolean (true);
+
             case METHOD_NAME_MAXIMIZE: on_user_message_received_check (parameters, "(mb)");
+              GLib.Variant? v = parameters.get_child_value (0).get_maybe ();
+              maximize (null != v, null == v ? false : v.get_boolean ());
+              return new GLib.Variant.boolean (true);
+
+            case METHOD_NAME_MINIMIZE: on_user_message_received_check (parameters, "(mb)");
+              GLib.Variant? v = parameters.get_child_value (0).get_maybe ();
+              minimize (null != v, null == v ? false : v.get_boolean ());
               return new GLib.Variant.boolean (true);
             }
         return null;
