@@ -25,6 +25,7 @@ namespace Wakit
     {
 
       private JSC.Context _context;
+      private GLib.MainContext _main_context;
       private JSC.Value _reject;
       private JSC.Value _resolve;
       private uint _refs = 1;
@@ -35,6 +36,7 @@ namespace Wakit
         {
 
           _context = context;
+          _main_context = GLib.MainContext.ref_thread_default ();
           _reject = reject;
           _resolve = resolve;
         }

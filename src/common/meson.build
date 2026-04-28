@@ -19,15 +19,15 @@ gio_dep = dependency ('gio-2.0', required: true)
 
 subdir ('enum')
 
-__common_src = [ 'bits.h', 'boxing.h', 'mixin.h' ]
+__common_src = [ 'bits.h', 'boxing.h', 'mixin.h', 'slice.h' ]
 
-foreach lib: [ 'asyncdelay' ]
+foreach lib: [ 'asyncdelay', 'asynclock' ]
 
   __common_src += [ '@0@.cc'.format (lib) ]
   __common_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'asyncdelay', 'collection', 'ipcresult', 'listcollection', 'ptrarraycollection', 'resource', 'timeoutcancellable' ]
+foreach lib: [ 'asyncdelay', 'asynclock', 'collection', 'ipcresult', 'listcollection', 'ptrarraycollection', 'resource', 'timeoutcancellable' ]
 
   __common_src += [ '@0@.vala'.format (lib) ]
 endforeach

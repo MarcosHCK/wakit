@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
+#include <common/boxing.h>
+#include <common/slice.h>
 #include <extension/utility/promise.h>
 
 struct _ExecutorData
@@ -29,6 +31,7 @@ struct _WakitPromise
 {
 
 	JSCContext* context;
+  GMainContext* main_context;
 	JSCValue* reject;
 	JSCValue* resolve;
 };
@@ -63,6 +66,48 @@ static inline void finish (JSCContext* context, JSCValue* callback, JSCValue* va
   g_object_unref (jsc_value_function_callv (callback, 1, &value));
   g_object_unref (value);
 }
+
+struct _FinishData
+{
+
+  boxing::object<JSCValue> _callback;
+  boxing::object<JSCContext> _context;
+  boxing::object<JSCValue> _value;
+
+  inline _FinishData (JSCContext* context, JSCValue* callback, JSCValue* value) noexcept:
+      _callback (g_object_ref (callback)),
+      _context (g_object_ref (context)),
+      _value (g_object_ref (value))
+    { }
+};
+
+static gboolean finish_callback (struct _FinishData* data)
+{
+
+  (finish) (*data->_context, *data->_callback, *data->_value);
+return G_SOURCE_REMOVE;
+}
+
+[[gnu::always_inline]]
+static inline void finish_foreign (JSCContext* context, JSCValue* callback, JSCValue* value, GMainContext* main_context)
+{
+
+  auto data = g_slice_new_<_FinishData> (g_object_ref (context), g_object_ref (callback), g_object_ref (value));
+
+  g_main_context_invoke_full (main_context, G_PRIORITY_DEFAULT, G_SOURCE_FUNC (finish_callback), data, g_slice_free_<_FinishData>);
+}
+
+#define finish(context,callback,value) (G_GNUC_EXTENSION ({ \
+ ; \
+    JSCContext* __context = ((context)); \
+    JSCValue* __callback = ((callback)); \
+    JSCValue* __value = ((value)); \
+ ; \
+    if (g_main_context_is_owner (self->main_context)) \
+      (finish) (__context, __callback, __value); \
+    else \
+      finish_foreign (__context, __callback, __value, self->main_context); \
+  }))
 
 void wakit_promise_reject (WakitPromise* self, JSCValue* value)
 {

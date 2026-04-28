@@ -22,7 +22,8 @@
 static G_DEFINE_QUARK (wakit-binding-isignalable-hub-emit-single-invoker-quark,
                        invoker);
 
-static JSCValue* get_invoker (JSCContext* context)
+[[gnu::always_inline]]
+static inline JSCValue* get_invoker (JSCContext* context)
 {
 
   static const char code [] = "(f,a) =>"

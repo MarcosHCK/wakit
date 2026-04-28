@@ -14,8 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
-#include <common/boxing.h>
-#include <common/slice.h>
+#pragma once
 #include <gio/gio.h>
-#include <jsc/jsc.h>
+
+G_BEGIN_DECLS
+
+  void wakit_async_lock (GMutex* mutex, int io_priority, GAsyncReadyCallback callback, gpointer user_data);
+  void wakit_async_lock_finish (GAsyncResult* result);
+
+G_END_DECLS

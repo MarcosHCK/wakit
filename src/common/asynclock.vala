@@ -15,7 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <common/boxing.h>
-#include <common/slice.h>
-#include <gio/gio.h>
-#include <jsc/jsc.h>
+namespace Wakit
+{
+
+  public extern static async void async_lock (GLib.Mutex mutex, int io_priority = GLib.Priority.DEFAULT);
+}
