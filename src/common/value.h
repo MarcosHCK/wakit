@@ -14,9 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+#include <glib-object.h>
+#include <utility>
 
-#include <common/boxing.h>
-#include <common/slice.h>
-#include <common/value.h>
-#include <gio/gio.h>
-#include <jsc/jsc.h>
+template<unsigned N> static void g_value_unset_ (GValue (&values) [N])
+{
+
+  for (std::remove_cvref_t<decltype (N)> i = 0; i < N; ++i)
+    g_value_unset (&values [i]);
+}
+
+template<typename... Args,
+         typename = std::enable_if_t<( std::is_same_v<Args, GValue*> && ... )>>
+static void g_value_unset_ (Args&&... args)
+{
+
+return (g_value_unset (std::forward<Args> (args)), ...);
+}

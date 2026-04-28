@@ -19,7 +19,7 @@ gio_dep = dependency ('gio-2.0', required: true)
 
 subdir ('enum')
 
-__common_src = [ 'bits.h', 'boxing.h', 'mixin.h', 'slice.h' ]
+__common_src = [ 'bits.h', 'boxing.h', 'mixin.h', 'slice.h', 'value.h' ]
 
 foreach lib: [ 'asyncdelay', 'asynclock' ]
 

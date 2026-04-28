@@ -15,8 +15,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <common/boxing.h>
-#include <common/slice.h>
-#include <common/value.h>
-#include <gio/gio.h>
-#include <jsc/jsc.h>
+namespace Wakit
+{
+
+  [CCode (cheader_filename = "extension/utility/webpageproxy.h")]
+  public sealed class WebPageProxy: GLib.Object
+    {
+
+      public WebKit.WebPage web_page { owned get; construct; }
+      public static unowned WebPageProxy get_default (WebKit.WebPage web_page);
+      public signal bool user_message_received (WebKit.UserMessage message);
+    }
+}

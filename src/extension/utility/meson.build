@@ -17,9 +17,10 @@
 
 __extension_utility_src = [ 'marshalling.h',
                             'marshallingpack.cc',
-                            'marshallingunpack.cc', ]
+                            'marshallingunpack.cc',
+                            'webpageproxy.vapi' ]
 
-foreach bit: [ 'promise' ]
+foreach bit: [ 'promise', 'webpageproxy' ]
 
   __extension_utility_src += [ '@0@.cc'.format (bit) ]
   __extension_utility_src += [ '@0@.h'.format (bit) ]
@@ -29,6 +30,11 @@ foreach bit: [ 'error', 'marshalling', 'objectserializer', 'promise' ]
 
   __extension_utility_src += [ '@0@.vala'.format (bit) ]
 endforeach
+
+__extension_utility_src += import ('gnome').genmarshal ('wakit-extension-utility-marshals',
+  internal: true,
+  sources: 'marshals.txt',
+  valist_marshallers: true)
 
 __extension_utility_deps = [ __common_dep ]
 

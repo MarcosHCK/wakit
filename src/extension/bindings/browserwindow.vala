@@ -50,7 +50,7 @@ namespace Wakit.Binding
         {
 
           base.constructed ();
-          web_page.user_message_received.connect (on_user_message_received);
+          WebPageProxy.get_default (web_page).user_message_received.connect (on_user_message_received);
         }
 
       private JSC.Value? invoke (GenericArray<JSC.Value> a, string name, string signature)
