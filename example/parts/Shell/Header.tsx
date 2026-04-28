@@ -24,18 +24,22 @@ import * as css from './style.module.css'
 
 export interface HeaderProps
 {
-  onNavigate?: () => void,
-  skipAvatar?: boolean,
-  skipBrand?: boolean,
-  skipLinks?: boolean,
-  vertical?: boolean,
-  withHome?: boolean,
+  brandSize?: number;
+  controlSize?: number;
+  onNavigate?: () => void;
+  size?: number;
+  skipControls?: boolean;
+  skipBrand?: boolean;
+  skipLinks?: boolean;
+  vertical?: boolean;
+  withHome?: boolean;
 }
 
 export function Header (props: HeaderProps)
 {
 
-  const { onNavigate = () => {}, skipAvatar, skipBrand, skipLinks, vertical, withHome } = props
+  const { brandSize = 30, controlSize = 40, onNavigate = () => {},
+          skipControls, skipBrand, skipLinks, vertical, withHome } = props
 
   const divider = useCallback ((props: DividerProps) =>
     {
@@ -46,7 +50,7 @@ export function Header (props: HeaderProps)
   const link = useCallback ((props: { vertical?: boolean } & PolymorphicComponentProps<typeof Link, NavLinkProps>) =>
     {
       const { vertical: ovr = vertical, ...rest } = props
-      const nav = <NavLink {...rest} component={Link} key={`${Math.random ()}`} onClick={() => onNavigate ()} />
+      const nav = <NavLink {...rest} component={Link} key={`${Math.random ()}`} onClick={() => onNavigate ()} p={7} />
       return !! ovr ? nav : <div key={`${Math.random ()}`}>{ nav }</div>
     }, [onNavigate, vertical])
 
@@ -60,16 +64,16 @@ export function Header (props: HeaderProps)
       { skipLinks ||
           <>
           </> }
-      { skipAvatar ||
+      { skipControls ||
           <>
+            <Controls size={controlSize} />
           </> }
-      <Controls />
-    </> ), [divider, link, skipAvatar, skipLinks, withHome])
+    </> ), [divider, link, skipLinks, withHome])
 
   return <Group className={css.appShellHeaderBox}>
 
     { ! skipBrand &&
-      link ({ leftSection: <span className={css.killNavLinkMargin}> <Brand title='Wakit Example' /> </span>,
+      link ({ leftSection: <span className={css.killNavLinkMargin}> <Brand size={brandSize} title='Wakit Example' /> </span>,
               p: 'xs', to: '/', vertical: false }) }
     { ! vertical ? <Group align='center'>{ links }</Group>
                  : <Stack align='start' gap={0} style={{ minWidth: '100%' }}>{ links }</Stack> }

@@ -29,11 +29,13 @@ function Control ({ children, onClick, size = 30 }: { children?: ReactNode, onCl
 
   return <Stack className={css.controlButtonContainer} style={{ '--button-size': rem (size) }}>
 
-    <Button className={css.controlButton} onClick={onClick} variant='subtle'> { children } </Button>
+    <Button className={css.controlButton} onClick={onClick} radius={size} variant='subtle'>
+      { children }
+    </Button>
   </Stack>
 }
 
-export function Controls ()
+export function Controls ({ size = 30 }: { size?: number })
 {
 
   const [ maximized, setMaximized ] = useState (false)
@@ -47,8 +49,8 @@ export function Controls ()
 
   return <Group gap={3} justify='end'>
 
-    <Control onClick={() => collect (browserWindow.minimize ())}> <FiMinus /> </Control>
-    <Control onClick={() => collect (browserWindow.maximize ())}> { ! maximized ? <FiMaximize2 /> : <FiMinimize2 /> } </Control>
-    <Control onClick={() => collect (browserWindow.close ())}> <FiX /> </Control>
+    <Control onClick={() => collect (browserWindow.minimize ())} size={size}> <FiMinus /> </Control>
+    <Control onClick={() => collect (browserWindow.maximize ())} size={size}> { ! maximized ? <FiMaximize2 /> : <FiMinimize2 /> } </Control>
+    <Control onClick={() => collect (browserWindow.close ())} size={size}> <FiX /> </Control>
   </Group>
 }

@@ -20,7 +20,7 @@
 
   align-items: center;
   justify-content: space-between;
-  padding: var(--mantine-spacing-xs);
+  width: var(--app-shell-actual-header-width);
 }
 
 .appShellHeaderGroup
@@ -30,8 +30,8 @@
   justify-content: space-between;
   max-height: var(--app-shell-header-height);
   min-height: 100%;
-  padding-left: var(--mantine-spacing-lg);
-  padding-right: var(--mantine-spacing-lg);
+  padding-left: var(--mantine-spacing-xs);
+  padding-right: var(--mantine-spacing-xs);
 }
 
 .appShellMain
@@ -54,11 +54,22 @@
   min-height: var(--app-shell-main-col-height);
 }
 
+.brandSeparator
+{
+  padding: 0.25rem;
+}
+
+.brandText
+{
+  font-weight: bold;
+  text-box-trim: trim-end;
+}
+
 .controlButton
 {
 
   --button-color: var(--mantine-color-text) !important;
-  --button-hover-color: var(--mantine-color-text) !important;
+  --button-hover: var(--mantine-color-default-hover) !important;
   --button-padding-x: 0px;
 }
 

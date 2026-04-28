@@ -20,13 +20,17 @@ import { type ReactNode } from 'react'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks'
 import * as css from './style.module.css'
 
-const headerHeightPx = 80 as const
+const headerHeightPx = 46 as const
+const headerBrandSizePx = 21 as const
+const headerControlsSizePx = 33 as const
 const breakpointWidthPx = 650 as const
 
 const columns = 32 as const
 const spaceSizes = { base: 0, sm: 1 } as const
 const centerSizeTuples = Object.entries (spaceSizes).map (([b, s]) => [ b, columns - s * 2 ]) as readonly [string,number][]
 const centerSizes = Object.fromEntries (centerSizeTuples)
+
+const headerSizes = { brandSize: headerBrandSizePx, controlSize: headerControlsSizePx } as const
 
 export const Shell = ({ children }: { children?: ReactNode }) =>
 {
@@ -44,22 +48,27 @@ export const Shell = ({ children }: { children?: ReactNode }) =>
   { desktop
     ? <AppShell.Header data-wakit-drag-area>
 
-        <Header />
+        <Group className={css.appShellHeaderGroup}
+                   style={{ '--app-shell-actual-header-width': '100%' }}>
+
+          <Header {...headerSizes} />
+        </Group>
       </AppShell.Header>
     : <>
       
         <AppShell.Header data-wakit-drag-area>
 
-          <Group className={css.appShellHeaderGroup}>
+          <Group className={css.appShellHeaderGroup}
+                     style={{ '--app-shell-actual-header-width': 'initial' }}>
 
             <Burger opened={opened} onClick={toggle} />
-            <Header skipBrand skipLinks />
+            <Header skipBrand skipLinks {...headerSizes} />
           </Group>
         </AppShell.Header>
 
         <AppShell.Navbar>
 
-          <Header skipAvatar skipBrand onNavigate={() => close ()} vertical withHome />
+          <Header skipControls skipBrand onNavigate={() => close ()} vertical withHome {...headerSizes} />
         </AppShell.Navbar>
       </>}
 
