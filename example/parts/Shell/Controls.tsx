@@ -38,7 +38,7 @@ function Control ({ children, onClick, size = 30 }: { children?: ReactNode, onCl
 export function Controls ({ size = 30 }: { size?: number })
 {
 
-  const [ maximized, setMaximized ] = useState (false)
+  const [ maximized, setMaximized ] = useState (browserWindow.maximized)
 
   useEffect (() =>
     {
