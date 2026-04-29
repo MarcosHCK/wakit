@@ -18,11 +18,6 @@
 namespace Wakit
 {
 
-  /**
-   * Keep well-known name in sync with extension/extension.vala
-   * - note: the constant named BUS_NAME on the Extension class
-   */
-
   public class Application: Gtk.Application
     {
 
@@ -38,14 +33,12 @@ namespace Wakit
       public IExtensionHost extension_host { get { return _browser_extension_host; } }
       public bool ready { get; private set; default = false; }
 
-      const string BUS_NAME = "org.hck.wakit.AppBus";
-
       public override void constructed ()
         {
 
           base.constructed ();
 
-          _appbus_bus = new AppBus.Bus (BUS_NAME);
+          _appbus_bus = new AppBus.Bus ();
           _appbus_watcher = new AppBus.Watcher ();
 
           _appbus_watcher.crashed.connect (on_appbus_crashed);
@@ -86,7 +79,7 @@ namespace Wakit
         {
 
           var page_id = widget.web_view.page_id.to_string ();
-          var object_path = GLib.Path.build_filename (_appbus_bus.object_path, "window", page_id);
+          var object_path = GLib.Path.build_filename (IAppBus.BUS_OBJECT_PATH, "windows", page_id);
 
           var connection = _appbus_watcher.connection;
           var window = new Wakit.Browser.Window (widget);

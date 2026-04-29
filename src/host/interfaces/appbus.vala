@@ -18,10 +18,22 @@
 namespace Wakit
 {
 
+  /**
+   * Keep well-known bus things in sync with extension/extension.ts
+   * - note: the constants named BUS_* at the top
+   */
+
+  /**
+   * Keep well-known bus things in sync with extension/extension.vala
+   * - note: the constants named BUS_* on the WebExtension class
+   */
+
   public interface IAppBus: GLib.Object
     {
 
-      public abstract string bus_name { get; construct; }
+      public const string BUS_NAME = "org.hck.wakit.AppBus";
+      public const string BUS_OBJECT_PATH = "/org/hck/wakit/AppBus";
+
       public abstract ICollection<IPostable> postables { get; }
 
       public extern void set_bus_name (string name);

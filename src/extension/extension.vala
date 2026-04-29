@@ -19,8 +19,13 @@ namespace Wakit
 {
 
   /**
-   * Keep well-known name in sync with host/application.vala
-   * - note: the constant named BUS_NAME on the Application class
+   * Keep well-known bus things in sync with host/interfaces/appbus.vala
+   * - note: the constants named BUS_* on the IAppBus interface
+   */
+
+  /**
+   * Keep well-known bus things in sync with extension/extension.vala
+   * - note: the constants named BUS_* on the WebExtension class
    */
 
   public class WebExtension: GLib.Object, GLib.Initable
@@ -31,6 +36,7 @@ namespace Wakit
       private GenericSet<string> _secure_schemes;
 
       const string BUS_NAME = "org.hck.wakit.AppBus";
+      const string BUS_OBJECT_PATH = "/org/hck/wakit/AppBus";
 
       public GLib.DBusConnection appbus { get; }
       public GLib.Variant? extension_data { get; }

@@ -15,6 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+const BUS_NAME = 'org.hck.wakit.AppBus' as const
+const BUS_OBJECT_PATH = '/org/hck/wakit/AppBus' as const
+
 export type ProxyBase =
 {
 }
@@ -32,6 +35,15 @@ export type ProxyLister =
 export const setup = async (page_id: string, proxyBuilder: ProxyBuilder, proxyLister: ProxyLister) =>
 {
 
+  try
+    { await setupUnsafe (page_id, proxyBuilder, proxyLister) }
+  catch (error)
+    { logging.error (error) }
+}
+
+export const setupUnsafe = async (page_id: string, proxyBuilder: ProxyBuilder, proxyLister: ProxyLister) =>
+{
+
   await makeBridge (proxyBuilder, proxyLister)
   await makeBrowserWindow (page_id, proxyBuilder)
 }
@@ -39,7 +51,7 @@ export const setup = async (page_id: string, proxyBuilder: ProxyBuilder, proxyLi
 export const makeBridge = async (proxyBuilder: ProxyBuilder, proxyLister: ProxyLister) =>
 {
 
-  const object_path = '/org/hck/wakit/AppBus'
+  const object_path = `${BUS_OBJECT_PATH}/services`
 
   const interfaces = await proxyLister.list_path (object_path)
   const typenames = interfaces.map (v => { let l = v.split ('.'); return l [l.length - 1] })
@@ -59,7 +71,7 @@ export const makeBrowserWindow = async (page_id: string, proxyBuilder: ProxyBuil
 {
 
   const interface_name = 'org.hck.wakit.Browser.Window'
-  const object_path = `/org/hck/wakit/AppBus/window/${page_id}`
+  const object_path = `${BUS_OBJECT_PATH}/windows/${page_id}`
 
   const proxy = await proxyBuilder.create (interface_name, object_path)
 
