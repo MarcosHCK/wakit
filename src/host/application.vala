@@ -44,9 +44,10 @@ namespace Wakit
           _appbus_watcher.crashed.connect (on_appbus_crashed);
 
           _browser_config = _browser_config ?? (BrowserConfig) GLib.Object.new (typeof (BrowserConfig),
-            "application-id", application_id,
-            "application-version", get_version (),
             null);
+
+          _browser_config.application_id = application_id;
+          _browser_config.application_version = get_version ();
 
           _browser_browser = new Browser.Browser (_browser_config);
           _browser_config = null;
