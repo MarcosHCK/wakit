@@ -28,18 +28,17 @@ namespace Wakit
    * - note: the constants named BUS_* on the WebExtension class
    */
 
-  public class WebExtension: GLib.Object, GLib.Initable
+  public class WebExtension: GLib.Object, GLib.Initable, IExtensionDataGuest
     {
-
-      private string _bus_address;
-      private string _eid;
-      private GenericSet<string> _secure_schemes;
 
       const string BUS_NAME = "org.hck.wakit.AppBus";
       const string BUS_OBJECT_PATH = "/org/hck/wakit/AppBus";
 
       public GLib.DBusConnection appbus { get; }
-      public GLib.Variant? extension_data { get; }
+      public string bus_address { get; protected set; }
+      public GLib.Variant? extension_data { get; protected set; }
+      public string guid { get; protected set; }
+      public ICollection<string> secure_schemes { get; }
       public WebKit.ScriptWorld script_world { get; private set; }
       public GLib.Variant parameters { construct; }
       public WebKit.WebProcessExtension wk_extension { get; construct; }
@@ -56,17 +55,15 @@ namespace Wakit
           unowned GLib.HashFunc<string> hash_func = GLib.str_hash;
           unowned GLib.EqualFunc<string> equal_func = GLib.str_equal;
 
-          _secure_schemes = new GenericSet<string> (hash_func, equal_func);
+          _secure_schemes = new GenericSetCollection<string> (hash_func, equal_func);
 
-          GLib.VariantIter secure_schemes_iter;
+          if (true == deserialize (_parameters))
 
-          _parameters.get ("(smsasm*)", out _eid, 
-                                        out _bus_address,
-                                        out secure_schemes_iter,
-                                        out _extension_data);
+            _parameters = null;
+          else
+            error ("bad extension data");
 
-          for (GLib.Variant? value; null != (value = secure_schemes_iter.next_value ());)
-            _secure_schemes.add (value.get_string ());
+          wk_extension.page_created.connect (on_page_created);
         }
 
       public extern static unowned Wakit.WebExtension get_default ();

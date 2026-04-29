@@ -18,7 +18,7 @@
 namespace Wakit.Browser
 {
 
-  public class ExtensionHost: GLib.Object, IExtensionHost
+  public class ExtensionHost: GLib.Object, IExtensionDataHost, IExtensionHost
     {
 
       public string bus_address { get; set; }
@@ -43,15 +43,7 @@ namespace Wakit.Browser
       private void on_initialize_web_process_extensions ()
         {
 
-          GLib.Variant items [] =
-            {
-              new GLib.Variant.take_string ( GLib.Uuid.string_random ()),
-              new GLib.Variant.maybe (GLib.VariantType.STRING, _bus_address),
-              new GLib.Variant.strv (((PtrArrayCollection<string>) _secure_schemes).array.data),
-              new GLib.Variant.maybe (null != _extension_data ? _extension_data.get_type () : GLib.VariantType.BOOLEAN, _extension_data),
-            };
-
-          GLib.Variant @params = new GLib.Variant.tuple (items);
+          GLib.Variant @params = serialize (GLib.Uuid.string_random ());
 
           if (null != _extension_dir)
           _context.set_web_process_extensions_directory (_extension_dir);

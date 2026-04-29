@@ -18,9 +18,16 @@
 namespace Wakit
 {
 
-  public interface IExtensionHost: GLib.Object, IExtensionDataHost
+  public abstract class CollectionIter<T>
     {
 
-      public abstract string? extension_dir { get; set; }
+      public abstract bool next (out unowned T value);
+
+      public virtual unowned T next_value ()
+        {
+
+          unowned T value;
+          return ! next (out value) ? null : value;
+        }
     }
 }

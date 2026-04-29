@@ -18,38 +18,43 @@
 namespace Wakit
 {
 
-  public sealed class ListCollection<T>: GLib.Object, ICollection<T>
+  public sealed class GenericSetCollection<T>: GLib.Object, ICollection<T>
     {
 
-      public size_t length { get { return (size_t) _struct.length; } }
+      public size_t length { get { return _struct.length; } }
 
-      public GLib.List<T> @struct { get { return _struct; } }
-      private GLib.List<T> _struct = new GLib.List<T> ();
+      public GenericSet<T> @struct { get { return _struct; }
+                            construct { _struct = value; } }
+      private GenericSet<T> _struct;
 
       sealed class CollectionIterImpl<T>: CollectionIter<T>
         {
 
-          private unowned GLib.List<T> _iter;
+          private GenericSetIter<T> _iter;
 
-          public CollectionIterImpl (GLib.List<T> _struct)
+          public CollectionIterImpl (GenericSet<T> _struct)
             {
-              _iter = _struct;
+              _iter = _struct.iterator ();
             }
 
           public override bool next (out unowned T item)
             {
 
-              if (null != _iter) {  item = _iter.data;
-                                   _iter = _iter.next;
-                                   return true; }
-              item = null;
-            return false;
+              unowned T? value = _iter.next_value ();
+                          item = value;
+            return null != value;
             }
+        }
+
+      public GenericSetCollection (GLib.HashFunc<T> hash_func, GLib.EqualFunc<T> equal_func)
+        {
+
+          Object (@struct: new GenericSet<T> (hash_func, equal_func));
         }
 
       public void add (owned T value)
         {
-          _struct.append ((owned) value);
+          _struct.add ((owned) value);
         }
 
       public void del (T value)

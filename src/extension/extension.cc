@@ -53,7 +53,7 @@ static gpointer wakit_web_extension_new_default_once (WebKitWebProcessExtension*
 {
 
   g_return_val_if_fail (WEBKIT_IS_WEB_PROCESS_EXTENSION (wk_extension), NULL);
-  g_return_val_if_fail (nullptr == parameters || g_variant_check_format_string (parameters, "(smsasm*)", FALSE), NULL);
+  g_return_val_if_fail (nullptr != parameters, NULL);
   g_return_val_if_fail (g_type_is_a (g_type, WAKIT_TYPE_WEB_EXTENSION), NULL);
 
   g_debug ("Web-Process-Extension loaded");

@@ -21,17 +21,62 @@ namespace Wakit
   public sealed class PtrArrayCollection<T>: GLib.Object, ICollection<T>
     {
 
-      public GenericArray<T> array { get { return _array; } }
-      private GenericArray<T> _array = new GenericArray<T> ();
+      public size_t length { get { return _struct.length; } }
+
+      public GenericArray<T> @struct { get { return _struct; } }
+      private GenericArray<T> _struct = new GenericArray<T> ();
+
+      sealed class CollectionIterImpl<T>: CollectionIter<T>
+        {
+
+          private GenericArray<T> _array;
+          private size_t _iter;
+
+          public CollectionIterImpl (GenericArray<T> _struct)
+            {
+              _array = _struct;
+              _iter = 0;
+            }
+
+          public override bool next (out unowned T item)
+            {
+
+              size_t i = _iter;
+
+              if (i < _array.length) { item = _array.data [i];
+                                       return true; }
+              item = null;
+            return false;
+            }
+        }
 
       public void add (owned T value)
         {
-          _array.add ((owned) value);
+          _struct.add ((owned) value);
         }
 
       public void del (T value)
         {
-          _array.remove (value);
+          _struct.remove (value);
+        }
+
+      public CollectionIter<T> iterator ()
+        {
+
+        return new CollectionIterImpl<T> (_struct);
+        }
+
+      public override (unowned T)[] to_array ()
+        {
+
+          var count = _struct.length;
+          var array = new (unowned T) [count];
+
+          unowned var data = _struct.data;
+
+          for (size_t i = 0; i < count; ++i)
+            array [i] = data [i];
+        return array;
         }
     }
 }

@@ -18,24 +18,29 @@
 namespace Wakit
 {
 
-  public interface ICollection<T>: GLib.Object
+  public interface IExtensionDataHost: GLib.Object
     {
 
-      public abstract size_t length { get; }
+      public const string SIGNATURE = "(ssas*)";
 
-      public abstract void add (owned T value);
-      public abstract void del (T value);
-      public abstract CollectionIter<T> iterator ();
+      public abstract string bus_address { get; set; }
+      public abstract GLib.Variant? extension_data { get; set; }
+      public abstract ICollection<string> secure_schemes { get; }
 
-      public virtual (unowned T)[] to_array ()
+      public virtual GLib.Variant serialize (string guid)
+          requires (bus_address != null)
         {
 
-          var array = new (unowned T) [length];
-          var next = (size_t) 0;
+          GLib.Variant items [] =
+            {
 
-          foreach (unowned T item in this)
-            array [next++] = item;
-        return array;
+              new GLib.Variant.string (guid),
+              new GLib.Variant.string (bus_address),
+              new GLib.Variant.strv (secure_schemes.to_array ()),
+              extension_data ?? new GLib.Variant.boolean (false),
+            };
+
+        return new GLib.Variant.tuple (items);
         }
     }
 }

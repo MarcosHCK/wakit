@@ -49,7 +49,7 @@ namespace Wakit.Bundle
 
           size_t length = path.length;
 
-          foreach (unowned var alias in ((ListCollection<Alias>) _aliases).list)
+          foreach (unowned var alias in ((ListCollection<Alias>) _aliases).struct)
             {
 
               if (! alias.matches (path, length))
@@ -70,7 +70,7 @@ namespace Wakit.Bundle
 
           size_t length = path.length;
 
-          foreach (unowned var alias in ((ListCollection<Alias>) _aliases).list)
+          foreach (unowned var alias in ((ListCollection<Alias>) _aliases).struct)
             {
 
               if (! alias.matches (path, length))

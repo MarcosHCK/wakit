@@ -15,12 +15,29 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit
+namespace GLib
 {
 
-  public interface IExtensionHost: GLib.Object, IExtensionDataHost
+  [CCode (cheader_filename = "glib.h",
+                     cname = "GVariantIter",
+         has_copy_function = false,
+      has_destroy_function = false,
+               has_type_id = false,
+        lower_case_csuffix = "variant_iter_")]
+
+  public extern struct VariantIter_
     {
 
-      public abstract string? extension_dir { get; set; }
+      public VariantIter_ (GLib.Variant variant)
+        {
+          this.constructor (variant);
+        }
+
+      [CCode (cheader_filename = "common/variant.c",
+                         cname = "g_variant_iter_constructor")]
+      private extern VariantIter_.constructor (GLib.Variant variant);
+
+      [CCode (cname = "g_variant_iter_next")]
+      public extern bool next (string format, ...);
     }
 }

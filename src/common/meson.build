@@ -27,7 +27,17 @@ foreach lib: [ 'asyncdelay', 'asynclock' ]
   __common_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'asyncdelay', 'asynclock', 'collection', 'ipcresult', 'listcollection', 'ptrarraycollection', 'resource', 'timeoutcancellable' ]
+foreach lib: [ 'genericset', 'list', 'ptrarray' ]
+
+  __common_src += [ '@0@collection.vala'.format (lib) ]
+endforeach
+
+foreach lib: [ 'guest', 'host' ]
+
+  __common_src += [ 'extensiondata@0@.vala'.format (lib) ]
+endforeach
+
+foreach lib: [ 'asyncdelay', 'asynclock', 'collection', 'collectioniter', 'ipcresult', 'resource', 'timeoutcancellable', 'variant' ]
 
   __common_src += [ '@0@.vala'.format (lib) ]
 endforeach

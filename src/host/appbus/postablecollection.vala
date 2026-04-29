@@ -34,6 +34,8 @@ namespace Wakit.AppBus
             }
         }
 
+      public size_t length { get { return _ar.length; } }
+
       private GLib.Array<Entry> _ar = new Array<Entry> (false, false);
       private bool _touched = false;
 
@@ -51,6 +53,12 @@ namespace Wakit.AppBus
 
           if (try_del (postable, out post_id) && 0 != post_id)
             warning ("removing a posted object from the collection");
+        }
+
+      public CollectionIter<IPostable> iterator ()
+        {
+
+          assert_not_reached ();
         }
 
       public bool try_del (IPostable postable, out uint post_id = null)

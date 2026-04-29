@@ -14,13 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#include <config.h>
+#include <glib.h>
 
-namespace Wakit
+GVariantIter* g_variant_iter__dup (const GVariantIter* self);
+void g_variant_iter__free (GVariantIter* self);
+
+static __inline void g_variant_iter_constructor (GVariantIter* iter, GVariant* variant)
 {
 
-  public interface IExtensionHost: GLib.Object, IExtensionDataHost
-    {
-
-      public abstract string? extension_dir { get; set; }
-    }
+  g_variant_iter_init (iter, variant);
 }
