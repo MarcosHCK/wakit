@@ -34,6 +34,8 @@ namespace Wakit
       const string BUS_NAME = "org.hck.wakit.AppBus";
       const string BUS_OBJECT_PATH = "/org/hck/wakit/AppBus";
 
+      public ICollection<GLib.Regex> accessible_uri_outsource { get; }
+      public ICollection<GLib.Regex> accessible_uri_whitelist { get; }
       public GLib.DBusConnection appbus { get; }
       public string bus_address { get; protected set; }
       public GLib.Variant? extension_data { get; protected set; }
@@ -55,6 +57,8 @@ namespace Wakit
           unowned GLib.HashFunc<string> hash_func = GLib.str_hash;
           unowned GLib.EqualFunc<string> equal_func = GLib.str_equal;
 
+          _accessible_uri_outsource = new PtrArrayCollection<GLib.Regex> ();
+          _accessible_uri_whitelist = new PtrArrayCollection<GLib.Regex> ();
           _secure_schemes = new GenericSetCollection<string> (hash_func, equal_func);
 
           if (true == deserialize (_parameters))
@@ -83,11 +87,36 @@ namespace Wakit
         return true;
         }
 
-      static bool is_secure (WebKit.Frame frame, GenericSet<string> secure_schemes)
+      static bool is_uri_accessible (string uri, GenericArray<GLib.Regex> whitelist)
         {
 
-          var scheme = GLib.Uri.parse_scheme (frame.get_uri ());
-          var found = secure_schemes.contains (scheme);
+          try
+            { return is_uri_accessible_ (uri, whitelist); }
+          catch (GLib.Error error)
+            { GLib.warning ("Wakit.WebExtension.is_uri_accessible ()!: %s: %u: %s",
+                error.domain.to_string (), error.code, error.message); }
+
+        return false;
+        }
+
+      static bool is_uri_accessible_ (string uri, GenericArray<GLib.Regex> whitelist) throws GLib.Error
+        {
+
+          unowned GLib.RegexMatchFlags match_options = 0;
+
+          foreach (unowned var regex in whitelist)
+
+            if (regex.match_full (uri, -1, 0, match_options, null))
+              return true;
+
+        return false;
+        }
+
+      static bool is_uri_secure (string uri, GenericSet<string> whitelist)
+        {
+
+          var scheme = GLib.Uri.parse_scheme (uri);
+          var found = whitelist.contains (scheme);
         return found;
         }
 
@@ -96,13 +125,29 @@ namespace Wakit
                                                                    GLib.Variant? parameters,
                                                                    GLib.Type g_type);
 
+      private void on_page_created (WebKit.WebPage web_page)
+        {
+
+          web_page.send_request.connect (on_send_request);
+        }
+
+      private bool on_send_request (WebKit.URIRequest request, WebKit.URIResponse? redirected_response)
+        {
+
+          unowned var collection = _accessible_uri_whitelist;
+          unowned var uri = request.get_uri ();
+
+        return ! is_uri_secure (uri, ((GenericSetCollection<string>) _secure_schemes).struct)
+            && ! is_uri_accessible (uri, ((PtrArrayCollection<GLib.Regex>) collection).struct);
+        }
+
       [CCode (cheader_filename = "glib.h", cname = "g_bytes_get_data")]
       extern static unowned void* _g_bytes_get_data (GLib.Bytes bytes, out size_t size);
 
       private void on_window_object_cleared (WebKit.WebPage web_page, WebKit.Frame frame)
         {
 
-          if (! is_secure (frame, _secure_schemes))
+          if (! is_uri_secure (frame.get_uri (), ((GenericSetCollection<string>) _secure_schemes).struct))
             return;
 
           JSC.Context context = frame.get_js_context_for_script_world (_script_world);

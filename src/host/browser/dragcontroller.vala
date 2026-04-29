@@ -127,6 +127,11 @@ namespace Wakit.Browser
       async bool _on_drag_begin_async (double x, double y, GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
+          var scheme = GLib.Uri.parse_scheme (_web_view.get_uri ());
+
+          if ("app" != scheme)
+            return false;
+
           yield async_delay (_drag_delay, GLib.Priority.DEFAULT, cancellable);
 
           string code = TEST_TEMPLATE.printf (x, y);

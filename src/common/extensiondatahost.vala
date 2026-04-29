@@ -21,23 +21,40 @@ namespace Wakit
   public interface IExtensionDataHost: GLib.Object
     {
 
-      public const string SIGNATURE = "(ssas*)";
+      internal const string SIGNATURE = "("
+        + _V_TYPE_STRING
+        + _V_TYPE_STRING
+        + _V_TYPE_ANY
+        + _V_TYPE_STRING_ARRAY
+        + _V_TYPE_STRING_ARRAY
+        + _V_TYPE_STRING_ARRAY
+        + ")";
 
+      internal const string _V_TYPE_ANY = "*";
+      internal const string _V_TYPE_ARRAY = "a";
+      internal const string _V_TYPE_STRING = "s";
+      internal const string _V_TYPE_STRING_ARRAY = _V_TYPE_ARRAY + "s";
+
+      public abstract ICollection<string> accessible_uri_outsource { get; }
+      public abstract ICollection<string> accessible_uri_whitelist { get; }
       public abstract string bus_address { get; set; }
       public abstract GLib.Variant? extension_data { get; set; }
       public abstract ICollection<string> secure_schemes { get; }
 
       public virtual GLib.Variant serialize (string guid)
           requires (bus_address != null)
+          ensures (result.check_format_string (IExtensionDataHost.SIGNATURE, false))
         {
 
           GLib.Variant items [] =
             {
 
-              new GLib.Variant.string (guid),
               new GLib.Variant.string (bus_address),
-              new GLib.Variant.strv (secure_schemes.to_array ()),
+              new GLib.Variant.string (guid),
               extension_data ?? new GLib.Variant.boolean (false),
+              new GLib.Variant.strv (accessible_uri_outsource.to_array ()),
+              new GLib.Variant.strv (accessible_uri_whitelist.to_array ()),
+              new GLib.Variant.strv (secure_schemes.to_array ()),
             };
 
         return new GLib.Variant.tuple (items);

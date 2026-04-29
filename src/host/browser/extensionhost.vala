@@ -21,6 +21,8 @@ namespace Wakit.Browser
   public class ExtensionHost: GLib.Object, IExtensionDataHost, IExtensionHost
     {
 
+      public ICollection<string> accessible_uri_outsource { get; }
+      public ICollection<string> accessible_uri_whitelist { get; }
       public string bus_address { get; set; }
       public WebKit.WebContext context { get; construct; }
       public GLib.Variant? extension_data { get; set; }
@@ -37,6 +39,9 @@ namespace Wakit.Browser
 
           base.constructed ();
           _context.initialize_web_process_extensions.connect (on_initialize_web_process_extensions);
+
+          _accessible_uri_outsource = new PtrArrayCollection<string> ();
+          _accessible_uri_whitelist = new PtrArrayCollection<string> ();
           _secure_schemes = new PtrArrayCollection<string> ();
         }
 
