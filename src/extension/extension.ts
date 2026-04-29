@@ -29,6 +29,13 @@ export type ProxyLister =
   list_path: (object_path: string) => Promise<string[]>
 }
 
+export const setup = async (page_id: string, proxyBuilder: ProxyBuilder, proxyLister: ProxyLister) =>
+{
+
+  await makeBridge (proxyBuilder, proxyLister)
+  await makeBrowserWindow (page_id, proxyBuilder)
+}
+
 export const makeBridge = async (proxyBuilder: ProxyBuilder, proxyLister: ProxyLister) =>
 {
 
@@ -45,5 +52,16 @@ export const makeBridge = async (proxyBuilder: ProxyBuilder, proxyLister: ProxyL
       proxies [typename] = await proxyBuilder.create (interface_name, object_path)
     }
 
-  (globalThis as unknown as { bridge: typeof proxies }).bridge = proxies
+  ;(globalThis as unknown as { bridge: typeof proxies }).bridge = proxies
+}
+
+export const makeBrowserWindow = async (page_id: string, proxyBuilder: ProxyBuilder) =>
+{
+
+  const interface_name = 'org.hck.wakit.Browser.Window'
+  const object_path = `/org/hck/wakit/AppBus/window/${page_id}`
+
+  const proxy = await proxyBuilder.create (interface_name, object_path)
+
+  ;(globalThis as unknown as { browserWindow: ProxyBase }).browserWindow = proxy
 }

@@ -43,14 +43,14 @@ export function Controls ({ size = 30 }: { size?: number })
   useEffect (() =>
     {
 
-      const id = browserWindow.onMaximized.connect (setMaximized)
+      const id = browserWindow.maximizedChanged.connect (setMaximized)
       return () => browserWindow.disconnect (id)
     }, [])
 
   return <Group gap={3} justify='end'>
 
-    <Control onClick={() => collect (browserWindow.minimize ())} size={size}> <FiMinus /> </Control>
-    <Control onClick={() => collect (browserWindow.maximize ())} size={size}> { ! maximized ? <FiMaximize2 /> : <FiMinimize2 /> } </Control>
+    <Control onClick={() => collect (browserWindow.minimizedToggle ())} size={size}> <FiMinus /> </Control>
+    <Control onClick={() => collect (browserWindow.maximizedToggle ())} size={size}> { ! maximized ? <FiMaximize2 /> : <FiMinimize2 /> } </Control>
     <Control onClick={() => collect (browserWindow.close ())} size={size}> <FiX /> </Control>
   </Group>
 }

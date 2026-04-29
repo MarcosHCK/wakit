@@ -26,7 +26,7 @@ foreach bit: [ ]
   __host_browser_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'browser', 'dragcontroller', 'extensionhost', 'resource', 'urirequest', 'widget' ]
+foreach bit: [ 'browser', 'dragcontroller', 'extensionhost', 'resource', 'urirequest', 'widget', 'window', 'windowregistrar' ]
 
   __host_browser_src += [ '@0@.vala'.format (bit) ]
 endforeach

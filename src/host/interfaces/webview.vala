@@ -28,6 +28,9 @@ namespace Wakit
   public interface IWebView: Gtk.Widget
     {
 
+      public abstract bool maximized { get; set; }
+      public abstract bool minimized { get; set; }
+
       public unowned WebViewBinding bind_window (Gtk.Window window)
         {
 
@@ -60,52 +63,6 @@ namespace Wakit
         }
 
       public abstract void open_uri (GLib.File uri, string hint);
-
-      [CCode (cname = "WAKIT_IWEB_VIEW_GET_INTERFACE (self)->maximize")]
-      extern const uintptr maximize_actv;
-
-      [CCode (cname = "wakit_iweb_view_real_maximize")]
-      extern const uintptr maximize_real;
-
-      [CCode (cname = "wakit_iweb_view_signals[WAKIT_IWEB_VIEW_MAXIMIZE_SIGNAL]")]
-      extern const uint maximize_sid;
-
-      [HasEmitter, Signal (action = true, run = "first")]
-      public virtual signal void maximize (bool @set, bool value)
-        {
-
-          if (! GLib.Signal.has_handler_pending (this, maximize_sid, 0, true)
-             && maximize_actv == maximize_real)
-            {
-
-              GLib.warning_once ("Your application does not implement "
-                               + "wakit_iweb_view_maximize() and has no handlers connected "
-                               + "to the 'close' signal. It should do one of these.");
-            }
-        }
-
-      [CCode (cname = "WAKIT_IWEB_VIEW_GET_INTERFACE (self)->minimize")]
-      extern const uintptr minimize_actv;
-
-      [CCode (cname = "wakit_iweb_view_real_minimize")]
-      extern const uintptr minimize_real;
-
-      [CCode (cname = "wakit_iweb_view_signals[WAKIT_IWEB_VIEW_MINIMIZE_SIGNAL]")]
-      extern const uint minimize_sid;
-
-      [HasEmitter, Signal (action = true, run = "first")]
-      public virtual signal void minimize (bool @set, bool value)
-        {
-
-          if (! GLib.Signal.has_handler_pending (this, minimize_sid, 0, true)
-             && minimize_actv == minimize_real)
-            {
-
-              GLib.warning_once ("Your application does not implement "
-                               + "wakit_iweb_view_minimize() and has no handlers connected "
-                               + "to the 'close' signal. It should do one of these.");
-            }
-        }
 
       [CCode (cname = "WAKIT_IWEB_VIEW_GET_INTERFACE (self)->terminated")]
       extern const uintptr terminated_actv;

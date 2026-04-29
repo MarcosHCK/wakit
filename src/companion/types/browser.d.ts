@@ -24,12 +24,14 @@ declare global
     {
 
       function close (): Promise<boolean>;
+      const closing: SignalSpec<[]>;
       function disconnect (signal_id: number): void;
-      function maximize (value?: boolean): Promise<boolean>;
-      function minimize (value?: boolean): Promise<boolean>;
-      const onClose: SignalSpec<[]>;
-      const onMaximized: SignalSpec<[ boolean ]>;
-      const onMinimized: SignalSpec<[ boolean ]>;
+      const maximized: boolean;
+      const maximizedChanged: SignalSpec<[ boolean ]>;
+      function maximizedToggle (): Promise<boolean>;
+      const minimized: boolean;
+      const minimizedChanged: SignalSpec<[ boolean ]>;
+      function minimizedToggle (value?: boolean): Promise<boolean>;
     }
 }
 

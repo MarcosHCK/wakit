@@ -18,26 +18,14 @@
 namespace Wakit.Browser
 {
 
-  /**
-   * Keep *_NAME_* constants in sync with extension/bindings/browserwindow.vala
-   * - note: at the start of the class definition
-   */
-
   public class Widget: Gtk.Grid, IWebView
     {
 
       public bool maximized { get; set; }
+      public bool minimized { get; set; }
       public WebKit.WebView web_view { get; construct; }
 
       private DragController _drag_controller;
-
-      const string METHOD_NAME_CLOSE = "Wakit.BrowserWindow.Close";
-      const string METHOD_NAME_MAXIMIZE = "Wakit.BrowserWindow.Maximize";
-      const string METHOD_NAME_MINIMIZE = "Wakit.BrowserWindow.Minimize";
-
-      const string SIGNAL_NAME_CLOSE = "Wakit.BrowserWindow.Close";
-      const string SIGNAL_NAME_MAXIMIZED = "Wakit.BrowserWindow.Maximized";
-      const string SIGNAL_NAME_MINIMIZED = "Wakit.BrowserWindow.Minimized";
 
       public Widget (WebKit.WebView web_view)
         {
@@ -56,10 +44,7 @@ namespace Wakit.Browser
 
           _web_view.decide_policy.connect (on_decide_policy);
           _web_view.permission_request.connect (on_permission_request);
-          _web_view.user_message_received.connect (on_user_message_received);
           _web_view.web_process_terminated.connect (on_web_process_terminated);
-
-          notify ["maximized"].connect (on_notify_maximized);
 
           add_controller (_drag_controller.controller);
           attach (_web_view, 0, 0);
@@ -161,68 +146,12 @@ namespace Wakit.Browser
         return true;
         }
 
-      private void on_notify_maximized () requires (null != _web_view)
-        {
-
-          var parameters = new GLib.Variant ("(b)", maximized);
-          var message = new WebKit.UserMessage (SIGNAL_NAME_MAXIMIZED, parameters);
-
-          _web_view.send_message_to_page.begin (message, null);
-        }
-
       private bool on_permission_request (WebKit.WebView webview, WebKit.PermissionRequest request)
         {
 
           request.deny ();
           warning ("permission request (type %s) denied", request.get_type ().name ());
         return true;
-        }
-
-      private bool on_user_message_received (WebKit.UserMessage message)
-        {
-
-          unowned var name = message.get_name ();
-          GLib.Variant result;
-
-          try
-            { GLib.Variant parameters = message.get_parameters ();
-              GLib.Variant? value = on_user_message_received_inner (name, parameters);
-              if (null == value) return false;
-              result = IpcResult.pack_value (value); }
-          catch (GLib.Error error)
-            { result = IpcResult.pack_error (error); }
-
-          message.send_reply (new WebKit.UserMessage (name, result));
-        return true;
-        }
-
-      static void on_user_message_received_check (GLib.Variant parameters, string format_string) throws GLib.Error
-        {
-
-          if (! parameters.check_format_string (format_string, false))
-            throw new GLib.IOError.INVALID_ARGUMENT ("invalid command parameters");
-        }
-
-      private GLib.Variant? on_user_message_received_inner (string name, GLib.Variant parameters) throws GLib.Error
-        {
-
-          switch (name)
-            {
-
-            case METHOD_NAME_CLOSE: close ();
-              return new GLib.Variant.boolean (true);
-
-            case METHOD_NAME_MAXIMIZE: on_user_message_received_check (parameters, "(mb)");
-              GLib.Variant? v = parameters.get_child_value (0).get_maybe ();
-              maximize (null != v, null == v ? false : v.get_boolean ());
-              return new GLib.Variant.boolean (true);
-
-            case METHOD_NAME_MINIMIZE: on_user_message_received_check (parameters, "(mb)");
-              GLib.Variant? v = parameters.get_child_value (0).get_maybe ();
-              minimize (null != v, null == v ? false : v.get_boolean ());
-              return new GLib.Variant.boolean (true);
-            }
-        return null;
         }
 
       private void on_web_process_terminated (WebKit.WebView webview, WebKit.WebProcessTerminationReason reason)

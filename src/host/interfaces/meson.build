@@ -19,11 +19,11 @@ __host_interfaces_src = [ ]
 
 foreach lib: [ ]
 
-  __host_interfaces_src += [ '@0@.c'.format (lib) ]
+  __host_interfaces_src += [ '@0@.cc'.format (lib) ]
   __host_interfaces_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'appbus', 'browser', 'browserconfig', 'extensionhost', 'postable', 'urirequest', 'webview', 'webviewbinding' ]
+foreach lib: [ 'appbus', 'browser', 'browserconfig', 'extensionhost', 'postable', 'urirequest', 'webview', 'webviewbinding', 'window' ]
 
   __host_interfaces_src += [ '@0@.vala'.format (lib) ]
 endforeach

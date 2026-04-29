@@ -60,6 +60,8 @@ namespace Wakit
           _browser_extension_host = new Browser.ExtensionHost (_browser_browser.context);
           _deferred_open = new GLib.Queue<DeferredUrl?> ();
           _ready = false;
+
+          _browser_browser.created_view.connect (on_created_view);
         }
 
       private void on_appbus_crashed (GLib.Error? error)
@@ -78,6 +80,25 @@ namespace Wakit
             }
 
           quit ();
+        }
+
+      private void on_created_view (Wakit.Browser.Widget widget)
+        {
+
+          var page_id = widget.web_view.page_id.to_string ();
+          var object_path = GLib.Path.build_filename (_appbus_bus.object_path, "window", page_id);
+
+          var connection = _appbus_watcher.connection;
+          var window = new Wakit.Browser.Window (widget);
+
+          try
+            { Wakit.Browser.WindowRegistrar.expose (connection, object_path, window); }
+          catch (GLib.Error error)
+            {
+              GLib.critical ("Wakit.Browser.WindowRegistrar.expose ()!: %s: %u: %s",
+                error.domain.to_string (), error.code, error.message);
+              return ;
+            }
         }
 
       public override void open ([CCode (array_length_cname = "n_files", array_length_pos = 1.5)] GLib.File[] files, string hint)

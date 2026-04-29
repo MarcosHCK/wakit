@@ -18,12 +18,29 @@
 namespace Wakit
 {
 
-  [Compact (opaque = true)] public class WebViewBinding
+  public sealed class WebViewBinding: GLib.Object
     {
 
       private ulong _close_sid = 0;
-      private ulong _maximize_sid = 0;
-      private ulong _minimize_sid = 0;
+      private ulong _notify_state_sid = 0;
+      private ulong _realize_sid = 0;
+      private ulong _unrealize_sid = 0;
+
+      public bool maximized
+        {
+          get { return Gdk.ToplevelState.MAXIMIZED in (surface as Gdk.Toplevel)?.state; }
+          set { var toplevel = (surface as Gdk.Toplevel); if (null != toplevel)
+                  _set_maximized (toplevel, value);
+        } }
+
+      public bool minimized
+        {
+          get { return Gdk.ToplevelState.MINIMIZED in (surface as Gdk.Toplevel)?.state; }
+          set { var toplevel = (surface as Gdk.Toplevel); if (null != toplevel)
+                  _set_minimized (toplevel, value, maximized);
+        } }
+
+      public Gdk.Surface surface { get { return window?.get_native ()?.get_surface (); } }
 
       public unowned Wakit.IWebView web_view { get; private set; }
       public unowned Gtk.Window window { get; private set; }
@@ -45,20 +62,42 @@ namespace Wakit
           _web_view = web_view;
 
           unowned GLib.BindingFlags flag1 = GLib.BindingFlags.BIDIRECTIONAL;
-          unowned GLib.BindingFlags flag2 = GLib.BindingFlags.SYNC_CREATE;
-          unowned GLib.BindingFlags flags = flag1 | flag2;
+          unowned GLib.BindingFlags flags = flag1;
+
+          bind_property ("maximized", web_view, "maximized", flags);
+          bind_property ("minimized", web_view, "minimized", flags);
 
           _close_sid = _g_signal_connect_data (web_view, "close", (GLib.Callback) on_close, this);
-          _maximize_sid = _g_signal_connect_data (web_view, "maximize", (GLib.Callback) on_maximize, this);
-          _minimize_sid = _g_signal_connect_data (web_view, "minimize", (GLib.Callback) on_minimize, this);
 
-          window.bind_property ("maximized", web_view, "maximized", flags);
+          _realize_sid = GLib.Signal.connect_swapped (window, "realize", (GLib.Callback) on_window_realize, this);
+          _unrealize_sid = GLib.Signal.connect_swapped (window, "unrealize", (GLib.Callback) on_window_unrealize, this);
 
           _g_object_weak_ref (web_view, on_destroy, this);
           _g_object_weak_ref (window, on_destroy, this);
         }
 
-      extern void free ();
+      static void _set_maximized (Gdk.Toplevel toplevel, bool value)
+        {
+
+          var layout = new Gdk.ToplevelLayout ();
+
+          layout.set_resizable (true);
+          layout.set_maximized (value);
+          toplevel.present (layout);
+        }
+
+      static void _set_minimized (Gdk.Toplevel toplevel, bool value, bool maximized)
+        {
+
+          if (value)
+            { toplevel.minimize (); return; }
+
+          var layout = new Gdk.ToplevelLayout ();
+
+          layout.set_resizable (true);
+          layout.set_maximized (maximized);
+          toplevel.present (layout);
+        }
 
       private void on_close ()
         {
@@ -75,15 +114,13 @@ namespace Wakit
           if ((void*) object == (void*) w._window)
             w._window = null;
 
-          w.free ();
+          w.unref ();
         }
 
       private void on_destroy_web_view_things ()
         {
 
           _web_view.disconnect (_close_sid);
-          _web_view.disconnect (_maximize_sid);
-          _web_view.disconnect (_minimize_sid);
 
           _g_object_weak_unref (_web_view, on_destroy, this);
         }
@@ -91,25 +128,43 @@ namespace Wakit
       private void on_destroy_window_things ()
         {
 
+          _window.disconnect (_realize_sid);
+          _window.disconnect (_unrealize_sid);
+
           _g_object_weak_unref (_window, on_destroy, this);
         }
 
-      private void on_maximize (bool @set, bool value)
+      private void on_notify_state ()
         {
 
-          Gtk.Window window = _window;
-
-          if (@set ? value : !( Gdk.ToplevelState.MAXIMIZED in (window.get_native ()?.get_surface () as Gdk.Toplevel)?.state))
-            window.maximize (); else window.unmaximize ();
+          notify_property ("maximized");
+          notify_property ("minimized");
         }
 
-      private void on_minimize (bool @set, bool value)
+      private void on_window_realize ()
         {
 
-          Gtk.Window window = _window;
+          Gdk.Toplevel toplevel;
 
-          if (@set ? value : !( Gdk.ToplevelState.MINIMIZED in (window.get_native ()?.get_surface () as Gdk.Toplevel)?.state))
-            window.minimize (); else window.unminimize ();
+          if (null == (toplevel = window?.get_surface () as Gdk.Toplevel))
+            return;
+
+          _notify_state_sid = toplevel.notify ["state"].connect (on_notify_state);
+          on_notify_state ();
+        }
+
+      private void on_window_unrealize ()
+        {
+
+          Gdk.Toplevel toplevel;
+
+          if (null == (toplevel = window?.get_surface () as Gdk.Toplevel))
+            return;
+
+          if (_notify_state_sid > 0)
+            toplevel.disconnect (_notify_state_sid);
+
+          _notify_state_sid = 0;
         }
 
       [CCode (cheader_filename = "glib-object.h",

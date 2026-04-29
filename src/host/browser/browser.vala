@@ -102,16 +102,23 @@ namespace Wakit.Browser
       public Wakit.IWebView create_view ()
         {
 
-          WebKit.WebView _viewer;
+          Wakit.Browser.Widget _widget;
+          WebKit.WebView _web_view;
 
-          _viewer = (WebKit.WebView) GLib.Object.new (typeof (WebKit.WebView),
+          _web_view = (WebKit.WebView) GLib.Object.new (typeof (WebKit.WebView),
             "settings", _settings,
             "user-content-manager", _user_content_manager,
             "web-context", _context,
             null);
 
-        return new Wakit.Browser.Widget (_viewer);
+          _widget = new Wakit.Browser.Widget (_web_view);
+
+          created_view (_widget);
+        return _widget;
         }
+
+      [HasEmitter]
+      public signal void created_view (Wakit.Browser.Widget web_view);
 
       static string make_application_name (string? application_id)
         {

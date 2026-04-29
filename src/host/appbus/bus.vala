@@ -22,6 +22,7 @@ namespace Wakit.AppBus
     {
 
       public string bus_name { get; construct; }
+      public string object_path { get { return _object_path; } }
       public ICollection<IPostable> postables { get { return _postables; } }
 
       private string _object_path;

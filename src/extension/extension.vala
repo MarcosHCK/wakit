@@ -122,15 +122,12 @@ namespace Wakit
             "wakit:///extension/extension.ts", 1);
 
           var dbus_service = new Binding.DBusService (_appbus, BUS_NAME);
-          var proxyBuilder = (new Binding.ProxyBuilder (dbus_service)).to_value (context);
-          var proxyLister = (new Binding.ProxyLister (dbus_service)).to_value (context);
-          JSC.Value parameters [] = { proxyBuilder, proxyLister };
+          var page_id = new JSC.Value.string (context, web_page.get_id ().to_string ());
+          var proxy_builder = (new Binding.ProxyBuilder (dbus_service)).to_value (context);
+          var proxy_lister = (new Binding.ProxyLister (dbus_service)).to_value (context);
+          JSC.Value parameters [] = { page_id, proxy_builder, proxy_lister };
 
-          setup.object_get_property ("makeBridge").function_callv (parameters);
-
-          Binding.BrowserWindow.register (context, "Wakit.Binding.BrowserWindow");
-
-          context.set_value ("browserWindow", (new Binding.BrowserWindow (web_page)).to_value (context));
+          setup.object_get_property ("setup").function_callv (parameters);
         }
 
       [CCode (cname = "WAKIT_WEB_EXTENSION_GET_CLASS (self)->registration")]
