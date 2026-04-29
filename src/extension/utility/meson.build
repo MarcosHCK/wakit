@@ -17,10 +17,9 @@
 
 __extension_utility_src = [ 'marshalling.h',
                             'marshallingpack.cc',
-                            'marshallingunpack.cc',
-                            'webpageproxy.vapi' ]
+                            'marshallingunpack.cc' ]
 
-foreach bit: [ 'promise', 'webpageproxy' ]
+foreach bit: [ 'promise' ]
 
   __extension_utility_src += [ '@0@.cc'.format (bit) ]
   __extension_utility_src += [ '@0@.h'.format (bit) ]

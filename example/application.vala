@@ -115,16 +115,8 @@ namespace Wakit.Example
           var window = new Gtk.ApplicationWindow (this);
           var web_view = browser.create_view ();
 
-          if (! with_frame)
-            {
-
-              var bar = new Gtk.HeaderBar ();
-
-              bar.visible = false;
-              window.set_titlebar (bar);
-            }
-
           window.set_child (web_view);
+          window.set_decorated (with_frame);
           window.set_default_size (800, 600);
 
           web_view.bind_window (window);

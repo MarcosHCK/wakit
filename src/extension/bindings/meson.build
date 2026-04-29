@@ -32,8 +32,6 @@ __extension_bindings_deps = [ __common_dep,
                               __extension_binding_dep,
                               __extension_utility_dep, ]
 
-__extension_bindings_src += '../utility/webpageproxy.vapi'
-
 __extension_bindings_lib = static_library ('wakit-extension-bindings',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Extension.Bindings"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
