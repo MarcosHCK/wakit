@@ -15,8 +15,6 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-gio_dep = dependency ('gio-2.0', required: true)
-
 subdir ('enum')
 
 __common_src = [ 'bits.h', 'boxing.h', 'mixin.h', 'slice.h', 'value.h' ]

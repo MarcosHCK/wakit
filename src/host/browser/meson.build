@@ -15,7 +15,6 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-json_dep = dependency ('json-glib-1.0', required: true)
 webkit_dep = dependency ('webkitgtk-6.0', required: true)
 
 __host_browser_src = [ ]
