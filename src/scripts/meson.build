@@ -17,6 +17,7 @@
 
 gio_dep = dependency ('gio-2.0', required: true)
 
+subdir ('apigendbus')
 subdir ('introspectdbus')
 
 python_exe = import ('python').find_installation ('python3')
@@ -42,13 +43,16 @@ esbuild_js_gen = generator (python_exe,
   depfile: '@BASENAME@.deps',
   output: '@BASENAME@.min.js')
 
-introspect_dbus_info_src = [ ]
-
-foreach bit: [ 'introspectdbus' ] 
-
-  introspect_dbus_info_src += [ '@0@.cc'.format (bit) ]
-  introspect_dbus_info_src += [ '@0@.h'.format (bit) ]
-endforeach
+apigen_dbus_exe = executable ('apigen-dbus',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.Introspect.DBus"', '-DG_LOG_USE_STRUCTURED=1',
+            '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
+            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.Introspect.DBus"', '-DG_LOG_USE_STRUCTURED=1',
+              '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
+              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+  cpp_pch: 'pch/apigen-dbus.h',
+  dependencies: [ config_dep, gio_dep, __apigen_dbus_dep ],
+  sources: 'apigendbus.cc')
 
 introspect_dbus_exe = executable ('introspect-dbus',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.Introspect.DBus"', '-DG_LOG_USE_STRUCTURED=1',
@@ -58,16 +62,17 @@ introspect_dbus_exe = executable ('introspect-dbus',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   cpp_pch: 'pch/introspect-dbus.h',
-  dependencies: [ config_dep, gio_dep, json_dep, __introspect_dbus_dep ],
-  sources: introspect_dbus_info_src, )
+  dependencies: [ config_dep, gio_dep, __introspect_dbus_dep ],
+  sources: 'introspectdbus.cc', )
 
 apigen_py = meson.current_source_dir () / 'apigen.py'
 
 apigen_gen = generator (python_exe, 
   arguments: [ apigen_py,
-               '--bin', introspect_dbus_exe.full_path (),
+               '--apigen-bin', apigen_dbus_exe.full_path (),
+               '--introspect-bin', introspect_dbus_exe.full_path (),
                '@EXTRA_ARGS@', '@INPUT@', '@OUTPUT@' ],
-  depends: introspect_dbus_exe,
+  depends: [ apigen_dbus_exe, introspect_dbus_exe ],
   output: '@BASENAME@.d.ts')
 
 mkresources_py = meson.current_source_dir () / 'mkresources.py'

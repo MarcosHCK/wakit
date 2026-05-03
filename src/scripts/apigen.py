@@ -15,51 +15,8 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 from argparse import ArgumentParser
-from functools import lru_cache
-from introspectdbus.dbusinfo import DBusInterfaceInfo, DBusArgInfo
-from jinja2 import Environment, FileSystemLoader
-from pathlib import Path
 from tempfile import NamedTemporaryFile
-from tool import tool as introspect
-from typing import Generator, Iterable, IO
-import json
-
-class TemplateManager:
-
-  def __init__ (self, base: Path) -> None:
-
-    self.env = Environment (loader = FileSystemLoader (base),
-                            trim_blocks = True,
-                            lstrip_blocks = True)
-
-    for name in [ 'out_signature' ]:
-
-      self.env.filters [name] = getattr (TemplateManager, f'format_{name}')
-
-  @staticmethod
-  def format_out_signature (infos: list[DBusArgInfo]):
-    pass
-
-  @lru_cache (maxsize = 128)
-  def get_template (self, template_name: str):
-    return self.env.get_template (template_name)
-
-  def render (self, template_name: str, **context):
-    return self.get_template (template_name).render (**context)
-
-def emit_info (out: IO[str], info: tuple[DBusInterfaceInfo, str]):
-  print (info, file = out)
-
-def emit_infos (out: IO[str], infos: Iterable[tuple[DBusInterfaceInfo, str]]):
-
-  path = Path (__file__).parent / 'introspectdbus'
-
-  infos_ = list (infos)
-
-  manager = TemplateManager (path)
-  result = manager.render ('types.d.ts.jinja2', infos = infos_, has_signals = any ((not not i[0].get ('signals') for i in infos_)))
-
-  print (result, file = out)
+from tool import tool as apigen, tool as introspect
 
 if __name__ == '__main__':
 
@@ -67,29 +24,14 @@ if __name__ == '__main__':
 
   parser.add_argument ('input', metavar = 'file', nargs = '*', type = str)
 
-  parser.add_argument ('--bin', default = 'introspect-dbus', metavar = 'bin', type = str)
+  parser.add_argument ('--apigen-bin', default = 'apigen-dbus', metavar = 'bin', type = str)
+  parser.add_argument ('--introspect-bin', default = 'introspect-dbus', metavar = 'bin', type = str)
+  parser.add_argument ('--template', default = 'apigendbus/types.d.ts.j2', metavar = 'file', type = str)
   parser.add_argument ('-o', '--output', default = '-', metavar = 'file', type = str)
 
-  exes: list[str]
+  args = parser.parse_args () 
 
-  args = parser.parse_args ()
-  exes = args.input
+  with NamedTemporaryFile ('r+t') as tmpfile:
 
-  def list_infos () -> Generator[tuple[DBusInterfaceInfo, str]]:
-
-    with NamedTemporaryFile ('r+t') as tmpfile:
-
-      introspect (args.bin, [ '--output', tmpfile.name, *exes ])
-
-      for line, source in zip (tmpfile, exes):
-
-        yield (json.loads (line), source)
-
-  if '-' == args.output:
-
-    from sys import stdout
-    emit_infos (stdout, list_infos ())
-  else:
-
-    with Path (args.output).open ('wt') as stream:
-      emit_infos (stream, list_infos ())
+    introspect (args.introspect_bin, [ '--output', tmpfile.name, *args.input ])
+    apigen (args.apigen_bin, [ '--template', args.template, tmpfile.name, args.output ])

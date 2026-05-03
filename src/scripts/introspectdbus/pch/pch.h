@@ -18,9 +18,9 @@
 #include <exception>
 #include <generator>
 #include <iterator>
-#include <json-glib/json-glib.h>
 #include <LIEF/LIEF.hpp>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <ostream>
 #include <ranges>
 #include <span>

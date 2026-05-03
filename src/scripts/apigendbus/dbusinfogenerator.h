@@ -14,10 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+#include <ostream>
+#include <scripts/apigendbus/dbusinfo.h>
 
-#include <common/boxing.h>
-#include <fstream>
-#include <gio/gio.h>
-#include <iostream>
-#include <scripts/introspectdbus/dbusinfoexplorer.h>
-#include <scripts/introspectdbus/dbusinfoexporter.h>
+class dbus_info_generator
+{
+
+  void* _p_impl;
+public:
+
+  ~dbus_info_generator ();
+
+  dbus_info_generator () = delete;
+  dbus_info_generator (dbus_info_generator&&) = delete;
+  dbus_info_generator (const dbus_info_generator&) = delete;
+
+  dbus_info_generator (std::string template_);
+
+  void generate (std::ostream& stream, std::span<dbus_info> infos);
+};

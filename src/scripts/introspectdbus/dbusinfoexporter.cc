@@ -15,303 +15,155 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
-#include <exception>
-#include <json-glib/json-glib.h>
+#include <nlohmann/json.hpp>
 #include <scripts/introspectdbus/dbusinfoexporter.h>
 
-dbus_info_exporter::~dbus_info_exporter () noexcept
-{
-  g_object_unref (_p_generator);
-}
-
-dbus_info_exporter::dbus_info_exporter () noexcept: _p_generator (json_generator_new ())
+dbus_info_exporter::dbus_info_exporter () noexcept
 {
 }
 
 template<typename T>
-static void _export_object (JsonBuilder* builder, T object);
+static nlohmann::json _export_object (T object);
 
-template<typename T> static void _export_array (JsonBuilder* builder, T** objects)
+template<typename T> static nlohmann::json _export_array (T** objects)
 {
 
-  json_builder_begin_array (builder);
+  auto o = nlohmann::json::array ();
 
   for (size_t i = 0; NULL != objects [i]; ++i)
-    _export_object (builder, objects [i]);
+    o.push_back (_export_object (objects [i]));
 
-  json_builder_end_array (builder);
+return o;
 }
 
-template<> void _export_object<char*> (JsonBuilder* builder, char* object)
+template<> nlohmann::json _export_object<char*> (char* object)
 {
 
-  json_builder_add_string_value (builder, object);
+return object;
 }
 
-template<> void _export_object<GDBusArgInfo*> (JsonBuilder* builder, GDBusArgInfo* object)
+template<> nlohmann::json _export_object<GDBusArgInfo*> (GDBusArgInfo* object)
 {
 
-  json_builder_begin_object (builder);
+  auto o = nlohmann::json::object ();
 
   if (auto ptr = object->annotations; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "annotation");
-      _export_array (builder, object->annotations);
-    }
+    o ["annotations"] = _export_array (ptr);
 
   if (auto ptr = object->name; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "name");
-      _export_object (builder, object->name);
-    }
+    o ["name"] = _export_object (ptr);
 
   if (auto ptr = object->signature; nullptr != ptr)
-    {
+    o ["signature"] = _export_object (object->signature);
 
-      json_builder_set_member_name (builder, "signature");
-      _export_object (builder, object->signature);
-    }
-
-  json_builder_end_object (builder);
+return o;
 }
 
-template<> void _export_object<GDBusAnnotationInfo*> (JsonBuilder* builder, GDBusAnnotationInfo* object)
+template<> nlohmann::json _export_object<GDBusAnnotationInfo*> (GDBusAnnotationInfo* object)
 {
 
-  json_builder_begin_object (builder);
+  auto o = nlohmann::json::object ();
 
   if (auto ptr = object->annotations; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "annotation");
-      _export_array (builder, object->annotations);
-    }
+    o ["annotations"] = _export_array (ptr);
 
   if (auto ptr = object->key; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "key");
-      _export_object (builder, object->key);
-    }
+    o ["key"] = _export_object (ptr);
 
   if (auto ptr = object->value; nullptr != ptr)
-    {
+    o ["value"] = _export_object (ptr);
 
-      json_builder_set_member_name (builder, "value");
-      _export_object (builder, object->value);
-    }
-
-  json_builder_end_object (builder);
+return o;
 }
 
-template<> void _export_object<GDBusMethodInfo*> (JsonBuilder* builder, GDBusMethodInfo* object)
+template<> nlohmann::json _export_object<GDBusMethodInfo*> (GDBusMethodInfo* object)
 {
 
-  json_builder_begin_object (builder);
+  auto o = nlohmann::json::object ();
 
   if (auto ptr = object->annotations; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "annotation");
-      _export_array (builder, object->annotations);
-    }
+    o ["annotations"] = _export_array (ptr);
 
   if (auto ptr = object->in_args; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "in_args");
-      _export_array (builder, object->in_args);
-    }
+    o ["in_args"] = _export_array (ptr);
 
   if (auto ptr = object->name; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "name");
-      _export_object (builder, object->name);
-    }
+    o ["name"] = _export_object (ptr);
 
   if (auto ptr = object->out_args; nullptr != ptr)
-    {
+    o ["out_args"] = _export_array (ptr);
 
-      json_builder_set_member_name (builder, "out_args");
-      _export_array (builder, object->out_args);
-    }
-
-  json_builder_end_object (builder);
+return o;
 }
 
-template<> void _export_object<GDBusInterfaceInfo*> (JsonBuilder* builder, GDBusInterfaceInfo* object)
+template<> nlohmann::json _export_object<GDBusInterfaceInfo*> (GDBusInterfaceInfo* object)
 {
 
-  json_builder_begin_object (builder);
+  auto o = nlohmann::json::object ();
 
   if (auto ptr = object->annotations; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "annotation");
-      _export_array (builder, object->annotations);
-    }
+    o ["annotations"] = _export_array (ptr);
 
   if (auto ptr = object->methods; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "methods");
-      _export_array (builder, object->methods);
-    }
+    o ["methods"] = _export_array (ptr);
 
   if (auto ptr = object->name; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "name");
-      _export_object (builder, object->name);
-    }
+    o ["name"] = _export_object (ptr);
 
   if (auto ptr = object->properties; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "properties");
-      _export_array (builder, object->properties);
-    }
+    o ["properties"] = _export_array (ptr);
 
   if (auto ptr = object->signals; nullptr != ptr)
-    {
+    o ["signals"] = _export_array (ptr);
 
-      json_builder_set_member_name (builder, "signals");
-      _export_array (builder, object->signals);
-    }
-
-  json_builder_end_object (builder);
+return o;
 }
 
-template<> void _export_object<GDBusPropertyInfoFlags> (JsonBuilder* builder, GDBusPropertyInfoFlags object)
+template<> nlohmann::json _export_object<GDBusPropertyInfoFlags> (GDBusPropertyInfoFlags object)
 {
 
-  json_builder_add_int_value (builder, (gint64) object);
+return (int) object;
 }
 
-template<> void _export_object<GDBusPropertyInfo*> (JsonBuilder* builder, GDBusPropertyInfo* object)
+template<> nlohmann::json _export_object<GDBusPropertyInfo*> (GDBusPropertyInfo* object)
 {
 
-  json_builder_begin_object (builder);
+  auto o = nlohmann::json::object ();
 
   if (auto ptr = object->annotations; nullptr != ptr)
-    {
+    o ["annotations"] = _export_array (ptr);
 
-      json_builder_set_member_name (builder, "annotation");
-      _export_array (builder, object->annotations);
-    }
-
-  json_builder_set_member_name (builder, "flags");
-  _export_object (builder, object->flags);
+  o ["flags"] = _export_object (object->flags);
 
   if (auto ptr = object->name; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "name");
-      _export_object (builder, object->name);
-    }
+    o ["name"] = _export_object (ptr);
 
   if (auto ptr = object->signature; nullptr != ptr)
-    {
+    o ["signature"] = _export_object (ptr);
 
-      json_builder_set_member_name (builder, "signature");
-      _export_object (builder, object->signature);
-    }
-
-  json_builder_end_object (builder);
+return o;
 }
 
-template<> void _export_object<GDBusSignalInfo*> (JsonBuilder* builder, GDBusSignalInfo* object)
+template<> nlohmann::json _export_object<GDBusSignalInfo*> (GDBusSignalInfo* object)
 {
 
-  json_builder_begin_object (builder);
+  auto o = nlohmann::json::object ();
 
   if (auto ptr = object->annotations; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "annotation");
-      _export_array (builder, object->annotations);
-    }
+    o ["annotations"] = _export_array (ptr);
 
   if (auto ptr = object->args; nullptr != ptr)
-    {
-
-      json_builder_set_member_name (builder, "args");
-      _export_array (builder, object->args);
-    }
+    o ["args"] = _export_array (ptr);
 
   if (auto ptr = object->name; nullptr != ptr)
-    {
+    o ["name"] = _export_object (ptr);
 
-      json_builder_set_member_name (builder, "name");
-      _export_object (builder, object->name);
-    }
-
-  json_builder_end_object (builder);
-}
-
-struct _OStreamStream { GOutputStream parent; std::ostream* stream; };
-
-G_DECLARE_FINAL_TYPE (OStreamStream, ostream_stream, , OStreamStream, GOutputStream)
-G_DEFINE_FINAL_TYPE (OStreamStream, ostream_stream, G_TYPE_OUTPUT_STREAM)
-
-static void ostream_stream_class_set_property (GObject* pself, guint property_id, const GValue* value, GParamSpec* pspec)
-{
-
-  switch (auto self = (OStreamStream*) pself; property_id)
-    {
-
-    case 1: self->stream = (std::ostream*) g_value_get_pointer (value);
-      break;
-
-    default: G_OBJECT_WARN_INVALID_PROPERTY_ID (pself, property_id, pspec);
-      break;
-    }
-}
-
-static gssize ostream_stream_class_write_fn (GOutputStream* pself, const void* buffer, gsize size, GCancellable* cancellable, GError** error)
-{
-
-  auto& ostream = *((OStreamStream*) pself)->stream;
-
-  try
-    { ostream.exceptions (std::ostream::badbit);
-      return (ostream.write ((char*) buffer, size), size); }
-  catch (std::exception& exception)
-    { return (g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED, exception.what ()), -1); }
-}
-
-static void ostream_stream_class_init (OStreamStreamClass* klass)
-{
-
-  G_OBJECT_CLASS (klass)->set_property = ostream_stream_class_set_property;
-
-  G_OUTPUT_STREAM_CLASS (klass)->write_fn = ostream_stream_class_write_fn;
-
-  g_object_class_install_property (G_OBJECT_CLASS (klass), 1, g_param_spec_pointer ("ostream", "ostream", "ostream",
-    (GParamFlags) (G_PARAM_CONSTRUCT_ONLY | G_PARAM_WRITABLE | G_PARAM_STATIC_STRINGS)));
-}
-
-static void ostream_stream_init (OStreamStream* self)
-{
+return o;
 }
 
 void dbus_info_exporter::export_ (std::ostream& ostream, GDBusInterfaceInfo* info)
 {
 
-  auto builder = json_builder_new ();
-  auto stream = (GOutputStream*) g_object_new (ostream_stream_get_type (), "ostream", &ostream, NULL);
-
-  _export_object (builder, info);
-
-  json_generator_take_root ((JsonGenerator*) _p_generator, json_builder_get_root (builder));
-  g_object_unref (builder);
-
-  GError* tmperr = nullptr;
-  json_generator_to_stream ((JsonGenerator*) _p_generator, stream, NULL, &tmperr);
-
-  if (G_UNLIKELY (nullptr != tmperr))
-    throw new std::runtime_error (g_quark_to_string (tmperr->domain) + ((":" + std::to_string (tmperr->code)) + ":") + tmperr->message);
+  auto json = _export_object (info);
+  ostream << json;
 }

@@ -20,11 +20,7 @@
 
 class dbus_info_exporter
 {
-
-  void* _p_generator;
 public:
-
-  ~dbus_info_exporter () noexcept;
 
   dbus_info_exporter (dbus_info_exporter&&) = delete;
   dbus_info_exporter (const dbus_info_exporter&) = delete;

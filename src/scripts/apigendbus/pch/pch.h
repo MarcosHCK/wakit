@@ -14,4 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+
+#include <algorithm>
+#include <inja/inja.hpp>
+#include <istream>
+#include <nlohmann/json.hpp>
+#include <ranges>
+#include <ostream>
+#include <stdexcept>

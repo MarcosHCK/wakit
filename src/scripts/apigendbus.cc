@@ -19,31 +19,45 @@
 #include <fstream>
 #include <gio/gio.h>
 #include <iostream>
-#include <scripts/introspectdbus/dbusinfoexplorer.h>
-#include <scripts/introspectdbus/dbusinfoexporter.h>
+#include <scripts/apigendbus/dbusinfo.h>
+#include <scripts/apigendbus/dbusinfogenerator.h>
+#include <scripts/apigendbus/dbusinfoimporter.h>
+#include <sstream>
+#include <vector>
 
 #define G_ERROR_INIT ((GError*) nullptr)
+static G_DEFINE_QUARK (introspect-dbus-error-quark, cpp_error)
 
 using _box_GOptionContext = boxing::destructible_box<GOptionContext, g_option_context_free>;
 
 class Application: public _box_GOptionContext
 {
 
-  const gchar* _output = "-";
+  const gchar* template_ = NULL;
 public:
 
   inline Application (const gchar* parameter_string = nullptr) noexcept;
 
   inline bool run (int* argc_, char*** argv_, GError** error) noexcept;
 
-  inline void process (std::ostream& out, int n_filename, const char* filenames []);
-  inline void process (std::ostream& out, const char* filename);
+  inline void print_help ()
+    {
+
+      auto str = g_option_context_get_help (*(*this), TRUE, NULL);
+
+      g_printerr ("%s\n", str);
+      g_free (str);
+    }
+
+  inline void process (const char* out, const char* in);
+  inline void process (const char* out, std::istream& in);
+  inline void process (std::ostream& out, std::istream& in);
 };
 
 int main (int argc, char* argv[])
 {
 
-  auto app = Application ();
+  auto app = Application ("<input> <output>");
   auto tmperr = G_ERROR_INIT;
 
   g_log_writer_default_set_use_stderr (true);
@@ -54,6 +68,9 @@ int main (int argc, char* argv[])
   const auto code = tmperr->code;
   const auto domain = g_quark_to_string (tmperr->domain);
   const auto message = tmperr->message;
+
+  if (! g_error_matches (tmperr, cpp_error_quark (), 0))
+    app.print_help ();
 
   g_printerr ("g_option_context_parse ()!: %s: %u: %s\n", domain, code, message);
 
@@ -69,7 +86,7 @@ inline Application::Application (const gchar* parameter_string) noexcept:
   static GOptionEntry entries [] =
   {
 
-    { "output", 'o', 0, G_OPTION_ARG_FILENAME, &_output, nullptr, nullptr },
+    { "template", 0, 0, G_OPTION_ARG_FILENAME, &template_, nullptr, nullptr },
     { nullptr, 0, 0, G_OPTION_ARG_NONE, nullptr, nullptr, nullptr },
   }; 
 
@@ -80,8 +97,6 @@ inline Application::Application (const gchar* parameter_string) noexcept:
   g_option_context_set_translation_domain (context, "en_US");
 }
 
-static G_DEFINE_QUARK (introspect-dbus-error-quark, cpp_error)
-
 inline bool Application::run (int* argc_, char*** argv_, GError** error) noexcept
 {
 
@@ -91,41 +106,66 @@ inline bool Application::run (int* argc_, char*** argv_, GError** error) noexcep
   if (g_option_context_parse (context, argc_, argv_, error); G_UNLIKELY (nullptr != tmperr))
     return false;
 
+  if (G_UNLIKELY (3 != *argc_))
+    return (g_set_error_literal (error, G_OPTION_ERROR, G_OPTION_ERROR_FAILED, "invalid amount of arguments"), false);
+
   try
-    {
-
-      if (g_str_equal ("-", _output))
-
-        process (std::cout, *argc_, (const gchar**) *argv_);
-      else
-        { std::ofstream out (_output);
-          process (out, *argc_, (const gchar**) *argv_); }
-    }
+    { process ((*argv_) [2], (*argv_) [1]); }
   catch (std::exception& exception)
     { g_set_error_literal (error, cpp_error_quark (), 0, exception.what ()); }
 
 return true;
 }
 
-inline void Application::process (std::ostream& out, int n_filename, const char* filenames [])
+inline void Application::process (const char* out, const char* in)
 {
 
-  for (std::remove_cvref_t<decltype (n_filename)> i = 1; i < n_filename; ++i)
-    process (out, filenames [i]);
+  if (g_str_equal ("-", in))
+    return process (out, std::cin);
+
+  std::ifstream stream (in);
+
+return process (out, stream);
 }
 
-inline void Application::process (std::ostream& out, const char* filename)
+inline void Application::process (const char* out, std::istream& in)
 {
 
-  dbus_info_explorer explorer (filename);
-  dbus_info_exporter exporter;
+  if (g_str_equal ("-", out))
+    return process (std::cout, in);
 
-  for (auto info: explorer.dbus_infos (explorer.suffixed_symbols ("_dbus_interface_info")))
+  std::ofstream stream (out);
+
+return process (stream, in);
+}
+
+static inline std::string load_template (const gchar* template_)
+{
+
+  if (g_str_equal ("-", template_))
+
+    return std::string (std::istreambuf_iterator<char> (std::cin),
+                        std::istreambuf_iterator<char> ());
+
+  std::ifstream stream (template_);
+
+  return std::string (std::istreambuf_iterator<char> (stream),
+                      std::istreambuf_iterator<char> ());
+}
+
+inline void Application::process (std::ostream& output, std::istream& input)
+{
+
+  dbus_info info;
+  std::vector<dbus_info> infos;
+  dbus_info_importer importer;
+
+  for (std::string line; std::getline (input, line); )
     {
 
-      g_info ("found DBus interface '%s'", info->name);
+      std::stringstream stream (line, std::ios_base::in);
 
-      exporter.export_ (out, info);
-      g_dbus_interface_info_unref (info);
+      infos.push_back (std::move ((importer.import_ (stream, info), info)));
     }
+return (dbus_info_generator (load_template (template_))).generate (output, infos);
 }

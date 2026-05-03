@@ -14,10 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#include <config.h>
+#include <nlohmann/json.hpp>
+#include <scripts/apigendbus/dbusinfo.h>
 
-#include <common/boxing.h>
-#include <fstream>
-#include <gio/gio.h>
-#include <iostream>
-#include <scripts/introspectdbus/dbusinfoexplorer.h>
-#include <scripts/introspectdbus/dbusinfoexporter.h>
+dbus_info::~dbus_info ()
+{
+
+  if (nullptr != _p_data)
+    _p_data = (delete (nlohmann::json*) _p_data, nullptr);
+}

@@ -1,0 +1,9 @@
+[wrap-git]
+depth = 1
+directory = inja-3.5.0
+method = cmake
+revision = v3.5.0
+url = https://github.com/pantor/inja.git
+
+[provide]
+inja = inja_dep

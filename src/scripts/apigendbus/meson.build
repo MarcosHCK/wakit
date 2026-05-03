@@ -15,28 +15,27 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-lief_dep = dependency ('LIEF', required: true)
-
+inja_dep = dependency ('inja', required: true)
 nlohmann_json_dep = dependency ('nlohmann_json', required: true)
 
-__introspect_dbus_src = []
+__apigen_dbus_src = [ ]
 
-foreach bit: [ 'dbusinfoexplorer', 'dbusinfoexporter', 'explorer' ] 
+foreach bit: [ 'dbusinfo', 'dbusinfogenerator', 'dbusinfoimporter' ] 
 
-  __introspect_dbus_src += [ '@0@.cc'.format (bit) ]
-  __introspect_dbus_src += [ '@0@.h'.format (bit) ]
+  __apigen_dbus_src += [ '@0@.cc'.format (bit) ]
+  __apigen_dbus_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-__introspect_dbus_lib = static_library ('wakit-scripts-introspect-dbus',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.Introspect.DBus"', '-DG_LOG_USE_STRUCTURED=1',
+__apigen_dbus_lib = static_library ('wakit-scripts-apigen-dbus',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.ApiGen.DBus"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.Introspect.DBus"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.ApiGen.DBus"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   cpp_pch: 'pch/pch.h',
-  dependencies: [ config_dep, gio_dep, lief_dep, nlohmann_json_dep ],
-  sources: __introspect_dbus_src)
+  dependencies: [ config_dep, inja_dep, nlohmann_json_dep ],
+  sources: __apigen_dbus_src)
 
-__introspect_dbus_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  link_with: __introspect_dbus_lib)
+__apigen_dbus_dep = declare_dependency (dependencies: [ config_dep ],
+  link_with: __apigen_dbus_lib)

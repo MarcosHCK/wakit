@@ -19,5 +19,8 @@
 #include <fstream>
 #include <gio/gio.h>
 #include <iostream>
-#include <scripts/introspectdbus/dbusinfoexplorer.h>
-#include <scripts/introspectdbus/dbusinfoexporter.h>
+#include <scripts/apigendbus/dbusinfo.h>
+#include <scripts/apigendbus/dbusinfogenerator.h>
+#include <scripts/apigendbus/dbusinfoimporter.h>
+#include <sstream>
+#include <vector>

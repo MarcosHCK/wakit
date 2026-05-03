@@ -14,10 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#include <config.h>
+#include <nlohmann/json.hpp>
+#include <scripts/apigendbus/dbusinfoimporter.h>
 
-#include <common/boxing.h>
-#include <fstream>
-#include <gio/gio.h>
-#include <iostream>
-#include <scripts/introspectdbus/dbusinfoexplorer.h>
-#include <scripts/introspectdbus/dbusinfoexporter.h>
+void dbus_info_importer::import_ (std::istream& istream, dbus_info& info)
+{
+
+  info = new nlohmann::json (nlohmann::json::parse (istream));
+}

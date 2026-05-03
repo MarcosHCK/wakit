@@ -14,10 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+#include <istream>
+#include <scripts/apigendbus/dbusinfo.h>
 
-#include <common/boxing.h>
-#include <fstream>
-#include <gio/gio.h>
-#include <iostream>
-#include <scripts/introspectdbus/dbusinfoexplorer.h>
-#include <scripts/introspectdbus/dbusinfoexporter.h>
+class dbus_info_importer
+{
+public:
+
+  void import_ (std::istream& istream, dbus_info& info);
+};
