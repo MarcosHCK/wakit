@@ -15,37 +15,42 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__host_bundle_src = [ ]
+__host_loaders_src = [ ]
 
 foreach lib: [ ]
 
-  __host_bundle_src += [ '@0@.cc'.format (lib) ]
-  __host_bundle_src += [ '@0@.h'.format (lib) ]
+  __host_loaders_src += [ '@0@.cc'.format (lib) ]
+  __host_loaders_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'alias', 'bundle', 'register' ]
+foreach lib: [ 'register' ]
 
-  __host_bundle_src += [ '@0@.vala'.format (lib) ]
+  __host_loaders_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
 foreach lib: [ '', 'absolute', 'regex', 'verbatim' ]
 
-  __host_bundle_src += [ '@0@alias.vala'.format (lib) ]
+  __host_loaders_src += [ '@0@alias.vala'.format (lib) ]
 endforeach
 
-__host_bundle_deps = [ __common_dep,
-                       __host_interfaces_dep ]
+foreach lib: [ '', 'bundle', 'tree' ]
 
-__host_bundle_lib = static_library ('wakit-host-bundle',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Bundle"', '-DG_LOG_USE_STRUCTURED=1',
+  __host_loaders_src += [ '@0@loader.vala'.format (lib) ]
+endforeach
+
+__host_loaders_deps = [ __common_dep,
+                        __host_interfaces_dep ]
+
+__host_loaders_lib = static_library ('wakit-host-loaders',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Loader"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Bundle"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Loader"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_vala_dep, gio_dep, __host_bundle_deps ],
-  sources: __host_bundle_src,
+  dependencies: [ config_vala_dep, gio_dep, __host_loaders_deps ],
+  sources: __host_loaders_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__host_bundle_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  link_with: __host_bundle_lib)
+__host_loaders_dep = declare_dependency (dependencies: [ config_dep, gio_dep, __common_dep ],
+  link_with: __host_loaders_lib)

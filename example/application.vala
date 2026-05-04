@@ -52,6 +52,7 @@ namespace Wakit.Example
       public override int handle_local_options (GLib.VariantDict options)
         {
 
+          Loaders.ILoader? loader = null;
           GLib.Variant? value = null;
 
           if (null != (value = options.lookup_value ("bundle", (GLib.VariantType) "ay")))
@@ -60,14 +61,7 @@ namespace Wakit.Example
               var filename = value.get_bytestring ();
 
               try
-                { var bundle = new Bundle.Bundle.from_file (filename);
-                  var pattern = new GLib.Regex ("^/$", GLib.RegexCompileFlags.OPTIMIZE,
-                                                                GLib.RegexMatchFlags.DEFAULT);
-                  bundle.aliases.add (new Bundle.RegexAlias (pattern, "/app.html"));
-                  bundle.aliases.add (new Bundle.VerbatimAlias ());
-                  Bundle.register_uri_scheme_in_bundle ("app", browser, bundle);
-                  browser.register_uri_scheme_as_local ("app");
-                  extension_host.secure_schemes.add ("app"); }
+                { loader = new Loaders.BundleLoader.from_file (filename); }
               catch (GLib.Error error)
                 {
                   unowned uint code = error.code;
@@ -85,15 +79,34 @@ namespace Wakit.Example
               var dirname = value.get_bytestring ();
               var directory = GLib.File.new_for_commandline_arg (dirname);
 
-              browser.register_uri_scheme ("app", r => resolve_tree (r, directory));
-              browser.register_uri_scheme_as_local ("app");
-              extension_host.secure_schemes.add ("app");
+              loader = new Loaders.TreeLoader (directory);
             }
 
           if (null == (value = options.lookup_value ("with-frame", (GLib.VariantType) "b")) || !value.get_boolean ())
             {
               with_frame = false;
             }
+
+          if (unlikely (null == loader))
+            {
+
+              printerr ("please specify one of --bundle or --tree");
+              return -1;
+            }
+
+          try
+            { var pattern = new GLib.Regex ("^/$", GLib.RegexCompileFlags.OPTIMIZE,
+                                                   GLib.RegexMatchFlags.DEFAULT);
+              loader.aliases.add (new Loaders.RegexAlias (pattern, "/app.html")); }
+          catch (GLib.Error error)
+            { GLib.error ("GLib.Regex ()!: %s: %u: %s", error.domain.to_string (), error.code, error.message); }
+
+          loader.aliases.add (new Loaders.VerbatimAlias ());
+
+          Loaders.register_uri_scheme ("app", browser, loader);
+          browser.register_uri_scheme_as_local ("app");
+
+          extension_host.secure_schemes.add ("app");
 
         return base.handle_local_options (options);
         }
@@ -130,65 +143,6 @@ namespace Wakit.Example
 
           foreach (unowned var file in files)
             open_uri (file, hint);
-        }
-
-      static void resolve_tree (IUriRequest request, GLib.File directory)
-        {
-
-          string fragment = GLib.Path.skip_root (request.path) ?? request.path;
-                 fragment = "" != fragment ? fragment : "app.html";
-          GLib.File file = GLib.File.new_build_filename (directory.peek_path (), fragment, null);
-
-          resolve_tree_async.begin (request, file, (o, res) =>
-            {
-              try
-                { resolve_tree_async.end (res); }
-              catch (GLib.Error error)
-                { request.finish_error (error); }
-            });
-        }
-
-      const string attribute1 = GLib.FileAttribute.STANDARD_CONTENT_TYPE;
-      const string attribute2 = GLib.FileAttribute.STANDARD_SIZE;
-      const string attributes = attribute1 + "," + attribute2;
-
-      static async void resolve_tree_async (IUriRequest request, GLib.File file) throws GLib.Error
-        {
-
-          unowned GLib.FileQueryInfoFlags flag1 = GLib.FileQueryInfoFlags.NONE;
-          unowned GLib.FileQueryInfoFlags flags = flag1;
-          unowned int io_priority = GLib.Priority.DEFAULT;
-
-          GLib.FileInfo info = yield file.query_info_async (attributes, flags, io_priority);
-
-          if (! info.has_attribute (GLib.FileAttribute.STANDARD_CONTENT_TYPE))
-
-            yield resolve_tree_async_not_content_type (request, file);
-          else
-            yield resolve_tree_async_yes_content_type (request, file, info);
-        }
-
-      static async void resolve_tree_async_not_content_type (IUriRequest request, GLib.File file) throws GLib.Error
-        {
-
-          var mapping = new GLib.MappedFile (file.peek_path (), false);
-
-          var bytes = mapping.get_bytes ();
-          var content_type = GLib.ContentType.guess (file.peek_path (), bytes.get_data (), null);
-          var stream = new GLib.MemoryInputStream.from_bytes (bytes);
-
-          request.finish (stream, bytes.get_size (), content_type);
-        }
-
-      static async void resolve_tree_async_yes_content_type (IUriRequest request, GLib.File file, GLib.FileInfo info) throws GLib.Error
-        {
-
-          GLib.InputStream stream = yield file.read_async ();
-
-          unowned string content_type = info.get_content_type ();
-          unowned int64 length = info.get_size ();
-
-          request.finish (stream, length, content_type);
         }
     }
 }

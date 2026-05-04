@@ -29,7 +29,7 @@ test ((testpath + '/alias').replace ('/', '.'),
                       [ '-DTESTPATHROOT="@0@"'.format (testpathroot / testpath / 'alias') ],
             cpp_pch: 'pch/pch.h',
             build_by_default: false,
-            dependencies: [ config_dep, __host_bundle_dep, __host_interfaces_dep, __testing_dep ],
+            dependencies: [ config_dep, __host_interfaces_dep, __host_loaders_dep, __testing_dep ],
             sources: 'alias.cc'),
       env: [ 'G_TEST_BUILDDIR=@0@'.format (meson.current_build_dir ()),
              'G_TEST_SRCDIR=@0@'.format (meson.current_source_dir ()) ], )

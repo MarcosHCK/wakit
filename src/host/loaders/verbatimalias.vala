@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Bundle
+namespace Wakit.Loaders
 {
 
   public sealed class VerbatimAlias: Alias

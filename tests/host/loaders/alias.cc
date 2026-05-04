@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
-#include <host/bundle/wakit-host-bundle.h>
+#include <host/loaders/wakit-host-loaders.h>
 #include <tests/testing.h>
 using namespace testing;
 
@@ -30,9 +30,9 @@ int main (int argc, char* argv [])
       auto pattern = g_test_rand_string (20, 10, nullptr);
       auto replacement = g_test_rand_string (20, 10, nullptr, pattern);
 
-      auto alias = wakit_bundle_absolute_alias_new (pattern.c_str (), replacement.c_str ());
+      auto alias = wakit_loaders_absolute_alias_new (pattern.c_str (), replacement.c_str ());
 
-      g_assert_false (wakit_bundle_alias_matches ((WakitBundleAlias*) alias, replacement.c_str (), replacement.length ()));
+      g_assert_false (wakit_loaders_alias_matches ((WakitLoadersAlias*) alias, replacement.c_str (), replacement.length ()));
       g_object_unref (alias);
     });
 
@@ -42,11 +42,11 @@ int main (int argc, char* argv [])
       auto pattern = g_test_rand_string (20, 10, nullptr);
       auto replacement = g_test_rand_string (20, 10, nullptr, pattern);
 
-      auto alias = wakit_bundle_absolute_alias_new (pattern.c_str (), replacement.c_str ());
+      auto alias = wakit_loaders_absolute_alias_new (pattern.c_str (), replacement.c_str ());
 
-      g_assert_true (wakit_bundle_alias_matches ((WakitBundleAlias*) alias, pattern.c_str (), pattern.length ()));
+      g_assert_true (wakit_loaders_alias_matches ((WakitLoadersAlias*) alias, pattern.c_str (), pattern.length ()));
 
-      auto done = wakit_bundle_alias_replace ((WakitBundleAlias*) alias, pattern.c_str (), pattern.length ());
+      auto done = wakit_loaders_alias_replace ((WakitLoadersAlias*) alias, pattern.c_str (), pattern.length ());
 
       g_assert_cmpstring (done, ==, replacement.c_str ());
       g_free (done);
@@ -64,10 +64,10 @@ int main (int argc, char* argv [])
       auto regex = g_regex_new ("[0-9]", G_REGEX_OPTIMIZE, G_REGEX_MATCH_DEFAULT, &tmperr);
       g_assert_no_error (tmperr);
 
-      auto alias = wakit_bundle_regex_alias_new_literal (regex, replacement.c_str ());
+      auto alias = wakit_loaders_regex_alias_new_literal (regex, replacement.c_str ());
       g_regex_unref (regex);
 
-      g_assert_false (wakit_bundle_alias_matches ((WakitBundleAlias*) alias, pattern.c_str (), pattern.length ()));
+      g_assert_false (wakit_loaders_alias_matches ((WakitLoadersAlias*) alias, pattern.c_str (), pattern.length ()));
       g_object_unref (alias);
     });
 
@@ -82,13 +82,13 @@ int main (int argc, char* argv [])
       auto regex = g_regex_new ("[0-9]", G_REGEX_OPTIMIZE, G_REGEX_MATCH_DEFAULT, &tmperr);
       g_assert_no_error (tmperr);
 
-      auto alias = wakit_bundle_regex_alias_new_literal (regex, replacement.c_str ());
+      auto alias = wakit_loaders_regex_alias_new_literal (regex, replacement.c_str ());
       g_regex_unref (regex);
 
       pattern = "0" + pattern;
-      g_assert_true (wakit_bundle_alias_matches ((WakitBundleAlias*) alias, pattern.c_str (), pattern.length ()));
+      g_assert_true (wakit_loaders_alias_matches ((WakitLoadersAlias*) alias, pattern.c_str (), pattern.length ()));
 
-      auto done = wakit_bundle_alias_replace ((WakitBundleAlias*) alias, pattern.c_str (), pattern.length ());
+      auto done = wakit_loaders_alias_replace ((WakitLoadersAlias*) alias, pattern.c_str (), pattern.length ());
 
       g_assert_cmpstring (done, ==, excepted.c_str ());
       g_free (done);
@@ -101,11 +101,11 @@ int main (int argc, char* argv [])
 
       auto pattern = g_test_rand_string (20, 10, nullptr);
 
-      auto alias = wakit_bundle_verbatim_alias_new ();
+      auto alias = wakit_loaders_verbatim_alias_new ();
 
-      g_assert_true (wakit_bundle_alias_matches ((WakitBundleAlias*) alias, pattern.c_str (), pattern.length ()));
+      g_assert_true (wakit_loaders_alias_matches ((WakitLoadersAlias*) alias, pattern.c_str (), pattern.length ()));
 
-      auto done = wakit_bundle_alias_replace ((WakitBundleAlias*) alias, pattern.c_str (), pattern.length ());
+      auto done = wakit_loaders_alias_replace ((WakitLoadersAlias*) alias, pattern.c_str (), pattern.length ());
 
       g_assert_cmpstring (done, ==, pattern.c_str ());
       g_free (done);
@@ -123,12 +123,12 @@ int main (int argc, char* argv [])
       auto regex = g_regex_new ("^/$", G_REGEX_OPTIMIZE, G_REGEX_MATCH_DEFAULT, &tmperr);
       g_assert_no_error (tmperr);
 
-      auto alias = wakit_bundle_regex_alias_new_literal (regex, replacement.c_str ());
+      auto alias = wakit_loaders_regex_alias_new_literal (regex, replacement.c_str ());
       g_regex_unref (regex);
 
-      g_assert_true (wakit_bundle_alias_matches ((WakitBundleAlias*) alias, pattern.c_str (), pattern.length ()));
+      g_assert_true (wakit_loaders_alias_matches ((WakitLoadersAlias*) alias, pattern.c_str (), pattern.length ()));
 
-      auto done = wakit_bundle_alias_replace ((WakitBundleAlias*) alias, pattern.c_str (), pattern.length ());
+      auto done = wakit_loaders_alias_replace ((WakitLoadersAlias*) alias, pattern.c_str (), pattern.length ());
 
       g_assert_cmpstring (done, ==, replacement.c_str ());
       g_free (done);

@@ -23,7 +23,7 @@ namespace Wakit
 
       public abstract bool next (out unowned T value);
 
-      public virtual unowned T next_value ()
+      public virtual unowned T? next_value ()
         {
 
           unowned T value;

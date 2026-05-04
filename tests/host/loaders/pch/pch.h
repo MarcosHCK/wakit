@@ -15,5 +15,5 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <host/bundle/wakit-host-bundle.h>
+#include <host/loaders/wakit-host-loaders.h>
 #include <tests/testing.h>
