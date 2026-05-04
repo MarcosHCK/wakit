@@ -74,7 +74,7 @@ int main (int argc, char* argv[])
 
   g_printerr ("g_option_context_parse ()!: %s: %u: %s\n", domain, code, message);
 
-return (g_error_free (tmperr), 0);
+return (g_error_free (tmperr), 1);
 }
 
 inline Application::Application (const gchar* parameter_string) noexcept:

@@ -16,9 +16,11 @@
  */
 
 #include <algorithm>
+#include <glib.h>
 #include <inja/inja.hpp>
 #include <istream>
 #include <nlohmann/json.hpp>
-#include <ranges>
 #include <ostream>
+#include <ranges>
+#include <sstream>
 #include <stdexcept>

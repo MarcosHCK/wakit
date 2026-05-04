@@ -18,7 +18,7 @@
 inja_dep = dependency ('inja', required: true)
 nlohmann_json_dep = dependency ('nlohmann_json', required: true)
 
-__apigen_dbus_src = [ ]
+__apigen_dbus_src = [ 'genimpl.h', 'typenameinargs.cc', 'typenameoutargs.cc' ]
 
 foreach bit: [ 'dbusinfo', 'dbusinfogenerator', 'dbusinfoimporter' ] 
 
@@ -34,7 +34,7 @@ __apigen_dbus_lib = static_library ('wakit-scripts-apigen-dbus',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   cpp_pch: 'pch/pch.h',
-  dependencies: [ config_dep, inja_dep, nlohmann_json_dep ],
+  dependencies: [ config_dep, gio_dep, inja_dep, nlohmann_json_dep ],
   sources: __apigen_dbus_src)
 
 __apigen_dbus_dep = declare_dependency (dependencies: [ config_dep ],

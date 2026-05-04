@@ -35,10 +35,35 @@ declare global
       namespace {{ typename_from_interface_info (dbus_info.name) }}
         {
 
-        {% for info_ in object_get_s (dbus_info, "methods", []) %}
-          {% set in_args = typename_typename_from_in_args (info_.in_args) %}
-          {% set out_args = typename_typename_from_out_args (info_.out_args) %}
-          function {{ info_.name }} (...args: {{ in_args }}): {{ out_args }};
+        {% for info_ in default (dbus_info.methods, []) %}
+          {% set in_args = typename_from_in_args (info_.in_args) %}
+          {% set out_args = typename_from_out_args (info_.out_args) %}
+          function {{ info_.name }} ({{ in_args }}): {{ out_args }};
+        {% endfor %}
+
+        {% for info_ in default (dbus_info.properties, []) %}
+          {% set in_args = typename_from_signature (info_.signature) %}
+          {% set readable = has_flag (info_.flags, G_DBUS_PROPERTY_INFO_FLAGS_READABLE) %}
+          {% set writable = has_flag (info_.flags, G_DBUS_PROPERTY_INFO_FLAGS_WRITABLE) %}
+          {% if writable %}
+            {% set qualifier = "let" %}
+          {% else %}
+            {% set qualifier = "const" %}
+          {% endif %}
+          {{ qualifier }} {{ info_.name }}: {{ in_args }};
+        {% endfor %}
+
+        {% if length (default (dbus_info.signals, [])) > 0 %}
+          function disconnect (signal_id: number): void;
+        {% endif %}
+
+        {% for info_ in default (dbus_info.signals, []) %}
+          {% set out_args = typename_from_out_args (info_.args) %}
+          {% if "[" == substr (out_args, 0, 1) %}
+          const {{ info_.name }} = SignalSpec<{{ out_args }}>;
+          {% else %}
+          const {{ info_.name }} = SignalSpec<[{{ out_args }}]>;
+          {% endif %}
         {% endfor %}
         }
       {% endfor %}

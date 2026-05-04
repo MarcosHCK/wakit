@@ -16,46 +16,9 @@
  */
 #include <config.h>
 #include <algorithm>
-#include <inja/inja.hpp>
-#include <ranges>
 #include <scripts/apigendbus/dbusinfo.h>
 #include <scripts/apigendbus/dbusinfogenerator.h>
-#include <stdexcept>
-
-class impl
-{
-
-  inja::Environment _environment;
-  inja::Template _template;
-
-  static inja::Environment _make_environment ()
-    {
-
-      inja::Environment env;
-
-      env.add_callback ("object_get_s", _callback_object_get_s);
-      env.add_callback ("typename_typename_from_in_args", 1, _callback_typename_from_in_args);
-      env.add_callback ("typename_from_interface_info", 1, _callback_typename_from_interface_info);
-      env.add_callback ("typename_typename_from_out_args", 1, _callback_typename_from_out_args);
-
-      env.set_lstrip_blocks (true);
-      env.set_trim_blocks (true);
-    return env;
-    }
-
-  static nlohmann::json _callback_object_get_s (std::vector<const nlohmann::json*>& args);
-  static nlohmann::json _callback_typename_from_in_args (std::vector<const nlohmann::json*>& args);
-  static nlohmann::json _callback_typename_from_interface_info (std::vector<const nlohmann::json*>& args);
-  static nlohmann::json _callback_typename_from_out_args (std::vector<const nlohmann::json*>& args);
-
-public:
-
-  inline impl (std::string template_): _environment (_make_environment ()),
-                                       _template (_environment.parse (template_))
-    { }
-
-  inline void render (std::ostream& stream, const nlohmann::json& data);
-};
+#include <scripts/apigendbus/genimpl.h>
 
 dbus_info_generator::~dbus_info_generator ()
 {
@@ -68,6 +31,18 @@ dbus_info_generator::dbus_info_generator (std::string template_): _p_impl (new i
 {
 }
 
+static inline bool has_signals (const nlohmann::json& info)
+{
+
+  assert (info.is_object ());
+
+  if (auto iter = info.find ("signals"); iter == info.end ())
+
+    return false;
+  else
+    return iter->is_array () && iter->size () > 0;
+}
+
 void dbus_info_generator::generate (std::ostream& stream, std::span<dbus_info> _infos)
 {
 
@@ -76,40 +51,40 @@ void dbus_info_generator::generate (std::ostream& stream, std::span<dbus_info> _
                                     { return *(nlohmann::json*) *info; })
                                 | std::ranges::to<std::vector<nlohmann::json>> ();
 
-  data ["has_signals"] = std::ranges::all_of (infos, [](const nlohmann::json& info)
-                          { return info ["signals"].is_array () && info ["signals"].size () > 0; });
-
+  data ["has_signals"] = std::ranges::any_of (infos, has_signals);
   data ["infos"] = infos;
 
 return ((impl*) _p_impl)->render (stream, data);
 }
 
-nlohmann::json impl::_callback_object_get_s (std::vector<const nlohmann::json*>& args)
+nlohmann::json impl::_callback_has_flag (std::vector<const nlohmann::json*>& args)
 {
 
-  assert (args.size () >= 2);
-  assert (args.size () <= 3);
-  assert (args [0]->is_object ());
-  assert (args [1]->is_string ());
+  assert (args.size () == 2);
+  assert (args [0]->is_number_integer ());
+  assert (args [1]->is_number_integer ());
 
-  auto& object = *args [0];
-  auto field_name = args [1]->get<std::string_view> ();
-
-  if (auto iter = object.find (field_name); iter != object.end ())
-
-    return *iter;
-  else
-
-    if (args.size () == 3)
-
-      return *args [2];
-    else
-      throw std::out_of_range ("missing property '" + std::string (field_name) + "'");
+return 0 != (args [0]->get<size_t> () & args [1]->get<size_t> ());
 }
 
-nlohmann::json impl::_callback_typename_from_in_args (std::vector<const nlohmann::json*>& args)
+nlohmann::json impl::_callback_substr (std::vector<const nlohmann::json*>& args)
 {
-return "undefined";
+
+  assert (args.size () > 0 && 4 > args.size ());
+  assert (args [0]->is_string ());
+
+  auto str = args [0]->get<std::string_view> ();
+
+  size_t length = str.npos;
+  size_t offset = 0;
+
+  if (args.size () > 1) { assert (args [1]->is_number_unsigned ());
+                          offset = args [1]->get<size_t> (); }
+
+  if (args.size () > 2) { assert (args [2]->is_number_unsigned ());
+                          length = args [2]->get<size_t> (); }
+
+return str.substr (offset, length);
 }
 
 nlohmann::json impl::_callback_typename_from_interface_info (std::vector<const nlohmann::json*>& args)
@@ -126,9 +101,30 @@ nlohmann::json impl::_callback_typename_from_interface_info (std::vector<const n
     return interface_name.substr (pos + 1);
 }
 
-nlohmann::json impl::_callback_typename_from_out_args (std::vector<const nlohmann::json*>& args)
+inja::Environment impl::_make_environment ()
 {
-return "undefined";
+
+  inja::Environment env;
+
+  env.add_callback ("has_flag", _callback_has_flag);
+  env.add_callback ("substr", _callback_substr);
+  env.add_callback ("typename_from_in_args", 1, _callback_typename_from_in_args);
+  env.add_callback ("typename_from_interface_info", 1, _callback_typename_from_interface_info);
+  env.add_callback ("typename_from_out_args", 1, _callback_typename_from_out_args);
+  env.add_callback ("typename_from_signature", 1, _callback_typename_from_signature);
+
+# define _define_constant(name) \
+  env.add_callback (G_STRINGIFY (name), 0, [](inja::Arguments&) \
+    { return name; })
+
+  _define_constant (G_DBUS_PROPERTY_INFO_FLAGS_NONE);
+  _define_constant (G_DBUS_PROPERTY_INFO_FLAGS_READABLE);
+  _define_constant (G_DBUS_PROPERTY_INFO_FLAGS_WRITABLE);
+# undef _define_constant
+
+  env.set_lstrip_blocks (true);
+  env.set_trim_blocks (true);
+return env;
 }
 
 inline void impl::render (std::ostream& stream, const nlohmann::json& data)
