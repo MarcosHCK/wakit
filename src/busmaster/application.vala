@@ -25,6 +25,7 @@ namespace Wakit.Busmaster
       private GLib.OptionContext _context;
 
       private Bus.Server? _bus_server = null;
+      private GLib.MainLoop _main_loop = null;
       private Transport.Server? _transport_server = null;
 
       public Application ()
@@ -68,6 +69,9 @@ namespace Wakit.Busmaster
               GLib.Error error = null;
               int result = 0;
 
+              _main_loop = main_loop;
+              sigint_source_add (main_context, on_sigint);
+
               run_async.begin (argv_, (o, res) =>
                 {
 
@@ -81,6 +85,9 @@ namespace Wakit.Busmaster
 
               if (unlikely (null != error))
                 throw (owned) error;
+
+              for (GLib.MainContext context = _main_loop.get_context (); context.pending ();)
+                context.iteration (false);
             }
           catch (GLib.Error error)
             {
@@ -97,6 +104,9 @@ namespace Wakit.Busmaster
               cname = "json_gobject_deserialize",
               simple_generics = true)]
       extern static T _json_gobject_deserialize<T> ([CCode (pos = 2.1)] Json.Node node, GLib.Type g_type = typeof (T));
+
+      [CCode (cheader_filename = "busmaster/application.c")]
+      extern static void sigint_source_add (GLib.MainContext context, owned GLib.SourceFunc func);
 
       private string generate_cookie (Configuration configuration)
         {
@@ -131,8 +141,9 @@ namespace Wakit.Busmaster
           string cookie = generate_cookie (configuration);
 
           _transport_server = yield open_transport (configuration);
-          _bus_server = new Bus.Server ();
+          _bus_server = new Bus.Server (_transport_server.guid);
 
+          _transport_server.start ();
           _transport_server.incoming.connect (on_incoming);
 
           print ("%s,cookie=%s\n", _transport_server.address, cookie);
@@ -144,6 +155,16 @@ namespace Wakit.Busmaster
 
           _bus_server.add_client (connection);
         return true;
+        }
+
+      private bool on_sigint ()
+        {
+
+          _transport_server.stop ();
+          _bus_server.reap_all ();
+          _main_loop.quit ();
+
+        return GLib.Source.REMOVE;
         }
 
       private async Transport.Server open_transport (Configuration configuration) throws GLib.Error

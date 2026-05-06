@@ -23,7 +23,7 @@ foreach bit: [ ]
   __busmaster_bus_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'server' ]
+foreach bit: [ 'bus', 'client', 'clientfilter', 'flags', 'match', 'name', 'nameowner', 'server' ]
 
   __busmaster_bus_src += [ '@0@.vala'.format (bit) ]
 endforeach

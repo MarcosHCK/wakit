@@ -111,7 +111,7 @@ namespace Wakit.Busmaster.Transport
           try
             { ((Server) o).on_incoming_async.end (res); }
           catch (GLib.Error error)
-            { GLib.warning ("Wakit.Busmaster.Transport.Server:run ()!: %s: %u: %s",
+            { GLib.warning ("Server:run ()!: %s: %u: %s",
                 error.domain.to_string (), error.code, error.message); }
         });
 
