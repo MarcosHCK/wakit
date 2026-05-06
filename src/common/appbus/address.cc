@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
-#include <host/appbus/address.h>
+#include <common/appbus/address.h>
 
 static void parse_options (const gchar* first, const gchar* list, guint length, WakitAppBusAddressForeachOption callback, gpointer user_data, GError** error);
 

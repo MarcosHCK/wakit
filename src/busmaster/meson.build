@@ -15,33 +15,35 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__host_appbus_src = [ 'watcher.vala' ]
+json_dep = dependency ('json-glib-1.0', required: true)
 
-foreach lib: [ 'ownname', 'postablecollection' ]
+subdir ('bus')
+subdir ('transport')
 
-  __host_appbus_src += [ '@0@.cc'.format (lib) ]
-  __host_appbus_src += [ '@0@.h'.format (lib) ]
+__busmaster_src = [ ]
+
+foreach bit: [ ]
+
+  __busmaster_src += [ '@0@.cc'.format (bit) ]
+  __busmaster_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach lib: [ 'bus', 'ownname', 'postablecollection', 'watcher' ]
+foreach bit: [ 'application', 'configuration' ]
 
-  __host_appbus_src += [ '@0@.vala'.format (lib) ]
+  __busmaster_src += [ '@0@.vala'.format (bit) ]
 endforeach
 
-__host_appbus_deps = [ __common_dep,
-                       __host_interfaces_dep,
-                       __host_process_dep ]
+__busmaster_deps = [ __common_dep,
+                     __busmaster_bus_dep.as_link_whole (),
+                     __busmaster_transport_dep.as_link_whole (), ]
 
-__host_appbus_lib = static_library ('wakit-host-appbus',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
+__busmaster_exe = executable ('wakit-busmaster',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.BusMaster"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.BusMaster"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_vala_dep, gio_dep, __host_appbus_deps ],
-  sources: __host_appbus_src,
+  dependencies: [ config_dep, gio_dep, json_dep, __busmaster_deps ],
+  sources: __busmaster_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
-
-__host_appbus_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  link_with: __host_appbus_lib)

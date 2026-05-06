@@ -28,5 +28,6 @@ subdir ('scripts')
 subdir ('common')
 
 # level 2
+subdir ('busmaster')
 subdir ('extension')
 subdir ('host')

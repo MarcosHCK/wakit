@@ -167,7 +167,7 @@ namespace Wakit
 
           GLib.debug ("AppBus launched (address = '%s')", _appbus_watcher.address);
 
-          var address = new AppBus.Address (_appbus_watcher.address);
+          var address = new AppBus.Address.from_string (_appbus_watcher.address);
 
           AppBus.AddressOption? opt; switch (address.transport)
             {

@@ -15,33 +15,31 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__host_appbus_src = [ 'watcher.vala' ]
+__common_appbus_src = [ ]
 
-foreach lib: [ 'ownname', 'postablecollection' ]
+foreach lib: [ 'address' ]
 
-  __host_appbus_src += [ '@0@.cc'.format (lib) ]
-  __host_appbus_src += [ '@0@.h'.format (lib) ]
+  __common_appbus_src += [ '@0@.cc'.format (lib) ]
+  __common_appbus_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'bus', 'ownname', 'postablecollection', 'watcher' ]
+foreach lib: [ 'address', 'addressoption', 'addressstring' ]
 
-  __host_appbus_src += [ '@0@.vala'.format (lib) ]
+  __common_appbus_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-__host_appbus_deps = [ __common_dep,
-                       __host_interfaces_dep,
-                       __host_process_dep ]
+__common_appbus_deps = [ ]
 
-__host_appbus_lib = static_library ('wakit-host-appbus',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
+__common_appbus_lib = static_library ('wakit-common-appbus',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Common.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_vala_dep, gio_dep, __host_appbus_deps ],
-  sources: __host_appbus_src,
+  dependencies: [ config_dep, gio_dep ],
+  sources: __common_appbus_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__host_appbus_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  link_with: __host_appbus_lib)
+__common_appbus_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
+  link_with: __common_appbus_lib)

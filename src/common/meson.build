@@ -15,7 +15,11 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
+subdir ('appbus')
 subdir ('enum')
+
+gio_unix_dep = dependency ('gio-unix-2.0', required: false)
+gio_win32_dep = dependency ('gio-win32-2.0', required: false)
 
 __common_src = [ 'bits.h', 'boxing.h', 'mixin.h', 'slice.h', 'value.h' ]
 
@@ -35,14 +39,24 @@ foreach lib: [ 'guest', 'host' ]
   __common_src += [ 'extensiondata@0@.vala'.format (lib) ]
 endforeach
 
-foreach lib: [ 'asyncdelay', 'asynclock', 'collection', 'collectioniter', 'ipcresult', 'resource', 'timeoutcancellable', 'variant' ]
+foreach lib: [ 'asyncdelay', 'asynclock', 'collection', 'collectioniter', 'resource', 'standardfiles', 'timeoutcancellable', 'variant' ]
 
   __common_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-__common_deps = [ __common_enum_dep.as_link_whole () ]
+__common_deps = [ __common_appbus_dep.as_link_whole (),
+                  __common_enum_dep.as_link_whole () ]
 
-__common_fwds = [ __common_enum_dep ]
+if gio_unix_dep.found ()
+  __common_deps += [ gio_unix_dep ]
+endif
+
+if gio_win32_dep.found ()
+  __common_deps += [ gio_win32_dep ]
+endif
+
+__common_fwds = [ __common_appbus_dep,
+                  __common_enum_dep ]
 
 __common_lib = library ('wakit-common',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Common"', '-DG_LOG_USE_STRUCTURED=1',

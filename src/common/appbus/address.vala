@@ -28,7 +28,14 @@ namespace Wakit.AppBus
       public AddressOption[] options { get { return _options; } }
       public string transport { owned get { return _transport.get_value (); } }
 
-      public Address (string address) throws GLib.Error
+      public Address (owned AddressString transport, owned AddressOption[] options)
+        {
+
+          _transport = transport;
+          _options = options;
+        }
+
+      public Address.from_string (string address) throws GLib.Error
         {
 
           var ar = new Array<AddressOption> ();
@@ -77,7 +84,7 @@ namespace Wakit.AppBus
       private extern delegate void ForeachOption (string key, uint key_length,
                                                   string value, uint value_length);
 
-      [CCode (cheader_filename = "host/appbus/address.h")]
+      [CCode (cheader_filename = "common/appbus/address.h")]
       private extern static unowned string parse (string address, out uint length, ForeachOption foreach_option) throws GLib.Error;
 
       private static unowned string parse_ (string address, out uint length, Array<AddressOption> options) throws GLib.Error
@@ -91,6 +98,32 @@ namespace Wakit.AppBus
 
               options.append_val (AddressOption (key, value));
             });
+        }
+
+      public string to_string ()
+        {
+
+          var builder = new GLib.StringBuilder.sized (64);
+          var first = true;
+
+          builder.append_printf ("%.*s:", (int) _transport.length, _transport.value);
+
+          foreach (unowned var option in _options)
+            {
+
+              if (first)
+
+                first = false;
+              else
+                builder.append_c (',');
+
+              unowned var key = option._key;
+              unowned var value = option._value;
+
+              builder.append_printf ("%.*s=%.*s", (int) key.length, key.value,
+                                                  (int) value.length, value.value);
+            }
+        return builder.free_and_steal ();
         }
     }
 }
