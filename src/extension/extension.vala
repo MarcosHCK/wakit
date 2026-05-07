@@ -78,13 +78,18 @@ namespace Wakit
           _script_world = WebKit.ScriptWorld.get_default ();
           _script_world.window_object_cleared.connect (on_window_object_cleared);
 
-          unowned string address = _bus_address;
-          unowned GLib.DBusConnectionFlags flag1 = GLib.DBusConnectionFlags.AUTHENTICATION_CLIENT;
-          unowned GLib.DBusConnectionFlags flag2 = GLib.DBusConnectionFlags.MESSAGE_BUS_CONNECTION;
-          unowned GLib.DBusConnectionFlags flags = flag1 | flag2;
-
-          _appbus = new GLib.DBusConnection.for_address_sync (address, flags, null, null);
+          AppBus.connect_client.begin (_bus_address, null, null, init_complete);
         return true;
+        }
+
+      private void init_complete (GLib.Object? source_object, GLib.AsyncResult result)
+        {
+
+          try
+            { _appbus = AppBus.connect_client.end (result); }
+          catch (GLib.Error error)
+            { GLib.error ("Wakit.WebExtension.init_complete ()!: %s: %u: %s",
+                error.domain.to_string (), error.code, error.message); }
         }
 
       static bool is_uri_accessible (string uri, GenericArray<GLib.Regex> whitelist)
@@ -149,6 +154,9 @@ namespace Wakit
 
           if (! is_uri_secure (frame.get_uri (), ((GenericSetCollection<string>) _secure_schemes).struct))
             return;
+
+          while (null == _appbus)
+            GLib.Thread.yield ();
 
           JSC.Context context = frame.get_js_context_for_script_world (_script_world);
 

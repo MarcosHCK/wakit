@@ -26,6 +26,8 @@ namespace Wakit.Busmaster
 
       private Bus.Server? _bus_server = null;
       private GLib.MainLoop _main_loop = null;
+      private bool _nofork = false;
+      private bool _print_address = false;
       private Transport.Server? _transport_server = null;
 
       public Application ()
@@ -40,7 +42,9 @@ namespace Wakit.Busmaster
 
           GLib.OptionEntry entries [] = {
 
-            { "config", 'c', 0, GLib.OptionArg.FILENAME, ref _config, null, null },
+            { "config-file", 'c', 0, GLib.OptionArg.FILENAME, ref _config, null, null },
+            { "nofork", 0, 0, GLib.OptionArg.NONE, ref _nofork, null, null },
+            { "print-address", 0, 0, GLib.OptionArg.NONE, ref _print_address, null, null },
             (GLib.OptionEntry) GLib.OptionEntry.NULL,
           };
 
@@ -88,6 +92,8 @@ namespace Wakit.Busmaster
 
               for (GLib.MainContext context = _main_loop.get_context (); context.pending ();)
                 context.iteration (false);
+
+            return result;
             }
           catch (GLib.Error error)
             {
@@ -141,20 +147,34 @@ namespace Wakit.Busmaster
           string cookie = generate_cookie (configuration);
 
           _transport_server = yield open_transport (configuration);
-          _bus_server = new Bus.Server (_transport_server.guid);
+          _bus_server = new Bus.Server (GLib.DBus.generate_guid ());
 
           _transport_server.start ();
           _transport_server.incoming.connect (on_incoming);
 
-          print ("%s,cookie=%s\n", _transport_server.address, cookie);
+          if (_print_address)
+
+            print ("%s,guid=%s,cookie=%s\n", _transport_server.address,
+                                            _bus_server.guid,
+                                            cookie);
         return 0;
         }
 
-      private bool on_incoming (GLib.DBusConnection connection)
+      private bool on_incoming (GLib.IOStream stream)
         {
 
-          _bus_server.add_client (connection);
+          AppBus.connect_server.begin (stream, _bus_server.guid, null, null, on_incoming_complete);
         return true;
+        }
+
+      private void on_incoming_complete (GLib.Object? source_object, GLib.AsyncResult result)
+        {
+
+          try
+            { _bus_server.add_client (AppBus.connect_server.end (result)); }
+          catch (GLib.Error error)
+            { GLib.warning ("Application:incoming ()!: %s: %u: %s",
+                error.domain.to_string (), error.code, error.message); }
         }
 
       private bool on_sigint ()

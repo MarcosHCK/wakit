@@ -23,7 +23,7 @@ foreach lib: [ 'address' ]
   __common_appbus_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'address', 'addressoption', 'addressstring' ]
+foreach lib: [ 'address', 'addressoption', 'addressstring', 'connect' ]
 
   __common_appbus_src += [ '@0@.vala'.format (lib) ]
 endforeach

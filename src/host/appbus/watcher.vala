@@ -21,12 +21,14 @@ namespace Wakit.AppBus
   public sealed class Watcher: GLib.Object
     {
 
+      [CCode (cname = "BUSMASTER_PATH")]
+      extern const string BUSMASTER_PATH;
 #if DEVELOP
-      public const string DEFAULT_CONFIG = Config.SOURCE_DIR + "/daemon.conf";
-      public const string DEFAULT_EXECUTABLE = Config.BUILD_DIR + "/wakit-appbus";
+      private const string DEFAULT_CONFIG = Config.SOURCE_DIR + "/daemon.json";
+      private const string DEFAULT_EXECUTABLE = BUSMASTER_PATH;
 #else // DEVELOP
-      public const string DEFAULT_CONFIG = Config.DATA_DIR + "/daemon.conf";
-      public const string DEFAULT_EXECUTABLE = Config.LIBEXEC_DIR + "/wakit-appbus";
+      private const string DEFAULT_CONFIG = Config.DATA_DIR + "/daemon.json";
+      private const string DEFAULT_EXECUTABLE = Config.LIBEXEC_DIR + "/wakit-busmaster";
 #endif // DEVELOP
 
       public uint cooldown { get; construct set; default = 500; }
@@ -39,7 +41,7 @@ namespace Wakit.AppBus
       public GLib.DBusConnection connection { get; private set; }
 
       private string _config = DEFAULT_CONFIG;
-      private string _executable = "dbus-daemon";
+      private string _executable = DEFAULT_EXECUTABLE;
       private Process.Watcher? _watcher = null;
 
       [HasEmitter]
@@ -63,16 +65,8 @@ namespace Wakit.AppBus
           if (unlikely (null == address || false == GLib.DBus.is_address (address)))
             throw new GLib.IOError.INVALID_DATA ("bad dbus address");
 
-          unowned var flag1 = GLib.DBusConnectionFlags.AUTHENTICATION_CLIENT;
-          unowned var flag2 = DBusConnectionFlags.MESSAGE_BUS_CONNECTION;
-          unowned var flags = flag1 | flag2;
-
-          var connection = yield new GLib.DBusConnection.for_address (address, flags, null, cancellable);
-
-          connection.exit_on_close = false;
-
-          _address = address;
-          _connection = connection;
+          _address = (owned) address;
+          _connection = yield Wakit.AppBus.connect_client (_address, null, cancellable);
 
         return true;
         }

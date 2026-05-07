@@ -47,3 +47,5 @@ __busmaster_exe = executable ('wakit-busmaster',
   dependencies: [ config_dep, gio_dep, json_dep, __busmaster_deps ],
   sources: __busmaster_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
+
+meson.override_find_program ('wakit-busmaster', __busmaster_exe)

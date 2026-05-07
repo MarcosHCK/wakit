@@ -22,7 +22,7 @@
 static void child_setup (gpointer user_data)
 {
 
-  prctl (PR_SET_PDEATHSIG, SIGTERM);
+  prctl (PR_SET_PDEATHSIG, SIGINT);
 
   if (1 == getppid ())
 
@@ -39,5 +39,5 @@ void wakit_process_impl_setup_launcher (GSubprocessLauncher* launcher)
 void wakit_process_impl_terminate_gracefully (GSubprocess* subprocess)
 {
 
-  g_subprocess_send_signal (subprocess, SIGTERM);
+  g_subprocess_send_signal (subprocess, SIGINT);
 }

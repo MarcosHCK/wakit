@@ -23,35 +23,24 @@ namespace Wakit.Busmaster.Transport
 
       public bool active { get; default = false; }
       public string address { get; construct; }
-      public GLib.DBusAuthObserver auth_observer { get; construct; }
-      public string guid { get; construct; }
       public GLib.SocketService socket_listener { get; }
 
       private GLib.Cancellable? _server_cancellable = null;
       private ulong _signal_handler = 0;
       private string? _unix_path = null;
 
-      public signal bool incoming (GLib.DBusConnection connection);
+      public signal bool incoming (GLib.IOStream connection);
 
-      public Server (string address, string? guid = null, GLib.DBusAuthObserver? auth_observer = null)
+      public Server (string address)
         {
-          Object (address: address, auth_observer: auth_observer, guid: guid);
+          Object (address: address);
         }
 
-      public async Server.async (string address, string? guid = null, GLib.DBusAuthObserver? auth_observer = null,
+      public async Server.async (string address,
                                  int io_priority = GLib.Priority.DEFAULT, GLib.Cancellable? cancellable = null) throws GLib.Error
         {
-          Object (address: address, auth_observer: auth_observer, guid: guid);
+          Object (address: address);
           yield init_async (io_priority, cancellable);
-        }
-
-      public override void constructed ()
-        {
-
-          base.constructed ();
-
-          if (null == _guid)
-            _guid = GLib.DBus.generate_guid ();
         }
 
       public override async bool init_async (int io_priority = GLib.Priority.DEFAULT, GLib.Cancellable? cancellable = null) throws GLib.Error
@@ -106,30 +95,8 @@ namespace Wakit.Busmaster.Transport
       private bool on_incoming (GLib.SocketConnection connection, GLib.Object? source_object)
         {
 
-          on_incoming_async.begin (connection, (o, res) =>
-        {
-          try
-            { ((Server) o).on_incoming_async.end (res); }
-          catch (GLib.Error error)
-            { GLib.warning ("Server:run ()!: %s: %u: %s",
-                error.domain.to_string (), error.code, error.message); }
-        });
-
+          incoming (connection);
         return true;
-        }
-
-      private async void on_incoming_async (GLib.SocketConnection connection) throws GLib.Error
-        {
-
-          unowned var flag1 = GLib.DBusConnectionFlags.AUTHENTICATION_SERVER;
-          unowned var flag2 = GLib.DBusConnectionFlags.DELAY_MESSAGE_PROCESSING;
-          unowned var flags = flag1 | flag2;
-          unowned var guid = _guid;
-          unowned var observer = auth_observer;
-
-          var dbus_connection = yield new GLib.DBusConnection (connection, guid, flags, observer);
-
-          incoming (dbus_connection);
         }
 
       public void start ()

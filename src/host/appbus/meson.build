@@ -28,6 +28,10 @@ foreach lib: [ 'bus', 'ownname', 'postablecollection', 'watcher' ]
   __host_appbus_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
+__host_appbus_args = [
+  '-DBUSMASTER_PATH="@0@"'.format (__busmaster_exe.full_path ()),
+]
+
 __host_appbus_deps = [ __common_dep,
                        __host_interfaces_dep,
                        __host_process_dep ]
@@ -35,10 +39,11 @@ __host_appbus_deps = [ __common_dep,
 __host_appbus_lib = static_library ('wakit-host-appbus',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()), ] + __host_appbus_args,
   cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()),
+              '-DBUSMASTER_PATH="@0@"'.format (__busmaster_exe.full_path ()) ] + __host_appbus_args,
   dependencies: [ config_vala_dep, gio_dep, __host_appbus_deps ],
   sources: __host_appbus_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
