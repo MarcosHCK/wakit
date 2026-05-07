@@ -21,9 +21,74 @@ namespace Wakit.Busmaster.Bus
   internal sealed class Match
     {
 
-      public bool matches (GLib.DBusMessage message, bool has_destination)
+      private bool _eavesdrop = false;
+      private MatchElement[] _elements;
+      private GLib.DBusMessageType _type = GLib.DBusMessageType.INVALID;
+
+      ~Match ()
         {
-        return false;
+          printerr ("~Match ()\n");
         }
+
+      class construct
+        {
+
+          if (unlikely (null == (void*) Server.match_name))
+            GLib.error ("WTF?");
+        }
+
+      private Match (bool eavesdrop, owned MatchElement[] elements, GLib.DBusMessageType type)
+        {
+
+          _eavesdrop = eavesdrop;
+          _elements = (owned) elements;
+          _type = type;
+        }
+
+      public static int compare (Match a, Match b)
+        {
+
+          return a._eavesdrop == b._eavesdrop && a._type == b._type &&
+                 a._elements.length == b._elements.length && equal_impl (a._elements, b._elements)
+            ? 0 : 1;
+        }
+
+      [CCode (cheader_filename = "busmaster/bus/match.h")]
+      extern static bool equal_impl ([CCode (array_length = false)] MatchElement[] a,
+                                     [CCode (array_length_pos = 2.9, array_length_type = "guint")] MatchElement[] b);
+
+      public bool matches (GLib.DBusMessage message, bool has_destination, Server server)
+        {
+
+          if (has_destination && !_eavesdrop)
+            return false;
+
+          if (GLib.DBusMessageType.INVALID != _type && message.get_message_type () != _type)
+            return false;
+
+        return matches_impl (message, has_destination, server, _elements);
+        }
+
+      [CCode (cheader_filename = "busmaster/bus/match.h")]
+      extern static bool matches_impl (GLib.DBusMessage message, bool has_destination,
+                                       Server server,
+                                       [CCode (array_length_pos = 3.9, array_length_type = "guint")] MatchElement[] elements);
+
+      public static Match? parse (string rule)
+        {
+
+          bool eavesdrop;
+          GLib.Array<MatchElement> elements;
+          GLib.DBusMessageType type;
+
+          if (null == (elements = parse_impl (rule, out eavesdrop, out type)) || 0 == elements.length)
+
+            return null;
+          else
+            return new Match (eavesdrop, elements.steal (), type);
+        }
+
+      [CCode (cheader_filename = "busmaster/bus/match.h")]
+      extern static GLib.Array<MatchElement>? parse_impl (string rule, out bool eavesdrop, out GLib.DBusMessageType type);
     }
 }

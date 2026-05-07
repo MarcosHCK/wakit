@@ -15,9 +15,9 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__busmaster_bus_src = [ ]
+__busmaster_bus_src = [ 'matchmatches.cc', 'matchparse.cc', 'matchelement.vapi' ]
 
-foreach bit: [ ]
+foreach bit: [ 'match' ]
 
   __busmaster_bus_src += [ '@0@.cc'.format (bit) ]
   __busmaster_bus_src += [ '@0@.h'.format (bit) ]
@@ -37,6 +37,7 @@ __busmaster_bus_lib = static_library ('wakit-busmaster-bus',
   cpp_args: [ '-DG_LOG_DOMAIN="Wakit.BusMaster.Bus"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+  cpp_pch: 'pch/pch.h',
   dependencies: [ config_dep, gio_dep, __busmaster_bus_deps ],
   sources: __busmaster_bus_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])

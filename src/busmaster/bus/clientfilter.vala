@@ -25,6 +25,11 @@ namespace Wakit.Busmaster.Bus
       private FilterFunction _filter_function;
       private uint _filter_id;
 
+      ~ClientFilter ()
+        {
+          printerr ("~ClientFilter ()\n");
+        }
+
       public ClientFilter (Client client, owned FilterFunction filter_function)
         {
 

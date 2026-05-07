@@ -14,26 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+#include <array>
 
-namespace Wakit.Busmaster.Bus
+namespace constpairs
 {
 
-  [Compact (opaque = false)] internal class NameOwner
+  template<typename First, typename Second, int N, int... Is>
+  static inline constexpr std::array<std::pair<First, Second>, N> __make_array_helper (const std::pair<First, Second> (&pairs) [N],
+                                                                                           std::integer_sequence<int, Is ...> const&)
     {
+      return std::array<std::pair<First, Second>, N> { pairs [Is] ... };
+    }
 
-      public unowned Client client;
-      public unowned NameFlags flags;
-
-      ~NameOwner ()
-        {
-          printerr ("~NameOwner () <client.id = %s>\n", client.id);
-        }
-
-      public NameOwner (Client client, NameFlags flags)
-        {
-
-          this.client = client;
-          this.flags = flags;
-        }
+  template<typename First, typename Second, int N>
+  static inline constexpr std::array<std::pair<First, Second>, N> __make_array (const std::pair<First, Second> (&pairs) [N])
+    {
+      return __make_array_helper (pairs, std::make_integer_sequence<int, N> ());
     }
 }

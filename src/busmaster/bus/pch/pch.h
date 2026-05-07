@@ -15,25 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Busmaster.Bus
-{
-
-  [Compact (opaque = false)] internal class NameOwner
-    {
-
-      public unowned Client client;
-      public unowned NameFlags flags;
-
-      ~NameOwner ()
-        {
-          printerr ("~NameOwner () <client.id = %s>\n", client.id);
-        }
-
-      public NameOwner (Client client, NameFlags flags)
-        {
-
-          this.client = client;
-          this.flags = flags;
-        }
-    }
-}
+#include <charconv>
+#include <common/constmap.h>
+#include <gio/gio.h>
+#include <regex>
+#include <string_view>
+#include <system_error>
+#include <utility>

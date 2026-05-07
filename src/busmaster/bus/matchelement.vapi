@@ -18,22 +18,8 @@
 namespace Wakit.Busmaster.Bus
 {
 
-  [Compact (opaque = false)] internal class NameOwner
-    {
-
-      public unowned Client client;
-      public unowned NameFlags flags;
-
-      ~NameOwner ()
-        {
-          printerr ("~NameOwner () <client.id = %s>\n", client.id);
-        }
-
-      public NameOwner (Client client, NameFlags flags)
-        {
-
-          this.client = client;
-          this.flags = flags;
-        }
-    }
+  [CCode (cheader_filename = "busmaster/bus/match.h",
+          destroy_function = "wakit_busmaster_bus_element_clear",
+          has_type_id = false)]
+  internal struct MatchElement { }
 }

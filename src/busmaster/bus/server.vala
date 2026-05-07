@@ -30,7 +30,7 @@ namespace Wakit.Busmaster.Bus
 
       ~Server ()
         {
-          print ("~Server ()\n");
+          printerr ("~Server ()\n");
         }
 
       public Server (string guid)
@@ -79,43 +79,51 @@ namespace Wakit.Busmaster.Bus
 
             if (client != not_to)
 
-          foreach (unowned var match in client.matches) if (match.matches (message, has_destination))
+          foreach (unowned var match in client.matches) if (match.matches (message, has_destination, this))
             {
 
-              var flags = preserve_serial == false ? 0 : GLib.DBusSendMessageFlags.PRESERVE_SERIAL;
-
-              try
-                { client.connection.send_message (message.copy (), flags, null); }
-
-              catch (GLib.Error error)
-                {
-                  unowned uint code = error.code;
-                  unowned string domain = error.domain.to_string ();
-                  unowned string message_ = error.message.to_string ();
-
-                  GLib.warning ("Server.broadcast ()!: %s: %u: %s", domain, code, message_);
-                }
+              broadcast_message (client, message, preserve_serial);
               break;
             }
         }
 
-      private void broadcast_name_owner_changed (string name, string? old_name, string? new_name)
+      private void broadcast_message (Client client, GLib.DBusMessage message, bool preserve_serial)
         {
 
-          const string interface_ = IBus.NAME;
-          const string path = IBus.PATH;
-          const string signal_ = "NameOwnerChanged";
+          var flags = preserve_serial == false ? 0 : GLib.DBusSendMessageFlags.PRESERVE_SERIAL;
 
-          GLib.DBusMessage message;
+          try
+            { client.connection.send_message (message.copy (), flags, null); }
+
+          catch (GLib.Error error)
+            {
+              unowned uint code = error.code;
+              unowned string domain = error.domain.to_string ();
+              unowned string message_ = error.message.to_string ();
+
+              GLib.warning ("Server.broadcast_message ()!: %s: %u: %s", domain, code, message_);
+            }
+        }
+
+      internal void broadcast_name_owner_changed (string name, string? old_name, string? new_name)
+        {
 
           GLib.Variant items [] = { new GLib.Variant.string (name),
                                     new GLib.Variant.string (old_name ?? ""),
                                     new GLib.Variant.string (new_name ?? ""), };
 
           GLib.Variant body = new GLib.Variant.tuple (items);
+          GLib.DBusMessage message = new GLib.DBusMessage.signal (IBus.PATH, IBus.NAME, "NameOwnerChanged");
 
-          (message = new GLib.DBusMessage.signal (path, interface_, signal_)).set_body (body);
+          message.set_body (body);
           broadcast (null, message, false, false);
+        }
+
+      internal void claim_name (Name name)
+        {
+
+          if (null == name.owner && null == name.queue.first ())
+            _names.remove (name.name);
         }
 
       public override void constructed ()
@@ -129,7 +137,20 @@ namespace Wakit.Busmaster.Bus
           _names = new GLib.HashTable<string, Name> (hash_func, key_equal_func);
         }
 
-      public GLib.DBusMessage? ensure_unlocked (owned GLib.DBusMessage message)
+      internal unowned Name ensure_name (string name)
+        {
+
+          unowned Name? _name = null;
+
+          if (! _names.lookup_extended (name, null, out _name))
+
+            { var owned_ = new Name (name); _name = owned_;
+              _names.insert (name, (owned) owned_); }
+
+        return _name;
+        }
+
+      private GLib.DBusMessage? ensure_unlocked (owned GLib.DBusMessage message)
         {
 
           try
@@ -149,6 +170,32 @@ namespace Wakit.Busmaster.Bus
 
       private GLib.DBusMessage? filter (Client client, owned GLib.DBusMessage message, bool incoming)
         {
+
+        #if DEVELOP
+          string types[] = { "invalid", "method_call", "method_return", "error", "signal" };
+
+          printerr ("%s%s %s %u(%u) sender: %s, destination: %s %s %s.%s, body: %s\n",
+            client.id,
+            incoming ? "->" : "<-",
+            types [message.get_message_type ()],
+            (uint) message.get_serial (),
+            (uint) message.get_reply_serial (),
+            message.get_sender (),
+            message.get_destination (),
+            message.get_path (),
+            message.get_interface (),
+            message.get_member (),
+            message.get_body ()?.get_type_string () ?? "()");
+        #endif // DEVELOP
+
+          switch (message.get_message_type ())
+            {
+              default: break;
+              case GLib.DBusMessageType.ERROR: print ("  error: %s (%s)\n", message.get_body ()?.print_string (null, false)?.str ?? "()", message.get_error_name ()); break;
+              case GLib.DBusMessageType.METHOD_CALL: print ("  arguments: %s\n", message.get_body ()?.print_string (null, false)?.str ?? "()"); break;
+              case GLib.DBusMessageType.METHOD_RETURN: print ("  result: %s\n", message.get_body ()?.print_string (null, false)?.str ?? "()"); break;
+              case GLib.DBusMessageType.SIGNAL: print ("  arguments: %s\n", message.get_body ()?.print_string (null, false)?.str ?? "()"); break;
+            }
 
           if (incoming)
             {
@@ -210,9 +257,30 @@ namespace Wakit.Busmaster.Bus
         return !found ? null : value;
         }
 
+      internal bool match_name (string against, string to)
+        {
+
+          unowned Name? _name;
+
+          return against == to ||
+                (_names.lookup_extended (to, null, out _name) && null != _name.owner &&
+                 against == _name.owner.client.id);
+        }
+
       private void on_client_disconnected (Client client, bool remote_peer_vanished, GLib.Error? error)
         {
 
+          foreach (Name name in _names.get_values_as_ptr_array ())
+            {
+
+              if (client == name.owner.client)
+                name.release_owner (this);
+
+              name.unqueue_owner (client, this);
+              claim_name (name);
+            }
+
+          broadcast_name_owner_changed (client.id, client.id, null);
           _clients.remove (client.id);
         }
 
@@ -266,9 +334,9 @@ namespace Wakit.Busmaster.Bus
                 }
             }
 
-          broadcast (client, message, destination_client != null, true);
+          broadcast (client, message, null != destination_client, true);
 
-        return destination == null || destination != IBus.NAME ? null : message;
+        return null == destination || IBus.NAME != destination ? null : message;
         }
 
       private GLib.DBusMessage? route_error (Client client, GLib.DBusMessage invoke, owned GLib.Error error)
