@@ -15,18 +15,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Krypt
+namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cname = "gcry_random_level_t", cheader_filename = "gcryptapi.h", has_type_id = false)]
-  public enum RandomnessLevel
+  public errordomain Error
     {
 
-      [CCode (cname = "GCRY_WEAK_RANDOM")] WEAK,
-      [CCode (cname = "GCRY_STRONG_RANDOM")] STRONG,
-      [CCode (cname = "GCRY_VERY_STRONG_RANDOM")] VERY_STRONG,
-    }
+      FAILED;
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "gcry_randomize")]
-  internal void randomize ([CCode (array_length_pos = 1.1, array_length_type = "size_t", type = "void*")] uint8[] buffer, RandomnessLevel level);
+      public static Error from_code (ErrorCode code)
+        {
+
+        return (Error) new GLib.Error.literal (quark (), (int) code, code.to_string ());
+        }
+
+      public static extern GLib.Quark quark ();
+    }
 }

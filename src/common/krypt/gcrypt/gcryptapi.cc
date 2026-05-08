@@ -15,11 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
-#include <common/krypt/gcryptapi.h>
+#include <common/krypt/gcrypt/gcryptapi.h>
 
 G_LOCK_DEFINE_STATIC (gcry_strerror);
 
-gchar* wakit_krypt_error_code_to_string (gcry_error_t code)
+gchar* wakit_krypt_gcrypt_error_code_to_string (gcry_error_t code)
 {
 
   G_LOCK (gcry_strerror);

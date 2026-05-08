@@ -14,21 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+#include <gcrypt.h>
+#include <glib-object.h>
 
-namespace Wakit.Krypt
-{
+G_BEGIN_DECLS
 
-  public errordomain Error
-    {
+  G_GNUC_INTERNAL gchar* wakit_krypt_gcrypt_error_code_to_string (gcry_error_t code);
 
-      FAILED;
-
-      internal static Error from_code (ErrorCode code)
-        {
-
-        return (Error) new GLib.Error.literal (quark (), (int) code, code.to_string ());
-        }
-
-      public static extern GLib.Quark quark ();
-    }
-}
+G_END_DECLS

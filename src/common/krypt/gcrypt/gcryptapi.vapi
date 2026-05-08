@@ -15,13 +15,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Krypt
+namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "gcry_error_t")]
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "gcry_error_t")]
   [SimpleType]
   [IntegerType (rank = 7)]
-  internal struct ErrorCode: uint
+  public struct ErrorCode: uint
     {
       public string to_string ();
     }

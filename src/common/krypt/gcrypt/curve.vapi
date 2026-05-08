@@ -15,12 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Krypt
+namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "struct gcry_context", free_function = "gcry_ctx_release", has_type_id = false)]
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "struct gcry_context", free_function = "gcry_ctx_release", has_type_id = false)]
   [Compact (opaque = true)]
-  internal class Curve
+  public class Curve
     {
 
       private Curve ();
@@ -31,7 +31,7 @@ namespace Wakit.Krypt
       [CCode (cname = "gcry_mpi_ec_mul", instance_pos = 3.1)]
       public void mul (Point result, Scalar factor, Point point);
 
-      public static Curve named (string curve_name) throws Krypt.Error
+      public static Curve named (string curve_name) throws GCrypt.Error
         {
 
           Curve curve;
@@ -52,9 +52,9 @@ namespace Wakit.Krypt
       static ErrorCode _new (out Curve curve, void* s_exp, string? curve_name);
     }
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "struct gcry_mpi_point", free_function = "gcry_mpi_point_release", has_type_id = false)]
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "struct gcry_mpi_point", free_function = "gcry_mpi_point_release", has_type_id = false)]
   [Compact (opaque = true)]
-  internal class Point
+  public class Point
     {
 
       [CCode (cname = "gcry_mpi_point_new")]
@@ -79,7 +79,7 @@ namespace Wakit.Krypt
       [CCode (cname = "gcry_mpi_point_get", instance_pos = 3.1)]
       public void @get (Scalar x, Scalar y, Scalar z);
 
-      public uint8[] pack () throws Krypt.Error
+      public uint8[] pack () throws GCrypt.Error
         {
 
           Scalar x, y, z;
@@ -102,7 +102,7 @@ namespace Wakit.Krypt
       [CCode (cname = "gcry_mpi_point_set")]
       public void @set (Scalar x, Scalar y, Scalar z);
 
-      public Point.unpack (uint8[] buffer) throws Krypt.Error
+      public Point.unpack (uint8[] buffer) throws GCrypt.Error
         {
 
           this ();

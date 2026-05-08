@@ -14,12 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
-#include <gcrypt.h>
-#include <glib-object.h>
 
-G_BEGIN_DECLS
+namespace Wakit.Krypt.GCrypt
+{
 
-  G_GNUC_INTERNAL gchar* wakit_krypt_error_code_to_string (gcry_error_t code);
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "gcry_random_level_t", has_type_id = false)]
+  public enum RandomnessLevel
+    {
 
-G_END_DECLS
+      [CCode (cname = "GCRY_WEAK_RANDOM")] WEAK,
+      [CCode (cname = "GCRY_STRONG_RANDOM")] STRONG,
+      [CCode (cname = "GCRY_VERY_STRONG_RANDOM")] VERY_STRONG,
+    }
+
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "gcry_randomize")]
+  public void randomize ([CCode (array_length_pos = 1.1, array_length_type = "size_t", type = "void*")] uint8[] buffer, RandomnessLevel level);
+}

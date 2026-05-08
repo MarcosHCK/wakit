@@ -15,14 +15,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Krypt
+namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cheader_filename = "gcryptapi.h")]
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h")]
   namespace Kdf
     {
 
-      internal void derive (uint8[] passphrase, KdfAlgos algo, int subalgo, uint8[] salt, ulong iterations, uint8[] key) throws GLib.Error
+      public void derive (uint8[] passphrase, KdfAlgos algo, int subalgo, uint8[] salt, ulong iterations, uint8[] key) throws GLib.Error
         {
 
           ErrorCode code;
@@ -35,8 +35,8 @@ namespace Wakit.Krypt
       private ErrorCode _derive ([CCode (array_length_pos = 1.1, array_length_type = "size_t")] uint8[] passphrase, KdfAlgos algo, int subalgo, [CCode (array_length_pos = 4.1, array_length_type = "size_t")] uint8[] salt, ulong iterations, [CCode (array_length_pos = 5.9, array_length_type = "size_t")] uint8[] key);
     }
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "enum gcry_kdf_algos", has_type_id = false)]
-  internal enum KdfAlgos
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "enum gcry_kdf_algos", has_type_id = false)]
+  public enum KdfAlgos
     {
 
       [CCode (cname = "GCRY_KDF_NONE")] NONE,

@@ -15,15 +15,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Krypt
+namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "struct gcry_cipher_handle", free_function = "gcry_cipher_close", has_type_id = false)]
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "struct gcry_cipher_handle", free_function = "gcry_cipher_close", has_type_id = false)]
   [Compact (opaque = true)]
-  internal class Cipher
+  public class Cipher
     {
 
-      public bool decrypt (uint8[] @out, uint8[] @in) throws Krypt.Error
+      public bool decrypt (uint8[] @out, uint8[] @in) throws GCrypt.Error
         {
 
           ErrorCode code;
@@ -34,7 +34,7 @@ namespace Wakit.Krypt
         return true;
         }
 
-      public bool encrypt (uint8[] @out, uint8[] @in) throws Krypt.Error
+      public bool encrypt (uint8[] @out, uint8[] @in) throws GCrypt.Error
         {
 
           ErrorCode code;
@@ -45,7 +45,7 @@ namespace Wakit.Krypt
         return true;
         }
 
-      public static Cipher open ([CCode (type = "int")] CipherAlgo algo, [CCode (type = "int")] CipherMode mode, [CCode (type = "int")] CipherFlags flags) throws Krypt.Error
+      public static Cipher open ([CCode (type = "int")] CipherAlgo algo, [CCode (type = "int")] CipherMode mode, [CCode (type = "int")] CipherFlags flags) throws GCrypt.Error
         {
 
           Cipher cipher;
@@ -57,7 +57,7 @@ namespace Wakit.Krypt
         return (owned) cipher;
         }
 
-      public bool reset () throws Krypt.Error
+      public bool reset () throws GCrypt.Error
         {
 
           ErrorCode code;
@@ -68,7 +68,7 @@ namespace Wakit.Krypt
         return true;
         }
 
-      public bool setfinal () throws Krypt.Error
+      public bool setfinal () throws GCrypt.Error
         {
           ErrorCode code;
 
@@ -78,7 +78,7 @@ namespace Wakit.Krypt
         return true;
         }
 
-      public bool setkey (uint8[] key) throws Krypt.Error
+      public bool setkey (uint8[] key) throws GCrypt.Error
         {
           ErrorCode code;
 
@@ -102,8 +102,8 @@ namespace Wakit.Krypt
       public ErrorCode _setfinal ();
     }
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "enum gcry_cipher_algos", has_type_id = false)]
-  internal enum CipherAlgo
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "enum gcry_cipher_algos", has_type_id = false)]
+  public enum CipherAlgo
     {
 
       [CCode (cname = "GCRY_CIPHER_NONE")] NONE,
@@ -147,9 +147,9 @@ namespace Wakit.Krypt
       public unowned string to_string ();
     }
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "enum gcry_cipher_flags", has_type_id = false)]
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "enum gcry_cipher_flags", has_type_id = false)]
   [Flags]
-  internal enum CipherFlags
+  public enum CipherFlags
     {
 
       [CCode (cname = "GCRY_CIPHER_SECURE")] SECURE,
@@ -159,8 +159,8 @@ namespace Wakit.Krypt
       [CCode (cname = "GCRY_CIPHER_EXTENDED")] EXTENDED,
     }
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "enum gcry_cipher_modes", has_type_id = false)]
-  internal enum CipherMode
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "enum gcry_cipher_modes", has_type_id = false)]
+  public enum CipherMode
     {
 
       [CCode (cname = "GCRY_CIPHER_MODE_NONE")] NONE,

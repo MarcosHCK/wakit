@@ -16,16 +16,32 @@
  */
 using Wakit.Krypt.GCrypt;
 
-namespace Wakit.Krypt.Cookie
+namespace Wakit.Krypt.CookieAuth
 {
 
-  public const uint BIT_LENGTH = 256;
-  public const uint BYTE_LENGTH = BIT_LENGTH >> 3;
-
-  public static void generate (uint8 buffer [BYTE_LENGTH])
+  public sealed class Client: ProtocolComponent, GLib.Initable
     {
 
-      unowned RandomnessLevel level = RandomnessLevel.VERY_STRONG;
-      randomize (buffer, level);
+      public Client (string master_key) throws GLib.Error
+        {
+          Object (master_key: master_key);
+        }
+
+      public bool init (GLib.Cancellable? cancellable) throws GLib.Error
+        {
+
+          uint nbits;
+          uint expect = COOKIE_LENGTH << 3;
+
+          if (unlikely (expect != (nbits = Scalar.parse (format, master_key.data, null).nbits)))
+            throw new GLib.IOError.INVALID_ARGUMENT ("invalid key (nbits %u differs from expected %u)", nbits, expect);
+
+        return true;
+        }
+
+      public Response respond_challenge (Challenge challenge)
+        {
+        return new Response ();
+        }
     }
 }

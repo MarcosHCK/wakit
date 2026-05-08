@@ -15,21 +15,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Krypt
+namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "int", has_type_id = false)]
-  internal enum PrimeCheckMode
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "int", has_type_id = false)]
+  public enum PrimeCheckMode
     {
       [CCode (cname = "GCRY_PRIME_CHECK_AT_FINISH")] AT_FINISH,
       [CCode (cname = "GCRY_PRIME_CHECK_AT_GOT_PRIME")] AT_GOT_PRIME,
       [CCode (cname = "GCRY_PRIME_CHECK_AT_MAYBE_PRIME")] AT_MAYBE_PRIME,
     }
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "gcry_prime_check_func_t", delegate_target_pos = 0.9, scope = "call", type = "int")]
-  internal delegate int PrimeCheckFunc (PrimeCheckMode mode, Scalar candidate);
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "gcry_prime_check_func_t", delegate_target_pos = 0.9, scope = "call", type = "int")]
+  public delegate int PrimeCheckFunc (PrimeCheckMode mode, Scalar candidate);
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "int", has_type_id = false)]
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "int", has_type_id = false)]
   [Flags]
   public enum PrimeGeneratorFlags
     {

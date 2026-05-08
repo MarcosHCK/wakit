@@ -15,12 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Krypt
+namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "struct gcry_mpi", copy_function = "gcry_mpi_copy", free_function = "gcry_mpi_release", has_type_id = false)]
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "struct gcry_mpi", copy_function = "gcry_mpi_copy", free_function = "gcry_mpi_release", has_type_id = false)]
   [Compact (opaque = true)]
-  internal class Scalar
+  public class Scalar
     {
 
       public uint nbits { [CCode (cname = "gcry_mpi_get_nbits")] get; }
@@ -37,7 +37,7 @@ namespace Wakit.Krypt
       [CCode (cname = "gcry_mpi_mod")]
       public static void mod (Scalar result, Scalar dividend, Scalar divisor);
 
-      public static Scalar parse (ExternalFormat format, uint8[] buffer, out size_t unscanned = null) throws Krypt.Error
+      public static Scalar parse (ExternalFormat format, uint8[] buffer, out size_t unscanned = null) throws GCrypt.Error
         {
 
           ErrorCode code;
@@ -55,7 +55,7 @@ namespace Wakit.Krypt
       [CCode (cname = "gcry_mpi_print", instance_pos = 4.1)]
       public ErrorCode print (ExternalFormat format, void* buffer, size_t buflen, out size_t written = null);
 
-      public static Scalar random_prime (uint nbits, uint factor_bits, out Scalar[] factors, PrimeCheckFunc? check_func, RandomnessLevel level, PrimeGeneratorFlags flags) throws Krypt.Error
+      public static Scalar random_prime (uint nbits, uint factor_bits, out Scalar[] factors, PrimeCheckFunc? check_func, RandomnessLevel level, PrimeGeneratorFlags flags) throws GCrypt.Error
         {
 
           ErrorCode code;
@@ -70,7 +70,7 @@ namespace Wakit.Krypt
       [CCode (cname = "gcry_mpi_scan")]
       public static ErrorCode scan (out Scalar scalar, ExternalFormat format, void* buffer, size_t buflen, out size_t unscanned = null);
 
-      public bool to_buffer (ExternalFormat format, uint8[] buffer, out size_t written = null) throws Krypt.Error
+      public bool to_buffer (ExternalFormat format, uint8[] buffer, out size_t written = null) throws GCrypt.Error
         {
 
           ErrorCode code;
@@ -79,6 +79,22 @@ namespace Wakit.Krypt
             throw Error.from_code (code);
 
         return true;
+        }
+
+      public string to_string () throws GCrypt.Error
+        {
+
+          ErrorCode code;
+
+          var length = nbits >> 2;
+          var buffer = GLib.malloc (1 + length);
+
+          if (GLib.unlikely (0 != (code = print (ExternalFormat.HEX, buffer, length, null))))
+            throw Error.from_code (code);
+
+          ((uint8*) buffer) [length] = 0;
+
+        return (string) buffer;
         }
     }
 }

@@ -15,10 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Krypt
+namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cheader_filename = "gcryptapi.h", cname = "enum gcry_mpi_format", has_type_id = false)]
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "enum gcry_mpi_format", has_type_id = false)]
   public enum ExternalFormat
     {
 
@@ -30,15 +30,15 @@ namespace Wakit.Krypt
       [CCode (cname = "GCRYMPI_FMT_USG")] USG,
     }
 
-  [CCode (cheader_filename = "common/krypt/export.c", lower_case_cprefix = "gcrypt_point_pack_")]
+  [CCode (cheader_filename = "common/krypt/gcrypt/export.c", lower_case_cprefix = "gcrypt_point_pack_")]
   namespace PointPack
     {
 
       [CCode (cname = "GCRYPT_POINT_PACK_OVERHEAD")]
-      internal const uint OVERHEAD;
+      public const uint OVERHEAD;
 
       [CCode (array_length_pos = 3.1, array_length_type = "guint")]
-      internal static uint8[] pack (Scalar x, Scalar y, Scalar z, out void* xp, out uint xB, out void* yp, out uint yB, out void* zp, out uint zB);
-      internal static bool unpack ([CCode (array_length_pos = 1.1, array_length_type = "guint")] uint8[] buffer, out void* xp, out uint xB, out void* yp, out uint yB, out void* zp, out uint zB);
+      public static uint8[] pack (Scalar x, Scalar y, Scalar z, out void* xp, out uint xB, out void* yp, out uint yB, out void* zp, out uint zB);
+      public static bool unpack ([CCode (array_length_pos = 1.1, array_length_type = "guint")] uint8[] buffer, out void* xp, out uint xB, out void* yp, out uint yB, out void* zp, out uint zB);
     }
 }
