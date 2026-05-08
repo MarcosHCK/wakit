@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
-#include <common/asynclock.h>
+#include <common/asynchelp/asynclock.h>
 
 struct _LockSource: public GSource
 {

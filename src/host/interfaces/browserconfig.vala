@@ -31,6 +31,8 @@ namespace Wakit
 
       public string? application_id { get; construct set; default = null; }
       public string? application_version { get; construct set; default = null; }
+      public uint appbus_launch_timeout { get; construct set; default = 2000; }
+      public uint appbus_shutdown_timeout { get; construct set; default = 1000; }
       public bool auto_load_images { get; construct set; default = true; }
       public bool enable_dns_prefetching { get; construct set; default = false; }
       public bool enable_fullscreen { get; construct set; default = false; }

@@ -24,6 +24,7 @@ namespace Wakit.Browser
       public ICollection<string> accessible_uri_outsource { get; }
       public ICollection<string> accessible_uri_whitelist { get; }
       public string bus_address { get; set; }
+      public string? bus_cookie { get; set; }
       public WebKit.WebContext context { get; construct; }
       public GLib.Variant? extension_data { get; set; }
       public string? extension_dir { get; set; }

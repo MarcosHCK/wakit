@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
-#include <common/asyncdelay.h>
+#include <common/asynchelp/asyncdelay.h>
 
 static gboolean _source_callback (GTask* task)
 {

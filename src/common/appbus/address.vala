@@ -28,9 +28,10 @@ namespace Wakit.AppBus
       public AddressOption[] options { get { return _options; } }
       public string transport { owned get { return _transport.get_value (); } }
 
-      public Address (owned AddressString transport, owned AddressOption[] options)
+      public Address (owned string address, owned AddressString transport, owned AddressOption[] options)
         {
 
+          _address = (owned) address;
           _transport = transport;
           _options = options;
         }

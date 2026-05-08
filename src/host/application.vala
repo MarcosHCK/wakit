@@ -50,7 +50,6 @@ namespace Wakit
           _browser_config.application_version = get_version ();
 
           _browser_browser = new Browser.Browser (_browser_config);
-          _browser_config = null;
           _browser_extension_host = new Browser.ExtensionHost (_browser_browser.context);
           _deferred_open = new GLib.Queue<DeferredUrl?> ();
           _ready = false;
@@ -138,10 +137,11 @@ namespace Wakit
 
           var context = GLib.MainContext.ref_thread_default ();
           var loop = new GLib.MainLoop (context, false);
+          var timeout = _browser_config.appbus_shutdown_timeout;
 
           _appbus_bus.reap_on_connection (_appbus_watcher.connection);
 
-          _appbus_watcher.quit_async.begin ((o, res) =>
+          _appbus_watcher.quit_async.begin (timeout, (o, res) =>
             {
               ((AppBus.Watcher) o).quit_async.end (res);
               loop.quit ();
@@ -162,7 +162,9 @@ namespace Wakit
       private async bool startup_appbus (GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
-          bool result = (yield _appbus_watcher.launch (cancellable))
+          var timeout = _browser_config.appbus_launch_timeout;
+
+          bool result = (yield _appbus_watcher.launch (timeout, cancellable))
                      && (yield _appbus_bus.graft_on_connection (_appbus_watcher.connection, cancellable));
 
           GLib.debug ("AppBus launched (address = '%s')", _appbus_watcher.address);
@@ -180,6 +182,7 @@ namespace Wakit
             }
 
           _browser_extension_host.bus_address = _appbus_watcher.address;
+          _browser_extension_host.bus_cookie = ((AppBus.Cookie?) _appbus_watcher.cookie)?.to_string ();
 
         return result;
         }

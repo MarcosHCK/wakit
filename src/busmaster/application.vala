@@ -25,9 +25,11 @@ namespace Wakit.Busmaster
       private GLib.OptionContext _context;
 
       private Bus.Server? _bus_server = null;
+      private AppBus.Cookie? _cookie = null;
       private GLib.MainLoop _main_loop = null;
       private bool _nofork = false;
       private bool _print_address = false;
+      private uint _timeout = 1000;
       private Transport.Server? _transport_server = null;
 
       public Application ()
@@ -114,21 +116,6 @@ namespace Wakit.Busmaster
       [CCode (cheader_filename = "busmaster/application.c")]
       extern static void sigint_source_add (GLib.MainContext context, owned GLib.SourceFunc func);
 
-      private string generate_cookie (Configuration configuration)
-        {
-
-          /* TODO: cryptographically secure cookie */
-          var checksum_type = GLib.ChecksumType.SHA512;
-          var checksum = new GLib.Checksum (checksum_type);
-
-          for (int i = 0; i < GLib.Random.int_range (10, 20); ++i)
-            {
-              double bit = GLib.Random.next_double ();
-              checksum.update ((uchar[]) &bit, sizeof (double));
-            }
-        return checksum.get_string ();
-        }
-
       private async int run_async (string[] args) throws GLib.Error
         {
 
@@ -144,7 +131,9 @@ namespace Wakit.Busmaster
           yield (parser = new Json.Parser ()).load_from_stream_async (stream);
 
           Configuration configuration = _json_gobject_deserialize<Configuration> (parser.get_root ());
-          string cookie = generate_cookie (configuration);
+
+          _cookie = configuration.disable_client_cookie ? null : AppBus.Cookie.generate ();
+          _timeout = configuration.timeout;
 
           _transport_server = yield open_transport (configuration);
           _bus_server = new Bus.Server (GLib.DBus.generate_guid ());
@@ -153,17 +142,15 @@ namespace Wakit.Busmaster
           _transport_server.incoming.connect (on_incoming);
 
           if (_print_address)
+            print_address (_transport_server.address, _bus_server.guid, _cookie?.to_string ());
 
-            print ("%s,guid=%s,cookie=%s\n", _transport_server.address,
-                                            _bus_server.guid,
-                                            cookie);
         return 0;
         }
 
       private bool on_incoming (GLib.IOStream stream)
         {
 
-          AppBus.connect_server.begin (stream, _bus_server.guid, null, null, on_incoming_complete);
+          AppBus.connect_server.begin (stream, _bus_server.guid, _timeout, _cookie, null, on_incoming_complete);
         return true;
         }
 
@@ -210,6 +197,16 @@ namespace Wakit.Busmaster
                 }
             }
         throw last_error ?? new GLib.IOError.INVALID_ARGUMENT ("no transport address provided");
+        }
+
+      static void print_address (string address, string guid, string? cookie)
+        {
+
+          if (null == cookie)
+
+            print ("%s,guid=%s\n", address, guid);
+          else
+            print ("%s,guid=%s,x-cookie=%s\n", address, guid, cookie);
         }
     }
 }

@@ -22,6 +22,7 @@ namespace Wakit.Busmaster
     {
 
       public string[] addresses { get; construct set; }
-      public int cookie_length { get; construct set; default = 16; }
+      public bool disable_client_cookie { get; construct set; default = false; }
+      public uint timeout { get; construct set; default = 1000; }
     }
 }

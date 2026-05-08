@@ -1,3 +1,4 @@
 {
-  "addresses": [ "unix:tmpdir=/tmp", "tcp:host=localhost,port=9999" ]
+  "addresses": [ "unix:tmpdir=/tmp", "tcp:host=localhost,port=9999" ],
+  "disable-client-cookie": true
 }

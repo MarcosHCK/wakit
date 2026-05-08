@@ -23,6 +23,7 @@ namespace Wakit
 
       internal const string SIGNATURE = "("
         + _V_TYPE_STRING
+        + _V_TYPE_STRING_MAYBE
         + _V_TYPE_STRING
         + _V_TYPE_ANY
         + _V_TYPE_STRING_ARRAY
@@ -32,12 +33,16 @@ namespace Wakit
 
       internal const string _V_TYPE_ANY = "*";
       internal const string _V_TYPE_ARRAY = "a";
+      internal const string _V_TYPE_MAYBE = "m";
       internal const string _V_TYPE_STRING = "s";
-      internal const string _V_TYPE_STRING_ARRAY = _V_TYPE_ARRAY + "s";
+
+      internal const string _V_TYPE_STRING_ARRAY = _V_TYPE_ARRAY + _V_TYPE_STRING;
+      internal const string _V_TYPE_STRING_MAYBE = _V_TYPE_MAYBE + _V_TYPE_STRING;
 
       public abstract ICollection<string> accessible_uri_outsource { get; }
       public abstract ICollection<string> accessible_uri_whitelist { get; }
       public abstract string bus_address { get; set; }
+      public abstract string? bus_cookie { get; set; }
       public abstract GLib.Variant? extension_data { get; set; }
       public abstract ICollection<string> secure_schemes { get; }
 
@@ -50,6 +55,7 @@ namespace Wakit
             {
 
               new GLib.Variant.string (bus_address),
+              new GLib.Variant.maybe ((GLib.VariantType) "s", null == bus_cookie ? null : new GLib.Variant.string (bus_cookie)),
               new GLib.Variant.string (guid),
               extension_data ?? new GLib.Variant.boolean (false),
               new GLib.Variant.strv (accessible_uri_outsource.to_array ()),

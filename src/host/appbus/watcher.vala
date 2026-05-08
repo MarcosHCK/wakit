@@ -31,13 +31,11 @@ namespace Wakit.AppBus
       private const string DEFAULT_EXECUTABLE = Config.LIBEXEC_DIR + "/wakit-busmaster";
 #endif // DEVELOP
 
-      public uint cooldown { get; construct set; default = 500; }
       public string config { get { return _config; } set { _config = value; } }
       public string executable { get { return _executable; } set { _executable = value; } }
-      public uint kill_timeout { get; construct set; default = 1000; }
-      public uint launch_timeout { get; construct set; default = 1000; }
 
       public string address { get; private set; }
+      public GLib.Bytes? cookie { get; private set; }
       public GLib.DBusConnection connection { get; private set; }
 
       private string _config = DEFAULT_CONFIG;
@@ -47,11 +45,23 @@ namespace Wakit.AppBus
       [HasEmitter]
       public signal void crashed (GLib.Error? error);
 
-      public async bool launch (GLib.Cancellable? cancellable = null) throws GLib.Error requires (null == _watcher)
+      static Cookie? extract_cookie (string address) throws GLib.Error
         {
 
-          var cancellable2 = new TimeoutCancellable (launch_timeout, cancellable);
-          var result = (bool) yield launch_spawn (cancellable2);
+          var _address = new Address.from_string (address);
+
+          AddressOption? option = null;
+          Cookie? cookie = null == (option = _address.lookup_option ("x-cookie"))
+                                ? null : Cookie.from_string (option.value);
+
+        return (owned) cookie;
+        }
+
+      public async bool launch (uint timeout, GLib.Cancellable? cancellable = null) throws GLib.Error requires (null == _watcher)
+        {
+
+          var cancellable2 = new TimeoutCancellable (timeout, cancellable);
+          var result = (bool) yield launch_spawn (timeout, cancellable2);
 
         return result;
         }
@@ -65,13 +75,16 @@ namespace Wakit.AppBus
           if (unlikely (null == address || false == GLib.DBus.is_address (address)))
             throw new GLib.IOError.INVALID_DATA ("bad dbus address");
 
+          var cookie = extract_cookie (address);
+
           _address = (owned) address;
-          _connection = yield Wakit.AppBus.connect_client (_address, null, cancellable);
+          _cookie = cookie;
+          _connection = yield Wakit.AppBus.connect_client (_address, 0, cookie, cancellable);
 
         return true;
         }
 
-      private async bool launch_spawn (GLib.Cancellable? cancellable = null) throws GLib.Error
+      private async bool launch_spawn (uint timeout, GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
           unowned var flag1 = GLib.SubprocessFlags.STDOUT_PIPE;
@@ -89,18 +102,18 @@ namespace Wakit.AppBus
             { result = yield launch_reach (subprocess, cancellable);
               (_watcher = new Process.Watcher (subprocess)).terminated.connect (crashed); }
           catch (GLib.Error error)
-            { yield Process.terminate_async (subprocess, _kill_timeout);
+            { yield Process.terminate_async (subprocess, timeout);
               throw (owned) error; }
         return result;
         }
 
-      public void quit ()
+      public void quit (uint timeout)
         {
 
-          quit_async.begin ();
+          quit_async.begin (timeout);
         }
 
-      public async void quit_async ()
+      public async void quit_async (uint timeout)
         {
 
           var watcher = _watcher;
@@ -109,7 +122,7 @@ namespace Wakit.AppBus
 
           if (null != watcher) try
             {
-              yield watcher.terminate (kill_timeout);
+              yield watcher.terminate (timeout);
             }
           catch (GLib.Error error)
             {

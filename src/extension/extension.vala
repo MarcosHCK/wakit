@@ -38,6 +38,7 @@ namespace Wakit
       public ICollection<GLib.Regex> accessible_uri_whitelist { get; }
       public GLib.DBusConnection appbus { get; }
       public string bus_address { get; protected set; }
+      public string? bus_cookie { get; protected set; }
       public GLib.Variant? extension_data { get; protected set; }
       public string guid { get; protected set; }
       public ICollection<string> secure_schemes { get; }
@@ -78,15 +79,23 @@ namespace Wakit
           _script_world = WebKit.ScriptWorld.get_default ();
           _script_world.window_object_cleared.connect (on_window_object_cleared);
 
-          AppBus.connect_client.begin (_bus_address, null, null, init_complete);
+          init_async.begin (init_complete);
         return true;
         }
 
-      private void init_complete (GLib.Object? source_object, GLib.AsyncResult result)
+      async void init_async () throws GLib.Error
+        {
+
+          var cookie = null == _bus_cookie ? null : AppBus.Cookie.from_string (_bus_cookie);
+          var appbus = yield AppBus.connect_client (_bus_address, 1200, cookie);
+          _appbus = appbus;
+        }
+
+      private void init_complete (GLib.Object? o, GLib.AsyncResult result)
         {
 
           try
-            { _appbus = AppBus.connect_client.end (result); }
+            { ((WebExtension) o).init_async.end (result); }
           catch (GLib.Error error)
             { GLib.error ("Wakit.WebExtension.init_complete ()!: %s: %u: %s",
                 error.domain.to_string (), error.code, error.message); }

@@ -18,17 +18,17 @@
 namespace Wakit
 {
 
-  public class TimeoutCancellable: GLib.Cancellable
+  public sealed class TimeoutCancellable: GLib.Cancellable
     {
 
-      private GLib.Source _source = null;
+      private GLib.Source? _source = null;
 
       public GLib.Cancellable? inner { construct; }
       public uint timeout { get; construct; }
 
       ~TimeoutCancellable ()
         {
-          _source.destroy ();
+          _source?.destroy ();
         }
 
       public TimeoutCancellable (uint timeout, GLib.Cancellable? inner = null)
@@ -36,13 +36,20 @@ namespace Wakit
           Object (inner: inner, timeout: timeout);
         }
 
+      static bool cancel_callback (GLib.Cancellable cancellable)
+        {
+
+          cancellable.cancel ();
+
+        return GLib.Source.REMOVE;
+        }
+
       public override void constructed ()
         {
 
           base.constructed ();
-
           constructed_static (this);
-        }      
+        }
 
       static void constructed_static (TimeoutCancellable self)
         {
@@ -51,19 +58,17 @@ namespace Wakit
           unowned var interval = (uint) self._timeout;
           unowned var inner = (GLib.Cancellable?) self._inner;
 
-          var source = (GLib.Source) (self._source = new GLib.TimeoutSource (interval));
+          var context = GLib.MainContext.ref_thread_default ();
 
-          source.add_child_source (new GLib.CancellableSource (inner));
-          source.set_callback (() => source_callback (cancellable));
+          var source = (self._source = 0 < interval
+            ? (GLib.Source) new GLib.TimeoutSource (interval)
+            : (GLib.Source) new GLib.CancellableSource (inner));
 
-          source.attach (GLib.MainContext.ref_thread_default ());
-        }
+          if (0 < interval)
+            source.add_child_source (new GLib.CancellableSource (inner));
 
-      static bool source_callback (GLib.Cancellable cancellable)
-        {
-
-          cancellable.cancel ();
-        return GLib.Source.REMOVE;
+          source.set_callback (() => cancel_callback (cancellable));
+          source.attach (context);
         }
     }
 }
