@@ -18,29 +18,33 @@
 namespace Wakit.AppBus
 {
 
-  [Compact (opaque = true)] public class Cookie: GLib.Bytes
+  [Compact (opaque = true)] public class Cookie
     {
 
-      const string charset = "0123456789abcdef";
-      const GLib.ChecksumType type = GLib.ChecksumType.SHA1;
+      private uint8 _data [LENGTH];
 
-      private Cookie (owned uint8[] bytes)
+      const string CHARSET = "0123456789abcdef";
+      const uint LENGTH = Wakit.Krypt.Cookie.BYTE_LENGTH;
+
+      public Cookie.random ()
         {
-          base.take ((owned) bytes);
+
+          this ();
+          Wakit.Krypt.Cookie.generate (_data);
         }
 
-      public static Cookie from_string (string cookie) throws GLib.Error
+      public Cookie.from_string (string cookie) throws GLib.Error
         {
+
+          this ();
 
           if (unlikely (0 < (cookie.length & 1)))
             throw new GLib.NumberParserError.INVALID ("invalid cookie value");
 
           uint length = cookie.length >> 1;
 
-          if (unlikely (length != type.get_length ()))
+          if (unlikely (length != Cookie.LENGTH))
             throw new GLib.NumberParserError.INVALID ("invalid cookie value");
-
-          var buffer = new uint8 [length];
 
           for (uint i = 0, j = 0; i < length; ++i, j += 2)
             {
@@ -63,49 +67,24 @@ namespace Wakit.AppBus
               else
                 throw new GLib.NumberParserError.INVALID ("invalid cookie value");
 
-              buffer [i] = b;
+              _data [i] = b;
             }
-        return new Cookie ((owned) buffer);
-        }
-
-      public static Cookie generate ()
-        {
-
-          var checksum = new GLib.Checksum (type);
-
-          for (int i = 0; i < GLib.Random.int_range (10, 20); ++i)
-            {
-              double bit = GLib.Random.next_double ();
-              checksum.update ((uchar[]) &bit, sizeof (double));
-            }
-        return generate_finish (checksum);
-        }
-
-      private static Cookie generate_finish (GLib.Checksum checksum)
-        {
-
-          var buffer = new uint8 [type.get_length ()];
-          var length = (size_t) type.get_length ();
-
-          checksum.get_digest (buffer, ref length);
-
-        return new Cookie ((owned) buffer);
         }
 
       public string to_string ()
         {
 
-          unowned var buffer = (uint8[]) get_data ();
-          unowned var length = (size_t) type.get_length ();
+          unowned var buffer = _data;
+          unowned var length = Cookie.LENGTH;
 
-          var builder = new StringBuilder.sized (length * 2);
+          var builder = new StringBuilder.sized (length << 1);
 
-          for (size_t i = 0; i < length; ++i)
+          for (size_t i = 0; i < Cookie.LENGTH; ++i)
             {
 
               uint8 b = buffer [i];
-              builder.append_c (charset [b >> 4]);
-              builder.append_c (charset [b & 0xf]);
+              builder.append_c (Cookie.CHARSET [b >> 4]);
+              builder.append_c (Cookie.CHARSET [b & 0xf]);
             }
         return builder.free_and_steal ();
         }

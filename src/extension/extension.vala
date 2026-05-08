@@ -86,9 +86,12 @@ namespace Wakit
       async void init_async () throws GLib.Error
         {
 
-          var cookie = null == _bus_cookie ? null : AppBus.Cookie.from_string (_bus_cookie);
-          var appbus = yield AppBus.connect_client (_bus_address, 1200, cookie);
-          _appbus = appbus;
+          AppBus.Cookie? cookie = null;
+
+          if (null != _bus_cookie)
+            cookie = new AppBus.Cookie.from_string (_bus_cookie);
+
+          _appbus = yield AppBus.connect_client (_bus_address, 1200, cookie);
         }
 
       private void init_complete (GLib.Object? o, GLib.AsyncResult result)

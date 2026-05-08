@@ -132,7 +132,9 @@ namespace Wakit.Busmaster
 
           Configuration configuration = _json_gobject_deserialize<Configuration> (parser.get_root ());
 
-          _cookie = configuration.disable_client_cookie ? null : AppBus.Cookie.generate ();
+          if (false == configuration.disable_client_cookie)
+            _cookie = new AppBus.Cookie.random ();
+
           _timeout = configuration.timeout;
 
           _transport_server = yield open_transport (configuration);

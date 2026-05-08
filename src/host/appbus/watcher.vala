@@ -35,7 +35,7 @@ namespace Wakit.AppBus
       public string executable { get { return _executable; } set { _executable = value; } }
 
       public string address { get; private set; }
-      public GLib.Bytes? cookie { get; private set; }
+      public Cookie? cookie { get; private owned set; }
       public GLib.DBusConnection connection { get; private set; }
 
       private string _config = DEFAULT_CONFIG;
@@ -48,11 +48,13 @@ namespace Wakit.AppBus
       static Cookie? extract_cookie (string address) throws GLib.Error
         {
 
+          Cookie? cookie = null;
+          AddressOption? option = null;
+
           var _address = new Address.from_string (address);
 
-          AddressOption? option = null;
-          Cookie? cookie = null == (option = _address.lookup_option ("x-cookie"))
-                                ? null : Cookie.from_string (option.value);
+          if (null != (option = _address.lookup_option ("x-cookie")))
+            cookie = new Cookie.from_string (option.value);
 
         return (owned) cookie;
         }
@@ -78,8 +80,8 @@ namespace Wakit.AppBus
           var cookie = extract_cookie (address);
 
           _address = (owned) address;
-          _cookie = cookie;
           _connection = yield Wakit.AppBus.connect_client (_address, 0, cookie, cancellable);
+          _cookie = (owned) cookie;
 
         return true;
         }

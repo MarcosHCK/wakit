@@ -20,6 +20,9 @@ subdir ('asynchelp')
 subdir ('enum')
 
 # level 2
+subdir ('krypt')
+
+# level 3
 subdir ('appbus')
 
 gio_unix_dep = dependency ('gio-unix-2.0', required: false)
@@ -50,7 +53,8 @@ endforeach
 
 __common_deps = [ __common_appbus_dep.as_link_whole (),
                   __common_asynchelp_dep.as_link_whole (),
-                  __common_enum_dep.as_link_whole () ]
+                  __common_enum_dep.as_link_whole (),
+                  __common_krypt_dep.as_link_whole (), ]
 
 if gio_unix_dep.found ()
   __common_deps += [ gio_unix_dep ]

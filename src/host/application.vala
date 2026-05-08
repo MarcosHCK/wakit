@@ -182,7 +182,7 @@ namespace Wakit
             }
 
           _browser_extension_host.bus_address = _appbus_watcher.address;
-          _browser_extension_host.bus_cookie = ((AppBus.Cookie?) _appbus_watcher.cookie)?.to_string ();
+          _browser_extension_host.bus_cookie = _appbus_watcher.cookie?.to_string ();
 
         return result;
         }

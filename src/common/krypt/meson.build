@@ -15,32 +15,38 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__common_appbus_src = [ ]
+gcrypt_dep = cc.find_library ('libgcrypt', required: true)
 
-foreach lib: [ 'address' ]
+__common_krypt_src = [ ]
 
-  __common_appbus_src += [ '@0@.cc'.format (lib) ]
-  __common_appbus_src += [ '@0@.h'.format (lib) ]
+foreach lib: [ 'gcryptapi' ]
+
+  __common_krypt_src += [ '@0@.cc'.format (lib) ]
+  __common_krypt_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'address', 'addressoption', 'addressstring', 'connectclient', 'connectserver', 'cookie' ]
+foreach lib: [ 'cookie', 'gcryptapi' ]
 
-  __common_appbus_src += [ '@0@.vala'.format (lib) ]
+  __common_krypt_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-__common_appbus_deps = [ __common_asynchelp_dep,
-                         __common_krypt_dep, ]
+foreach lib: [ 'curve', 'cipher', 'export', 'gcryptapi', 'kdf', 'prime', 'random', 'scalar' ]
 
-__common_appbus_lib = static_library ('wakit-common-appbus',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
+  __common_krypt_src += [ '@0@.vapi'.format (lib) ]
+endforeach
+
+__common_krypt_deps = [ gcrypt_dep ]
+
+__common_krypt_lib = static_library ('wakit-common-krypt',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Krypt"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Common.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Krypt"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_dep, gio_dep, __common_appbus_deps ],
-  sources: __common_appbus_src,
+  dependencies: [ config_dep, gio_dep, __common_krypt_deps ],
+  sources: __common_krypt_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__common_appbus_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  link_with: __common_appbus_lib)
+__common_krypt_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
+  link_with: __common_krypt_lib)
