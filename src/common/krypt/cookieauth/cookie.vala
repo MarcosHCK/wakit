@@ -28,11 +28,11 @@ namespace Wakit.Krypt.CookieAuth
         {
         }
 
-      public Cookie.from_string (string cookie) throws GLib.Error
+      public Cookie.from_string (string cookie, ssize_t length = -1) throws GLib.Error
         {
 
           this ();
-          Hex.from_string (cookie, _data);
+          Hex.from_string (_data, cookie, length);
         }
 
       public Cookie.random ()

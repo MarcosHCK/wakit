@@ -31,9 +31,9 @@ namespace Wakit.AppBus
           base.random ();
         }
 
-      public Cookie.from_string (string cookie) throws GLib.Error
+      public Cookie.from_string (string cookie, ssize_t length = -1) throws GLib.Error
         {
-          base.from_string (cookie);
+          base.from_string (cookie, length);
         }
     }
 }

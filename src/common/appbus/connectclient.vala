@@ -55,8 +55,20 @@ namespace Wakit.AppBus
         }
     }
 
-  public async GLib.DBusConnection connect_client (string address, Cookie? cookie = null, uint timeout = 0, GLib.Cancellable? cancellable = null) throws GLib.Error
+  static Cookie? extract_cookie (string address) throws GLib.Error
     {
+
+      var _address = new Address.from_string (address);
+      var _option = (AddressOption?) null;
+
+    return null == (_option = _address.lookup_option ("x-cookie"))
+                 ? null : new Cookie.from_string (_option._value.value, _option._value.length);
+    }
+
+  public async GLib.DBusConnection connect_client (string address, uint timeout = 0, GLib.Cancellable? cancellable = null) throws GLib.Error
+    {
+
+      Cookie? cookie = extract_cookie (address);
 
       string? guid = null;
       GLib.IOStream stream = yield GLib.DBus.address_get_stream (address, cancellable, out guid);

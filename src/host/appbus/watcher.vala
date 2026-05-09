@@ -35,7 +35,6 @@ namespace Wakit.AppBus
       public string executable { get { return _executable; } set { _executable = value; } }
 
       public string address { get; private set; }
-      public Cookie? cookie { get; private owned set; }
       public GLib.DBusConnection connection { get; private set; }
 
       private string _config = DEFAULT_CONFIG;
@@ -44,20 +43,6 @@ namespace Wakit.AppBus
 
       [HasEmitter]
       public signal void crashed (GLib.Error? error);
-
-      static Cookie? extract_cookie (string address) throws GLib.Error
-        {
-
-          Cookie? cookie = null;
-          AddressOption? option = null;
-
-          var _address = new Address.from_string (address);
-
-          if (null != (option = _address.lookup_option ("x-cookie")))
-            cookie = new Cookie.from_string (option.value);
-
-        return (owned) cookie;
-        }
 
       public async bool launch (uint timeout, GLib.Cancellable? cancellable = null) throws GLib.Error requires (null == _watcher)
         {
@@ -77,11 +62,8 @@ namespace Wakit.AppBus
           if (unlikely (null == address || false == GLib.DBus.is_address (address)))
             throw new GLib.IOError.INVALID_DATA ("bad dbus address");
 
-          var cookie = extract_cookie (address);
-
           _address = (owned) address;
-          _connection = yield Wakit.AppBus.connect_client (_address, cookie, 0, cancellable);
-          _cookie = (owned) cookie;
+          _connection = yield Wakit.AppBus.connect_client (_address, 0, cancellable);
 
         return true;
         }

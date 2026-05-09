@@ -20,18 +20,20 @@ namespace Wakit.Hex
 
   const string CHARSET = "0123456789abcdef";
 
-  public static void from_string (string hex_string, uint8[] buffer) throws GLib.Error
+  public static void from_string (uint8[] buffer, string hex_string, ssize_t length = -1) throws GLib.Error
     {
 
-      if (unlikely (0 < (hex_string.length & 1)))
+      uint chars = 0 > length ? hex_string.length : (uint) length;
+
+      if (unlikely (0 < (chars & 1)))
         throw new GLib.NumberParserError.INVALID ("invalid hex string");
 
-      uint length = hex_string.length >> 1;
+      uint bytes = chars >> 1;
 
-      if (unlikely (length != buffer.length))
-        throw new GLib.NumberParserError.INVALID ("invalid hex buffer");
+      if (unlikely (bytes != buffer.length))
+        throw new GLib.NumberParserError.INVALID ("invalid hex string");
 
-      for (uint i = 0, j = 0; i < length; ++i, j += 2)
+      for (uint i = 0, j = 0; i < bytes; ++i, j += 2)
         {
 
           uint8 b = 0;

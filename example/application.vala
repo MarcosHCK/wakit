@@ -21,7 +21,8 @@ namespace Wakit.Example
   public sealed class Application: Wakit.Application
     {
 
-      private bool with_frame = true;
+      private uint64 _start_time = GLib.get_monotonic_time ();
+      private bool _with_frame = true;
 
       public Application ()
         {
@@ -84,7 +85,7 @@ namespace Wakit.Example
 
           if (null == (value = options.lookup_value ("with-frame", (GLib.VariantType) "b")) || !value.get_boolean ())
             {
-              with_frame = false;
+              _with_frame = false;
             }
 
           if (unlikely (null == loader))
@@ -122,14 +123,22 @@ namespace Wakit.Example
         return app.run (argv);
         }
 
+      [CCode (cheader_filename = "glib.h", cname = "G_USEC_PER_SEC")]
+      extern const uint _G_USEC_PER_SEC;
+
       private void open_uri (GLib.File file, string hint)
         {
+
+          var took = GLib.get_monotonic_time () - _start_time;
+
+          GLib.debug ("open_uri ('%s', '%s') after %.2f ms\n",
+            file.get_uri (), hint, (double) took / (double) (_G_USEC_PER_SEC / 1000));
 
           var window = new Gtk.ApplicationWindow (this);
           var web_view = browser.create_view ();
 
           window.set_child (web_view);
-          window.set_decorated (with_frame);
+          window.set_decorated (_with_frame);
           window.set_default_size (800, 600);
 
           web_view.bind_window (window);
