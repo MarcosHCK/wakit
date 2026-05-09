@@ -30,7 +30,7 @@ test ((testpath + '/client').replace ('/', '.'),
             cpp_pch: 'pch/pch.h',
             build_by_default: false,
             dependencies: [ config_dep, __common_dep, __common_krypt_dep, __testing_dep ],
-            sources: [ 'client.cc', 'providers.h', 'dummy.vala' ]),
+            sources: [ 'client.cc', 'providers.h' ]),
       env: [ 'G_TEST_BUILDDIR=@0@'.format (meson.current_build_dir ()),
              'G_TEST_SRCDIR=@0@'.format (meson.current_source_dir ()) ], )
 
@@ -43,7 +43,7 @@ test ((testpath + '/integration').replace ('/', '.'),
             cpp_pch: 'pch/pch.h',
             build_by_default: false,
             dependencies: [ config_dep, __common_dep, __common_krypt_dep, __testing_dep ],
-            sources: [ 'integration.cc', 'providers.h', 'dummy.vala' ]),
+            sources: [ 'integration.cc', 'providers.h' ]),
       env: [ 'G_TEST_BUILDDIR=@0@'.format (meson.current_build_dir ()),
              'G_TEST_SRCDIR=@0@'.format (meson.current_source_dir ()) ], )
 
@@ -56,6 +56,6 @@ test ((testpath + '/server').replace ('/', '.'),
             cpp_pch: 'pch/pch.h',
             build_by_default: false,
             dependencies: [ config_dep, __common_dep, __common_krypt_dep, __testing_dep ],
-            sources: [ 'server.cc', 'providers.h', 'dummy.vala' ]),
+            sources: [ 'server.cc', 'providers.h' ]),
       env: [ 'G_TEST_BUILDDIR=@0@'.format (meson.current_build_dir ()),
              'G_TEST_SRCDIR=@0@'.format (meson.current_source_dir ()) ], )

@@ -31,6 +31,8 @@ endforeach
 __common_appbus_deps = [ __common_asynchelp_dep,
                          __common_krypt_dep, ]
 
+__common_appbus_fwds = [ __common_krypt_dep, ]
+
 __common_appbus_lib = static_library ('wakit-common-appbus',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
@@ -42,5 +44,5 @@ __common_appbus_lib = static_library ('wakit-common-appbus',
   sources: __common_appbus_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__common_appbus_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
+__common_appbus_dep = declare_dependency (dependencies: [ config_dep, gio_dep, __common_appbus_fwds ],
   link_with: __common_appbus_lib)

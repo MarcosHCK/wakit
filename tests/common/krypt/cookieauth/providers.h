@@ -17,7 +17,6 @@
 #pragma once
 #include <common/boxing.h>
 #include <common/krypt/cookieauth/wakit-common-krypt-cookieauth.h>
-#include <stdexcept>
 
 class key_provider
 {
@@ -42,21 +41,9 @@ public:
     {
 
       boxing::freeable<gchar> _key;
-      GError* tmperr = NULL;
 
       _key = wakit_krypt_cookie_auth_cookie_to_string (get_cookie ());
-      _client = wakit_krypt_cookie_auth_client_new (*_key, nullptr, &tmperr);
-
-      if (G_UNLIKELY (NULL != tmperr))
-        {
-
-          std::string code = std::to_string (tmperr->code);
-          std::string domain (g_quark_to_string (tmperr->domain));
-          std::string message (tmperr->message);
-
-          g_error_free (tmperr);
-          throw std::runtime_error (domain + ": " + code + ": " + message);
-        }
+      _client = wakit_krypt_cookie_auth_client_new (*_key, nullptr);
     }
 
   inline WakitKryptCookieAuthClient* get_client () const noexcept

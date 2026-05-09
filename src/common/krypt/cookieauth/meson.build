@@ -17,28 +17,21 @@
 
 __common_krypt_cookieauth_src = [ 'internal.h' ]
 
-foreach lib: [ 'protocol' ]
+foreach lib: [ ]
 
   __common_krypt_cookieauth_src += [ '@0@.cc'.format (lib) ]
   __common_krypt_cookieauth_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'challenge', 'client', 'cookie', 'server', 'response' ]
+foreach lib: [ 'challenge', 'client', 'cookie', 'server', 'protocol', 'response' ]
 
   __common_krypt_cookieauth_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-__common_krypt_cookieauth_fwds = []
-
-foreach lib: [ 'protocol' ]
-
-  __common_krypt_cookieauth_fwds += [ '@0@.vapi'.format (lib) ]
-  __common_krypt_cookieauth_src += [ '@0@.vapi'.format (lib) ]
-endforeach
-
 __common_krypt_cookieauth_deps = [ gcrypt_dep,
                                    __common_hex_dep,
-                                   __common_krypt_gcrypt_dep.as_link_whole () ]
+                                   __common_krypt_gcrypt_dep,
+                                   __common_krypt_gcrypt_vapi_dep, ]
 
 __common_krypt_cookieauth_lib = static_library ('wakit-common-krypt-cookieauth',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Krypt.CookieAuth"', '-DG_LOG_USE_STRUCTURED=1',
@@ -52,5 +45,4 @@ __common_krypt_cookieauth_lib = static_library ('wakit-common-krypt-cookieauth',
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
 __common_krypt_cookieauth_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  link_with: __common_krypt_cookieauth_lib,
-  sources: __common_krypt_cookieauth_fwds)
+  link_with: __common_krypt_cookieauth_lib)

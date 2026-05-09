@@ -14,25 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
-#include <gcrypt.h>
-#include <glib-object.h>
 
-typedef struct gcry_cipher_handle WakitKryptGCryptCipher;
+namespace Wakit.Krypt.GCrypt
+{
 
-G_BEGIN_DECLS
-
-  WakitKryptGCryptCipher* wakit_krypt_gcrypt_cipher_new (int algo, int mode, int flags, GError** error);
-
-  GQuark wakit_krypt_gcrypt_error_quark (void) G_GNUC_CONST;
-
-  GError* wakit_krypt_gcrypt_error_code_to_error (gcry_error_t code);
-  gchar* wakit_krypt_gcrypt_error_code_to_string (gcry_error_t code);
-
-  static __inline void wakit_krypt_gcrypt_error_propagate (GError** error, gcry_error_t code)
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "enum gcry_cipher_flags", has_type_id = false)]
+  [Flags]
+  public enum CipherFlags
     {
 
-    return g_propagate_error (error, wakit_krypt_gcrypt_error_code_to_error (code));
+      [CCode (cname = "GCRY_CIPHER_SECURE")] SECURE,
+      [CCode (cname = "GCRY_CIPHER_ENABLE_SYNC")] ENABLE_SYNC,
+      [CCode (cname = "GCRY_CIPHER_CBC_CTS")] CBC_CTS,
+      [CCode (cname = "GCRY_CIPHER_CBC_MAC")] CBC_MAC,
+      [CCode (cname = "GCRY_CIPHER_EXTENDED")] EXTENDED,
     }
-
-G_END_DECLS
+}

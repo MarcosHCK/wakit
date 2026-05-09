@@ -25,17 +25,17 @@ foreach lib: [ 'gcryptapi' ]
   __common_krypt_gcrypt_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'dummy' ]
+foreach lib: [ 'gcryptapi', 'random' ]
 
   __common_krypt_gcrypt_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-__common_krypt_gcrypt_fwds = []
+__common_krypt_gcrypt_vapis = [ ]
 
-foreach lib: [ 'cipher', 'gcryptapi', 'random' ]
+foreach lib: [ 'checksumalgo', 'cipher', 'cipheralgo', 'cipherflags', 'ciphermode', 'errorcode', 'kdf', 'kdfalgo' ]
 
-  __common_krypt_gcrypt_fwds += [ '@0@.vapi'.format (lib) ]
   __common_krypt_gcrypt_src += [ '@0@.vapi'.format (lib) ]
+  __common_krypt_gcrypt_vapis += [ '@0@.vapi'.format (lib) ]
 endforeach
 
 __common_krypt_gcrypt_deps = [ gcrypt_dep ]
@@ -52,5 +52,7 @@ __common_krypt_gcrypt_lib = static_library ('wakit-common-krypt-gcrypt',
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
 __common_krypt_gcrypt_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  link_with: __common_krypt_gcrypt_lib,
-  sources: __common_krypt_gcrypt_fwds)
+  link_with: __common_krypt_gcrypt_lib)
+
+__common_krypt_gcrypt_vapi_dep = declare_dependency (dependencies: __common_krypt_gcrypt_dep,
+  sources: __common_krypt_gcrypt_vapis)

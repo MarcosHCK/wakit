@@ -14,25 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
-#include <gcrypt.h>
-#include <glib-object.h>
 
-typedef struct gcry_cipher_handle WakitKryptGCryptCipher;
+namespace Wakit.Krypt.GCrypt
+{
 
-G_BEGIN_DECLS
-
-  WakitKryptGCryptCipher* wakit_krypt_gcrypt_cipher_new (int algo, int mode, int flags, GError** error);
-
-  GQuark wakit_krypt_gcrypt_error_quark (void) G_GNUC_CONST;
-
-  GError* wakit_krypt_gcrypt_error_code_to_error (gcry_error_t code);
-  gchar* wakit_krypt_gcrypt_error_code_to_string (gcry_error_t code);
-
-  static __inline void wakit_krypt_gcrypt_error_propagate (GError** error, gcry_error_t code)
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "gcry_random_level_t", has_type_id = false)]
+  public extern enum RandomnessLevel
     {
 
-    return g_propagate_error (error, wakit_krypt_gcrypt_error_code_to_error (code));
+      [CCode (cname = "GCRY_WEAK_RANDOM")] WEAK,
+      [CCode (cname = "GCRY_STRONG_RANDOM")] STRONG,
+      [CCode (cname = "GCRY_VERY_STRONG_RANDOM")] VERY_STRONG,
     }
 
-G_END_DECLS
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "gcry_randomize")]
+  public extern static void randomize ([CCode (array_length_pos = 1.1, array_length_type = "size_t", type = "void*")] uint8[] buffer, RandomnessLevel level);
+}

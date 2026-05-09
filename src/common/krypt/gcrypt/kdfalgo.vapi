@@ -18,15 +18,18 @@
 namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "gcry_random_level_t", has_type_id = false)]
-  public enum RandomnessLevel
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "enum gcry_kdf_algos", has_type_id = false)]
+  public enum KdfAlgo
     {
 
-      [CCode (cname = "GCRY_WEAK_RANDOM")] WEAK,
-      [CCode (cname = "GCRY_STRONG_RANDOM")] STRONG,
-      [CCode (cname = "GCRY_VERY_STRONG_RANDOM")] VERY_STRONG,
+      [CCode (cname = "GCRY_KDF_NONE")] NONE,
+      [CCode (cname = "GCRY_KDF_SIMPLE_S2K")] SIMPLE_S2K,
+      [CCode (cname = "GCRY_KDF_SALTED_S2K")] SALTED_S2K,
+      [CCode (cname = "GCRY_KDF_ITERSALTED_S2K")] ITERSALTED_S2K,
+      [CCode (cname = "GCRY_KDF_PBKDF1")] PBKDF1,
+      [CCode (cname = "GCRY_KDF_PBKDF2")] PBKDF2,
+      [CCode (cname = "GCRY_KDF_SCRYPT")] SCRYPT,
+      [CCode (cname = "GCRY_KDF_ARGON2")] ARGON2,
+      [CCode (cname = "GCRY_KDF_BALLOON")] BALLOON,
     }
-
-  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "gcry_randomize")]
-  public static void randomize ([CCode (array_length_pos = 1.1, array_length_type = "size_t", type = "void*")] uint8[] buffer, RandomnessLevel level);
 }

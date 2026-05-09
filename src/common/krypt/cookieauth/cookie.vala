@@ -19,12 +19,6 @@ using Wakit.Krypt.GCrypt;
 namespace Wakit.Krypt.CookieAuth
 {
 
-  [CCode (cheader_filename = "common/krypt/cookieauth/protocol.h")]
-  internal extern const uint BIT_LENGTH;
-
-  [CCode (cheader_filename = "common/krypt/cookieauth/protocol.h")]
-  internal extern const uint BYTE_LENGTH;
-
   [Compact (opaque = true)] public class Cookie
     {
 

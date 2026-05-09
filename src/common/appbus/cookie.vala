@@ -18,30 +18,22 @@
 namespace Wakit.AppBus
 {
 
-  [Compact (opaque = true)] public class Cookie
+  [Compact (opaque = true)] public class Cookie: Wakit.Krypt.CookieAuth.Cookie
     {
-
-      private Wakit.Krypt.CookieAuth.Cookie _cookie;
 
       public Cookie ()
         {
-          _cookie = new Wakit.Krypt.CookieAuth.Cookie ();
+          base ();
         }
 
       public Cookie.random ()
         {
-          _cookie = new Wakit.Krypt.CookieAuth.Cookie.random ();
+          base.random ();
         }
 
       public Cookie.from_string (string cookie) throws GLib.Error
         {
-          _cookie = new Wakit.Krypt.CookieAuth.Cookie.from_string (cookie);
-        }
-
-      public string to_string ()
-        {
-
-        return _cookie.to_string ();
+          base.from_string (cookie);
         }
     }
 }

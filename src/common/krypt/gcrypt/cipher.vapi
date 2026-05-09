@@ -23,6 +23,11 @@ namespace Wakit.Krypt.GCrypt
   public class Cipher
     {
 
+      [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h")]
+      public Cipher ([CCode (type = "int")] CipherAlgo algo,
+                     [CCode (type = "int")] CipherMode mode,
+                     [CCode (type = "int")] CipherFlags flags) throws GCrypt.Error;
+
       public bool decrypt (uint8[] @out, uint8[] @in) throws GCrypt.Error
           requires (@in.length == @out.length)
         {
@@ -30,7 +35,7 @@ namespace Wakit.Krypt.GCrypt
           ErrorCode code;
 
           if (GLib.unlikely (0 != (code = _decrypt (@out, @in))))
-            throw Error.from_code (code);
+            throw code.to_error ();
 
         return true;
         }
@@ -42,14 +47,45 @@ namespace Wakit.Krypt.GCrypt
           ErrorCode code;
 
           if (GLib.unlikely (0 != (code = _encrypt (@out, @in))))
-            throw Error.from_code (code);
+            throw code.to_error ();
+
+        return true;
+        }
+
+      public bool setiv (uint8[] iv) throws GCrypt.Error
+        {
+
+          ErrorCode code;
+
+          if (GLib.unlikely (0 != (code = _setiv (iv))))
+            throw code.to_error ();
+
+        return true;
+        }
+
+      public bool setkey (uint8[] key) throws GCrypt.Error
+        {
+
+          ErrorCode code;
+
+          if (GLib.unlikely (0 != (code = _setkey (key))))
+            throw code.to_error ();
 
         return true;
         }
 
       [CCode (cname = "gcry_cipher_decrypt")]
-      private ErrorCode _decrypt ([CCode (array_length_pos = 1.1, array_length_type = "size_t")] uint8[] @out, [CCode (array_length_pos = 2.1, array_length_type = "size_t")] uint8[] @in);
+      private ErrorCode _decrypt ([CCode (array_length_pos = 1.1, array_length_type = "size_t", type = "void*")] uint8[] @out,
+                                  [CCode (array_length_pos = 2.1, array_length_type = "size_t", type = "const void*")] uint8[] @in);
+
       [CCode (cname = "gcry_cipher_encrypt")]
-      private ErrorCode _encrypt ([CCode (array_length_pos = 1.1, array_length_type = "size_t")] uint8[] @out, [CCode (array_length_pos = 2.1, array_length_type = "size_t")] uint8[] @in);
+      private ErrorCode _encrypt ([CCode (array_length_pos = 1.1, array_length_type = "size_t", type = "void*")] uint8[] @out,
+                                  [CCode (array_length_pos = 2.1, array_length_type = "size_t", type = "const void*")] uint8[] @in);
+
+      [CCode (cname = "gcry_cipher_setiv")]
+      private ErrorCode _setiv ([CCode (array_length_pos = 1.1, array_length_type = "size_t", type = "const void*")] uint8[] iv);
+
+      [CCode (cname = "gcry_cipher_setkey")]
+      private ErrorCode _setkey ([CCode (array_length_pos = 1.1, array_length_type = "size_t", type = "const void*")] uint8[] key);
     }
 }

@@ -17,4 +17,11 @@
 
 namespace Wakit.Krypt.GCrypt
 {
+
+  public errordomain Error
+    {
+
+      FAILED;
+      public extern static GLib.Quark quark ();
+    }
 }

@@ -30,10 +30,8 @@ int main (int argc, char* argv[])
     {
 
       freeable master_key = wakit_krypt_cookie_auth_cookie_to_string (provider.get_cookie ());
-      auto tmperr = (GError*) nullptr;
 
-      g_object_unref (wakit_krypt_cookie_auth_client_new (*master_key, NULL, &tmperr));
-      g_assert_no_error (tmperr);
+      g_object_unref (wakit_krypt_cookie_auth_client_new (*master_key, NULL));
     });
 
 return g_test_run ();
