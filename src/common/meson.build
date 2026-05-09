@@ -18,6 +18,7 @@
 # level 1
 subdir ('asynchelp')
 subdir ('enum')
+subdir ('hex')
 
 # level 2
 subdir ('krypt')
@@ -54,6 +55,7 @@ endforeach
 __common_deps = [ __common_appbus_dep.as_link_whole (),
                   __common_asynchelp_dep.as_link_whole (),
                   __common_enum_dep.as_link_whole (),
+                  __common_hex_dep.as_link_whole (),
                   __common_krypt_dep.as_link_whole (), ]
 
 if gio_unix_dep.found ()

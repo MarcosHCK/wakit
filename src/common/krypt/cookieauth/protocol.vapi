@@ -19,24 +19,23 @@ using Wakit.Krypt.GCrypt;
 namespace Wakit.Krypt.CookieAuth
 {
 
-  public sealed class Client: ProtocolComponent
+  [CCode (cheader_filename = "common/krypt/cookieauth/internal.h")]
+  const uint CHALLENGE_BYTE_LENGTH;
+
+  [CCode (cheader_filename = "common/krypt/cookieauth/internal.h")]
+  const uint CIPHER_IV_BYTE_LENGTH;
+
+  [CCode (cheader_filename = "common/krypt/cookieauth/protocol.h")]
+  public abstract class ProtocolComponent: GLib.Object
     {
 
-      public Client (string master_key, string? auth_scope = null) throws GLib.Error
-        {
-          Object (auth_scope: auth_scope ?? "", master_key: master_key);
-        }
+      public string auth_scope { [NoAccessorMethod] get; construct; }
+      public string master_key { [NoAccessorMethod] get; construct; }
 
-      public Response respond_challenge (Challenge challenge) throws GCrypt.Error
-        {
+      [CCode (has_construct_function = false)]
+      protected ProtocolComponent ();
 
-          var response = new Response ();
-          randomize (response.iv, RandomnessLevel.STRONG);
-
-          Cipher cph = open_session_cipher (challenge.counter, response.iv);
-          cph.encrypt (response.bytes, challenge.bytes);
-
-        return response;
-        }
+      [CCode (cheader_filename = "common/krypt/cookieauth/internal.h")]
+      internal Cipher open_session_cipher (uint64 counter, uint8 iv [CIPHER_IV_BYTE_LENGTH]) throws GCrypt.Error;
     }
 }

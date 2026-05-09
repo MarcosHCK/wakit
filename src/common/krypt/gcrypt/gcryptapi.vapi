@@ -18,6 +18,16 @@
 namespace Wakit.Krypt.GCrypt
 {
 
+  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h")]
+  public errordomain Error
+    {
+
+      FAILED;
+
+      public static Error from_code (ErrorCode code);
+      public static extern GLib.Quark quark ();
+    }
+
   [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "gcry_error_t")]
   [SimpleType]
   [IntegerType (rank = 7)]

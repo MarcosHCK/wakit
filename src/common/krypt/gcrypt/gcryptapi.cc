@@ -17,6 +17,8 @@
 #include <config.h>
 #include <common/krypt/gcrypt/gcryptapi.h>
 
+G_DEFINE_QUARK (wakit-krypt-gcrypt-error-quark, wakit_krypt_gcrypt_error);
+
 G_LOCK_DEFINE_STATIC (gcry_strerror);
 
 gchar* wakit_krypt_gcrypt_error_code_to_string (gcry_error_t code)
@@ -27,4 +29,15 @@ gchar* wakit_krypt_gcrypt_error_code_to_string (gcry_error_t code)
                                                gcry_strsource (code));
 
 return (G_UNLOCK (gcry_strerror), message);
+}
+
+GError* wakit_krypt_gcrypt_error_from_code (gcry_error_t code)
+{
+
+  G_LOCK (gcry_strerror);
+
+  GError* error = g_error_new (WAKIT_KRYPT_GCRYPT_ERROR, (int) code, "%s / %s", gcry_strerror (code),
+                                                                                gcry_strsource (code));
+
+return (G_UNLOCK (gcry_strerror), error);
 }

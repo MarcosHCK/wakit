@@ -15,42 +15,33 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-gcrypt_dep = cc.find_library ('libgcrypt', required: true)
+gobject_dep = dependency ('gobject-2.0', required: true)
 
-__common_krypt_gcrypt_src = [ ]
+__common_hex_src = [ ]
 
-foreach lib: [ 'gcryptapi' ]
+foreach lib: [ ]
 
-  __common_krypt_gcrypt_src += [ '@0@.cc'.format (lib) ]
-  __common_krypt_gcrypt_src += [ '@0@.h'.format (lib) ]
+  __common_hex_src += [ '@0@.cc'.format (lib) ]
+  __common_hex_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'dummy' ]
+foreach lib: [ 'hex' ]
 
-  __common_krypt_gcrypt_src += [ '@0@.vala'.format (lib) ]
+  __common_hex_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-__common_krypt_gcrypt_fwds = []
+__common_hex_deps = [ ]
 
-foreach lib: [ 'cipher', 'gcryptapi', 'random' ]
-
-  __common_krypt_gcrypt_fwds += [ '@0@.vapi'.format (lib) ]
-  __common_krypt_gcrypt_src += [ '@0@.vapi'.format (lib) ]
-endforeach
-
-__common_krypt_gcrypt_deps = [ gcrypt_dep ]
-
-__common_krypt_gcrypt_lib = static_library ('wakit-common-krypt-gcrypt',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Krypt.GCrypt"', '-DG_LOG_USE_STRUCTURED=1',
+__common_hex_lib = static_library ('wakit-common-hex',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Hex"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Krypt.GCrypt"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Hex"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_dep, gio_dep, __common_krypt_gcrypt_deps ],
-  sources: __common_krypt_gcrypt_src,
+  dependencies: [ config_dep, gobject_dep ],
+  sources: __common_hex_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__common_krypt_gcrypt_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  link_with: __common_krypt_gcrypt_lib,
-  sources: __common_krypt_gcrypt_fwds,)
+__common_hex_dep = declare_dependency (dependencies: [ config_dep, gobject_dep ],
+  link_with: __common_hex_lib)

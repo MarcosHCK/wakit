@@ -26,18 +26,15 @@ namespace Wakit.Krypt.CookieAuth
 
       uint _refs = 1;
 
-      private uint8 _bytes [CHALLENGE_LENGTH];
+      private uint8 _bytes [CHALLENGE_BYTE_LENGTH];
       private uint64 _counter = 0;
 
-      public Challenge ()
-        {
-        }
+      public uint8[] bytes { get { return _bytes; } }
+      public uint64 counter { get { return _counter; } }
 
-      public Challenge.random (uint64 counter)
+      public Challenge (uint64 counter)
         {
-
           _counter = counter;
-          randomize (_bytes, RandomnessLevel.WEAK);
         }
 
       public extern void free () requires (null == @ref)

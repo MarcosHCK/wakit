@@ -19,8 +19,6 @@ using Wakit.Krypt.GCrypt;
 namespace Wakit.Krypt.CookieAuth
 {
 
-  public const uint IV_LENGTH = 12;
-
   [Compact (opaque = true), CCode (ref_function = "wakit_krypt_cookie_auth_response_ref",
                                    unref_function = "wakit_krypt_cookie_auth_response_unref")]
   public class Response
@@ -28,8 +26,11 @@ namespace Wakit.Krypt.CookieAuth
 
       uint _refs = 1;
 
-      private uint8 _bytes [CHALLENGE_LENGTH];
-      private uint8 _iv [IV_LENGTH];
+      private uint8 _bytes [CHALLENGE_BYTE_LENGTH];
+      private uint8 _iv [CIPHER_IV_BYTE_LENGTH];
+
+      public uint8[] bytes { get { return _bytes; } }
+      public uint8[] iv { get { return _iv; } }
 
       public Response ()
         {

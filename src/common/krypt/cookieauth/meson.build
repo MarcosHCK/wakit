@@ -15,20 +15,21 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__common_krypt_cookieauth_src = [ ]
+__common_krypt_cookieauth_src = [ 'internal.h', 'protocol.vapi' ]
 
-foreach lib: [ ]
+foreach lib: [ 'protocol' ]
 
   __common_krypt_cookieauth_src += [ '@0@.cc'.format (lib) ]
   __common_krypt_cookieauth_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'challenge', 'client', 'protocol', 'response', 'server' ]
+foreach lib: [ 'challenge', 'client', 'server', 'response' ]
 
   __common_krypt_cookieauth_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
 __common_krypt_cookieauth_deps = [ gcrypt_dep,
+                                   __common_hex_dep,
                                    __common_krypt_gcrypt_dep.as_link_whole () ]
 
 __common_krypt_cookieauth_lib = static_library ('wakit-common-krypt-cookieauth',
@@ -43,4 +44,5 @@ __common_krypt_cookieauth_lib = static_library ('wakit-common-krypt-cookieauth',
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
 __common_krypt_cookieauth_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  link_with: __common_krypt_cookieauth_lib)
+  link_with: __common_krypt_cookieauth_lib,
+  sources: 'protocol.vapi')

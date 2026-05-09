@@ -19,32 +19,35 @@ using Wakit.Krypt.GCrypt;
 namespace Wakit.Krypt.CookieAuth
 {
 
-  public sealed class Server: ProtocolComponent, GLib.Initable
+  public sealed class Server: ProtocolComponent
     {
 
       internal uint64 _counter = 0;
 
-      public Server (GLib.Cancellable? cancellable = null) throws GLib.Error
+      public Server (string master_key, string? auth_scope = null)
         {
-          Object ();
-          init (cancellable);
+
+          Object (auth_scope: auth_scope ?? "", master_key: master_key);
         }
 
-      public bool init (GLib.Cancellable? cancellable) throws GLib.Error
+      public bool check_challenge (Challenge challenge, Response response) throws GCrypt.Error
         {
 
-          const PrimeGeneratorFlags flags = PrimeGeneratorFlags.SECRET;
-          const RandomnessLevel level = RandomnessLevel.VERY_STRONG;
-          const uint nbits = MASTER_KEY_LENGTH << 3;
+          uint8 res [CHALLENGE_BYTE_LENGTH];
+          Cipher cph = open_session_cipher (challenge.counter, response.iv);
 
-          master_key = Scalar.random_prime (nbits, 0, null, null, level, flags).to_string ();
-        return true;
+          cph.decrypt (res, response.bytes);
+
+        return 0 == GLib.Memory.cmp (res, challenge.bytes, CHALLENGE_BYTE_LENGTH);
         }
 
       public Challenge next_challenge ()
         {
 
-        return new Challenge.random (++_counter);
+          var challenge = new Challenge (++_counter);
+          randomize (challenge.bytes, RandomnessLevel.WEAK);
+
+        return challenge;
         }
     }
 }

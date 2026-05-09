@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-using Wakit.Krypt.GCrypt;
 
 namespace Wakit.Krypt.Cookie
 {
@@ -25,7 +24,15 @@ namespace Wakit.Krypt.Cookie
   public static void generate (uint8 buffer [BYTE_LENGTH])
     {
 
-      unowned RandomnessLevel level = RandomnessLevel.VERY_STRONG;
-      randomize (buffer, level);
+      var checksum = new GLib.Checksum (GLib.ChecksumType.SHA256);
+      var length = (size_t) buffer.length;
+
+      for (int i = 0; i < GLib.Random.int_range (10, 20); ++i)
+        {
+          double d = GLib.Random.next_double ();
+          checksum.update ((uchar[]) &d, sizeof (double));
+        }
+
+      checksum.get_digest (buffer, ref length);
     }
 }

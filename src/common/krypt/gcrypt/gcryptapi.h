@@ -18,8 +18,26 @@
 #include <gcrypt.h>
 #include <glib-object.h>
 
+typedef enum
+{
+  WAKIT_KRYPT_GCRYPT_ERROR_FAILED,
+} WakitKryptGCryptError;
+
+#define WAKIT_KRYPT_GCRYPT_ERROR (wakit_krypt_gcrypt_error_quark ())
+
+typedef struct gcry_cipher_handle WakitKryptGCryptCipher;
+
 G_BEGIN_DECLS
 
-  G_GNUC_INTERNAL gchar* wakit_krypt_gcrypt_error_code_to_string (gcry_error_t code);
+  gchar* wakit_krypt_gcrypt_error_code_to_string (gcry_error_t code);
+
+  GQuark wakit_krypt_gcrypt_error_quark (void) G_GNUC_CONST;
+  GError* wakit_krypt_gcrypt_error_from_code (gcry_error_t error);
+
+  static __inline void wakit_krypt_gcrypt_error_propagate (GError** _error, gcry_error_t error)
+    {
+
+    return g_propagate_error (_error, wakit_krypt_gcrypt_error_from_code (error));
+    }
 
 G_END_DECLS

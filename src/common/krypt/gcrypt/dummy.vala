@@ -17,18 +17,4 @@
 
 namespace Wakit.Krypt.GCrypt
 {
-
-  public errordomain Error
-    {
-
-      FAILED;
-
-      public static Error from_code (ErrorCode code)
-        {
-
-        return (Error) new GLib.Error.literal (quark (), (int) code, code.to_string ());
-        }
-
-      public static extern GLib.Quark quark ();
-    }
 }
