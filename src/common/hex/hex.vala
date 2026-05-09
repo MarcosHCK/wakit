@@ -20,13 +20,13 @@ namespace Wakit.Hex
 
   const string CHARSET = "0123456789abcdef";
 
-  public static void from_string (string cookie, uint8[] buffer) throws GLib.Error
+  public static void from_string (string hex_string, uint8[] buffer) throws GLib.Error
     {
 
-      if (unlikely (0 < (cookie.length & 1)))
+      if (unlikely (0 < (hex_string.length & 1)))
         throw new GLib.NumberParserError.INVALID ("invalid hex string");
 
-      uint length = cookie.length >> 1;
+      uint length = hex_string.length >> 1;
 
       if (unlikely (length != buffer.length))
         throw new GLib.NumberParserError.INVALID ("invalid hex buffer");
@@ -38,19 +38,19 @@ namespace Wakit.Hex
           char c;
           bool t;
 
-          if ((t = ((c = cookie [j + 0]) >= '0' && '9' >= c)) || (c >= 'a' && 'f' >= c))
+          if ((t = ((c = hex_string [j + 0]) >= '0' && '9' >= c)) || (c >= 'a' && 'f' >= c))
 
             b |= t ? c - '0' : (c - 'a' + 10);
           else
-            throw new GLib.NumberParserError.INVALID ("invalid cookie value");
+            throw new GLib.NumberParserError.INVALID ("invalid hex string char");
 
           b <<= 4;
 
-          if ((t = ((c = cookie [j + 1]) >= '0' && '9' >= c)) || (c >= 'a' && 'f' >= c))
+          if ((t = ((c = hex_string [j + 1]) >= '0' && '9' >= c)) || (c >= 'a' && 'f' >= c))
 
             b |= t ? c - '0' : (c - 'a' + 10);
           else
-            throw new GLib.NumberParserError.INVALID ("invalid cookie value");
+            throw new GLib.NumberParserError.INVALID ("invalid hex string char");
 
           buffer [i] = b;
         }

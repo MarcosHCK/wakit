@@ -14,25 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#include <config.h>
+#include <common/boxing.h>
+#include <tests/common/krypt/cookieauth/providers.h>
+#include <tests/testing.h>
+using namespace boxing;
+using namespace testing;
 
-namespace Wakit.Krypt.Cookie
+int main (int argc, char* argv[])
 {
 
-  public const uint BIT_LENGTH = 256;
-  public const uint BYTE_LENGTH = BIT_LENGTH >> 3;
+  g_test_init (&argc, &argv, NULL);
 
-  public static void generate (uint8 buffer [BYTE_LENGTH])
+  g_test_add_<key_provider> (TESTPATHROOT "/new", [](const key_provider& provider)
     {
 
-      var checksum = new GLib.Checksum (GLib.ChecksumType.SHA256);
-      var length = (size_t) buffer.length;
+      freeable master_key = wakit_krypt_cookie_auth_cookie_to_string (provider.get_cookie ());
+      auto tmperr = (GError*) nullptr;
 
-      for (int i = 0; i < GLib.Random.int_range (10, 20); ++i)
-        {
-          double d = GLib.Random.next_double ();
-          checksum.update ((uchar[]) &d, sizeof (double));
-        }
+      g_object_unref (wakit_krypt_cookie_auth_client_new (*master_key, NULL, &tmperr));
+      g_assert_no_error (tmperr);
+    });
 
-      checksum.get_digest (buffer, ref length);
-    }
+return g_test_run ();
 }

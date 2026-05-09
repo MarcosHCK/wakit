@@ -53,4 +53,4 @@ __common_krypt_gcrypt_lib = static_library ('wakit-common-krypt-gcrypt',
 
 __common_krypt_gcrypt_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
   link_with: __common_krypt_gcrypt_lib,
-  sources: __common_krypt_gcrypt_fwds,)
+  sources: __common_krypt_gcrypt_fwds)

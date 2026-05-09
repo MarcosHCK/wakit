@@ -56,7 +56,7 @@ namespace boxing
   static void _free_with_delete (T* object) noexcept { delete object; }
 
   template<typename T>
-  using freeable = destructible_box<T, details::_g_free<T>>;
+  class freeable;
 
   using string = freeable<gchar>;
 
@@ -162,4 +162,16 @@ public:
       destructible_box<T, _free_func>::operator= ((T*) _copy_func (*o));
     return *this;
     }
+};
+
+template<typename T>
+class boxing::freeable: public destructible_box<T, details::_g_free<T>>
+{
+public:
+
+  inline freeable () noexcept: destructible_box<T, details::_g_free<T>> ()
+    { }
+
+  inline freeable (T* value) noexcept: destructible_box<T, details::_g_free<T>> (value)
+    { }
 };

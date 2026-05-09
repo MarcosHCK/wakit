@@ -142,7 +142,7 @@ static inline void _make_session_key (WakitKryptCookieAuthProtocolComponentPriva
                           WAKIT_KRYPT_COOKIE_AUTH_BYTE_LENGTH,
                           buffer);
 
-  if (g_free (salt); G_UNLIKELY (0 != error))
+  if (g_free (salt); G_UNLIKELY (0 != code))
     return wakit_krypt_gcrypt_error_propagate (error, code);
 }
 
@@ -161,10 +161,10 @@ WakitKryptGCryptCipher* wakit_krypt_cookie_auth_protocol_component_open_session_
   constexpr auto cipher_mode = WAKIT_KRYPT_COOKIE_AUTH_CIPHER_MODE;
   constexpr auto flags = GCRY_CIPHER_SECURE;
 
-  if (gcry_error_t code = gcry_cipher_open (&cph, cipher_algo, cipher_mode, flags); 0 != code)
+  if (gcry_error_t code = gcry_cipher_open (&cph, cipher_algo, cipher_mode, flags); G_UNLIKELY (0 != code))
     return (wakit_krypt_gcrypt_error_propagate (error, code), nullptr);
 
-  if (gcry_error_t code = gcry_cipher_setiv (cph, iv, WAKIT_KRYPT_COOKIE_AUTH_CIPHER_IV_BYTE_LENGTH); 0 != code)
+  if (gcry_error_t code = gcry_cipher_setiv (cph, iv, WAKIT_KRYPT_COOKIE_AUTH_CIPHER_IV_BYTE_LENGTH); G_UNLIKELY (0 != code))
     { gcry_cipher_close (cph);
       return (wakit_krypt_gcrypt_error_propagate (error, code), nullptr); }
 
@@ -174,7 +174,7 @@ WakitKryptGCryptCipher* wakit_krypt_cookie_auth_protocol_component_open_session_
     { gcry_cipher_close (cph);
       return (g_propagate_error (error, tmperr), nullptr); }
 
-  if (gcry_error_t code = gcry_cipher_setkey (cph, session_key, WAKIT_KRYPT_COOKIE_AUTH_BYTE_LENGTH); 0 != code)
+  if (gcry_error_t code = gcry_cipher_setkey (cph, session_key, WAKIT_KRYPT_COOKIE_AUTH_BYTE_LENGTH); G_UNLIKELY (0 != code))
     { gcry_cipher_close (cph);
       return (wakit_krypt_gcrypt_error_propagate (error, code), nullptr); }
 

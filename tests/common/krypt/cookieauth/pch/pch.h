@@ -15,33 +15,5 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.AppBus
-{
-
-  [Compact (opaque = true)] public class Cookie
-    {
-
-      private Wakit.Krypt.CookieAuth.Cookie _cookie;
-
-      public Cookie ()
-        {
-          _cookie = new Wakit.Krypt.CookieAuth.Cookie ();
-        }
-
-      public Cookie.random ()
-        {
-          _cookie = new Wakit.Krypt.CookieAuth.Cookie.random ();
-        }
-
-      public Cookie.from_string (string cookie) throws GLib.Error
-        {
-          _cookie = new Wakit.Krypt.CookieAuth.Cookie.from_string (cookie);
-        }
-
-      public string to_string ()
-        {
-
-        return _cookie.to_string ();
-        }
-    }
-}
+#include "../providers.h"
+#include <tests/testing.h>

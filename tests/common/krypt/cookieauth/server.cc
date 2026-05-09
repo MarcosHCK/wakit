@@ -1,0 +1,50 @@
+/* Copyright (C) 2025-2026 MarcosHCK
+ * This file is part of wakit.
+ *
+ * wakit is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * wakit is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+#include <config.h>
+#include <common/boxing.h>
+#include <tests/common/krypt/cookieauth/providers.h>
+#include <tests/testing.h>
+using namespace boxing;
+using namespace testing;
+
+int main (int argc, char* argv[])
+{
+
+  g_test_init (&argc, &argv, NULL);
+
+  g_test_add_<key_provider> (TESTPATHROOT "/new", [](const key_provider& provider)
+    {
+
+      freeable master_key = wakit_krypt_cookie_auth_cookie_to_string (provider.get_cookie ());
+      auto tmperr = (GError*) nullptr;
+
+      g_object_unref (wakit_krypt_cookie_auth_server_new (*master_key, NULL));
+      g_assert_no_error (tmperr);
+    });
+
+  g_test_add_<key_provider> (TESTPATHROOT "/next_challenge", [](const key_provider& provider)
+    {
+
+      freeable master_key = wakit_krypt_cookie_auth_cookie_to_string (provider.get_cookie ());
+      auto tmperr = (GError*) nullptr;
+
+      g_object_unref (wakit_krypt_cookie_auth_server_new (*master_key, NULL));
+      g_assert_no_error (tmperr);
+    });
+
+return g_test_run ();
+}

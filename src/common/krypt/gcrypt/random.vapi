@@ -28,5 +28,5 @@ namespace Wakit.Krypt.GCrypt
     }
 
   [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "gcry_randomize")]
-  public void randomize ([CCode (array_length_pos = 1.1, array_length_type = "size_t", type = "void*")] uint8[] buffer, RandomnessLevel level);
+  public static void randomize ([CCode (array_length_pos = 1.1, array_length_type = "size_t", type = "void*")] uint8[] buffer, RandomnessLevel level);
 }

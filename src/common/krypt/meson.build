@@ -29,7 +29,7 @@ foreach lib: [ ]
   __common_krypt_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'cookie' ]
+foreach lib: [ 'dummy' ]
 
   __common_krypt_src += [ '@0@.vala'.format (lib) ]
 endforeach
@@ -37,6 +37,9 @@ endforeach
 __common_krypt_deps = [ gcrypt_dep,
                         __common_krypt_cookieauth_dep.as_link_whole (),
                         __common_krypt_gcrypt_dep.as_link_whole (), ]
+
+__common_krypt_fwds = [ __common_krypt_cookieauth_dep,
+                        __common_krypt_gcrypt_dep, ]
 
 __common_krypt_lib = static_library ('wakit-common-krypt',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Krypt"', '-DG_LOG_USE_STRUCTURED=1',
@@ -49,5 +52,5 @@ __common_krypt_lib = static_library ('wakit-common-krypt',
   sources: __common_krypt_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__common_krypt_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
+__common_krypt_dep = declare_dependency (dependencies: [ config_dep, gio_dep, __common_krypt_fwds ],
   link_with: __common_krypt_lib)

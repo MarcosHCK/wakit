@@ -14,34 +14,44 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+using Wakit.Krypt.GCrypt;
 
-namespace Wakit.AppBus
+namespace Wakit.Krypt.CookieAuth
 {
+
+  [CCode (cheader_filename = "common/krypt/cookieauth/protocol.h")]
+  internal extern const uint BIT_LENGTH;
+
+  [CCode (cheader_filename = "common/krypt/cookieauth/protocol.h")]
+  internal extern const uint BYTE_LENGTH;
 
   [Compact (opaque = true)] public class Cookie
     {
 
-      private Wakit.Krypt.CookieAuth.Cookie _cookie;
+      private uint8 _data [BYTE_LENGTH];
 
       public Cookie ()
         {
-          _cookie = new Wakit.Krypt.CookieAuth.Cookie ();
-        }
-
-      public Cookie.random ()
-        {
-          _cookie = new Wakit.Krypt.CookieAuth.Cookie.random ();
         }
 
       public Cookie.from_string (string cookie) throws GLib.Error
         {
-          _cookie = new Wakit.Krypt.CookieAuth.Cookie.from_string (cookie);
+
+          this ();
+          Hex.from_string (cookie, _data);
+        }
+
+      public Cookie.random ()
+        {
+
+          this ();
+          randomize (_data, RandomnessLevel.VERY_STRONG);
         }
 
       public string to_string ()
         {
 
-        return _cookie.to_string ();
+        return Hex.to_string (_data);
         }
     }
 }

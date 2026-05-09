@@ -30,6 +30,7 @@ namespace Wakit.Krypt.CookieAuth
       public Response respond_challenge (Challenge challenge) throws GCrypt.Error
         {
 
+
           var response = new Response ();
           randomize (response.iv, RandomnessLevel.STRONG);
 
