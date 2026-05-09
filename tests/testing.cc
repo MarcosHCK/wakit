@@ -17,11 +17,11 @@
 #include <config.h>
 #include <algorithm>
 #include <cmath>
+#include <common/bits.h>
 #include <cstddef>
 #include <gio/gio.h>
 #include <iterator>
 #include <numeric>
-#include <tests/bits.h>
 #include <tests/testing.h>
 #include <utility>
 using namespace testing;

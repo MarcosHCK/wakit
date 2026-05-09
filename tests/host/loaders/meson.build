@@ -27,7 +27,6 @@ test ((testpath + '/alias').replace ('/', '.'),
                     [ '-DTESTPATHROOT="@0@"'.format (testpathroot / testpath / 'alias') ],
             cpp_args: c_args +
                       [ '-DTESTPATHROOT="@0@"'.format (testpathroot / testpath / 'alias') ],
-            cpp_pch: 'pch/pch.h',
             build_by_default: false,
             dependencies: [ config_dep, __host_interfaces_dep, __host_loaders_dep, __testing_dep ],
             sources: 'alias.cc'),

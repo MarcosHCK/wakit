@@ -20,7 +20,7 @@ testpathroot = '/org/hck/wakit'
 
 glib_dep = dependency ('glib-2.0', required: true)
 
-__testing_src = [ 'bits.h' ]
+__testing_src = [ ]
 
 foreach lib: [ 'testing' ]
 

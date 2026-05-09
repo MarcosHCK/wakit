@@ -18,11 +18,15 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <common/bits.h>
 #include <cstddef>
 #include <exception>
 #include <functional>
-#include <glib.h>
+#include <gio/gio.h>
+#include <glib-object.h>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>

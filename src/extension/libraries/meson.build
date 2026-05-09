@@ -59,7 +59,6 @@ __extension_libraries_lib = static_library ('wakit-extension-libraries',
   cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Extension.Libraries"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_pch: 'pch/pch.h',
   dependencies: [ config_vala_dep, webkitext_dep, __extension_libraries_deps ],
   sources: __extension_libraries_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
