@@ -91,7 +91,7 @@ namespace Wakit
           if (null != _bus_cookie)
             cookie = new AppBus.Cookie.from_string (_bus_cookie);
 
-          _appbus = yield AppBus.connect_client (_bus_address, 1200, cookie);
+          _appbus = yield AppBus.connect_client (_bus_address, cookie, 1200);
         }
 
       private void init_complete (GLib.Object? o, GLib.AsyncResult result)

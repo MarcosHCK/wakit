@@ -25,6 +25,7 @@ namespace Wakit.Busmaster
       private GLib.OptionContext _context;
 
       private Bus.Server? _bus_server = null;
+      private AppBus.AuthenticationServer _auth_server = null;
       private AppBus.Cookie? _cookie = null;
       private GLib.MainLoop _main_loop = null;
       private bool _nofork = false;
@@ -133,7 +134,11 @@ namespace Wakit.Busmaster
           Configuration configuration = _json_gobject_deserialize<Configuration> (parser.get_root ());
 
           if (false == configuration.disable_client_cookie)
-            _cookie = new AppBus.Cookie.random ();
+            {
+
+              _cookie = new AppBus.Cookie.random ();
+              _auth_server = new AppBus.AuthenticationServer (_cookie);
+            }
 
           _timeout = configuration.timeout;
 
@@ -152,7 +157,11 @@ namespace Wakit.Busmaster
       private bool on_incoming (GLib.IOStream stream)
         {
 
-          AppBus.connect_server.begin (stream, _bus_server.guid, _timeout, _cookie, null, on_incoming_complete);
+          unowned var auth_server = _auth_server;
+          unowned var guid = _bus_server.guid;
+          unowned var timeout = _timeout;
+
+          AppBus.connect_server.begin (stream, guid, auth_server, timeout, null, on_incoming_complete);
         return true;
         }
 

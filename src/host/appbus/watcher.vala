@@ -80,7 +80,7 @@ namespace Wakit.AppBus
           var cookie = extract_cookie (address);
 
           _address = (owned) address;
-          _connection = yield Wakit.AppBus.connect_client (_address, 0, cookie, cancellable);
+          _connection = yield Wakit.AppBus.connect_client (_address, cookie, 0, cancellable);
           _cookie = (owned) cookie;
 
         return true;

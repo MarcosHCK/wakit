@@ -32,7 +32,11 @@ namespace Wakit.Krypt.CookieAuth
       public uint8[] bytes { get { return _bytes; } }
       public uint64 counter { get { return _counter; } }
 
-      public Challenge (uint64 counter)
+      public Challenge ()
+        {
+        }
+
+      public Challenge.next (uint64 counter)
         {
           _counter = counter;
         }
@@ -44,7 +48,7 @@ namespace Wakit.Krypt.CookieAuth
         {
 
           size_t bytes;
-          uint8[] counter = (uint8[]) &_counter;
+          unowned uint8[] counter = (uint8[]) &_counter;
 
           counter.length = (int) sizeof (uint64);
           yield stream.read_all_async (_bytes, io_priority, cancellable, out bytes);
@@ -70,7 +74,7 @@ namespace Wakit.Krypt.CookieAuth
         {
 
           size_t bytes;
-          uint8[] counter = (uint8[]) &_counter;
+          unowned uint8[] counter = (uint8[]) &_counter;
 
           counter.length = (int) sizeof (uint64);
           yield stream.write_all_async (_bytes, io_priority, cancellable, out bytes);

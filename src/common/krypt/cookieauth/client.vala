@@ -22,7 +22,7 @@ namespace Wakit.Krypt.CookieAuth
   public sealed class Client: ProtocolComponent
     {
 
-      public Client (string master_key, string? auth_scope = null) throws GLib.Error
+      public Client (string master_key, string? auth_scope = null)
         {
           Object (auth_scope: auth_scope ?? "", master_key: master_key);
         }

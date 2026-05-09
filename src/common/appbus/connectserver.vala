@@ -20,31 +20,46 @@ namespace Wakit.AppBus
 
   const uint8 FINE [] = { 'F', 'I', 'N', 'E', '\n' };
 
-  static async void authenticate_server (GLib.IOStream stream, Cookie cookie, GLib.Cancellable? cancellable = null) throws GLib.Error
+  public sealed class AuthenticationServer: GLib.Object
     {
 
-      var _cookie = cookie.to_string ();
-      var _istream = stream.get_input_stream ();
-      var _ostream = stream.get_output_stream ();
+      private Krypt.CookieAuth.Server _auth_server;
 
-      var buffer = new uint8 [_cookie.length + 1];
-      size_t bytes;
+      public AuthenticationServer (Cookie cookie)
+        {
 
-      yield _istream.read_all_async (buffer, GLib.Priority.DEFAULT, cancellable, out bytes);
+          Object ();
+          _auth_server = new Krypt.CookieAuth.Server (cookie.to_string (), "dbus-authentication");
+        }
 
-      if (0 != GLib.Memory.cmp (buffer, _cookie.data, buffer.length - 1) || '\n' != buffer [buffer.length - 1])
-        throw new GLib.DBusError.AUTH_FAILED ("invalid authentication cookie");
+      public async bool authenticate (GLib.IOStream stream, GLib.Cancellable? cancellable = null) throws GLib.Error
+        {
 
-      yield _ostream.write_all_async (FINE, GLib.Priority.DEFAULT, cancellable, out bytes);
+          var _istream = stream.get_input_stream ();
+          var _ostream = stream.get_output_stream ();
+
+          Krypt.CookieAuth.Challenge challenge = _auth_server.next_challenge ();
+          yield challenge.write (_ostream, GLib.Priority.DEFAULT, cancellable);
+
+          Krypt.CookieAuth.Response response = new Krypt.CookieAuth.Response ();
+          yield response.read (_istream, GLib.Priority.DEFAULT, cancellable);
+
+          if (! _auth_server.check_challenge (challenge, response))
+            throw new GLib.DBusError.AUTH_FAILED ("invalid authentication cookie");
+
+          yield _ostream.write_all_async (FINE, GLib.Priority.DEFAULT, cancellable, null);
+
+        return true;
+        }
     }
 
-  public static async GLib.DBusConnection connect_server (GLib.IOStream stream, string guid, uint timeout = 0, Cookie? cookie = null, GLib.Cancellable? cancellable = null) throws GLib.Error
+  public static async GLib.DBusConnection connect_server (GLib.IOStream stream, string guid, AuthenticationServer? auth_server, uint timeout = 0, GLib.Cancellable? cancellable = null) throws GLib.Error
     {
 
       var _cancellable = new TimeoutCancellable (timeout, cancellable);
 
-      if (null != cookie)
-        yield authenticate_server (stream, cookie, _cancellable);
+      if (null != auth_server)
+        yield auth_server.authenticate (stream, _cancellable);
 
       const GLib.DBusConnectionFlags flag1 = GLib.DBusConnectionFlags.AUTHENTICATION_SERVER;
       const GLib.DBusConnectionFlags flag2 = GLib.DBusConnectionFlags.DELAY_MESSAGE_PROCESSING;

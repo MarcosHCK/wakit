@@ -18,27 +18,44 @@
 namespace Wakit.AppBus
 {
 
-  static async void authenticate_client (GLib.IOStream stream, Cookie cookie, GLib.Cancellable? cancellable = null) throws GLib.Error
+  public sealed class AuthenticationClient: GLib.Object
     {
 
-      var _cookie = "%s\n".printf (cookie.to_string ());
-      var _istream = stream.get_input_stream ();
-      var _ostream = stream.get_output_stream ();
+      private Krypt.CookieAuth.Client _auth_client;
 
-      uint8 answer [5];
-      size_t bytes;
+      public AuthenticationClient (Cookie cookie)
+        {
 
-      /* F**k vala */
-      assert (answer.length == FINE.length);
+          Object ();
+          _auth_client = new Krypt.CookieAuth.Client (cookie.to_string (), "dbus-authentication");
+        }
 
-      yield _ostream.write_all_async (_cookie.data, GLib.Priority.DEFAULT, cancellable, out bytes);
-      yield _istream.read_all_async (answer, GLib.Priority.DEFAULT, cancellable, out bytes);
+      public async bool authenticate (GLib.IOStream stream, GLib.Cancellable? cancellable = null) throws GLib.Error
+        {
 
-      if (unlikely (0 != GLib.Memory.cmp (answer, FINE, answer.length)))
-        throw new GLib.DBusError.AUTH_FAILED ("server refused connection");
+          var _istream = stream.get_input_stream ();
+          var _ostream = stream.get_output_stream ();
+
+          Krypt.CookieAuth.Challenge challenge = new Krypt.CookieAuth.Challenge ();
+          yield challenge.read (_istream, GLib.Priority.DEFAULT, cancellable);
+
+          Krypt.CookieAuth.Response response = _auth_client.respond_challenge (challenge);
+          yield response.write (_ostream, GLib.Priority.DEFAULT, cancellable);
+
+          uint8 answer [5];
+          /* F**k vala */
+          assert (answer.length == FINE.length);
+
+          yield _istream.read_all_async (answer, GLib.Priority.DEFAULT, cancellable, null);
+
+          if (unlikely (0 != GLib.Memory.cmp (answer, FINE, answer.length)))
+            throw new GLib.DBusError.AUTH_FAILED ("server refused connection");
+
+        return true;
+        }
     }
 
-  public static async GLib.DBusConnection connect_client (string address, uint timeout = 0, Cookie? cookie = null, GLib.Cancellable? cancellable = null) throws GLib.Error
+  public async GLib.DBusConnection connect_client (string address, Cookie? cookie = null, uint timeout = 0, GLib.Cancellable? cancellable = null) throws GLib.Error
     {
 
       string? guid = null;
@@ -47,7 +64,11 @@ namespace Wakit.AppBus
       var _cancellable = new TimeoutCancellable (timeout, cancellable);
 
       if (null != cookie)
-        yield authenticate_client (stream, cookie, _cancellable);
+        {
+
+          var auth_client = new AuthenticationClient (cookie);
+          yield auth_client.authenticate (stream, _cancellable);
+        }
 
       guid = null;
 

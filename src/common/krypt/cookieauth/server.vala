@@ -44,7 +44,7 @@ namespace Wakit.Krypt.CookieAuth
       public Challenge next_challenge ()
         {
 
-          var challenge = new Challenge (++_counter);
+          var challenge = new Challenge.next (++_counter);
           randomize (challenge.bytes, RandomnessLevel.WEAK);
 
         return challenge;
