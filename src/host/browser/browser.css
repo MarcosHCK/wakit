@@ -19,8 +19,3 @@
 {
   -webkit-user-select: none;
 }
-
-*[data-wakit-drag-area]:where([data-wakit-drag-area-active])
-{
-  cursor: grabbing;
-}
