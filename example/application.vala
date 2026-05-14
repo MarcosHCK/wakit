@@ -69,8 +69,8 @@ namespace Wakit.Example
                   unowned string domain = error.domain.to_string ();
                   unowned string message = error.message.to_string ();
 
-                  printerr ("Wakit.Bundle.Bundle.from_file ()!: %s: %u: %s", domain, code, message);
-                  return -1;
+                  printerr ("Wakit.Bundle.Bundle.from_file ()!: %s: %u: %s\n", domain, code, message);
+                  return 1;
                 }
             }
 
@@ -91,8 +91,8 @@ namespace Wakit.Example
           if (unlikely (null == loader))
             {
 
-              printerr ("please specify one of --bundle or --tree");
-              return -1;
+              printerr ("please specify one of --bundle or --tree\n");
+              return 1;
             }
 
           try
