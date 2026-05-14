@@ -95,8 +95,6 @@ namespace Wakit.Browser
                                                                             WebKit.UserContentInjectedFrames.ALL_FRAMES,
                                                                             WebKit.UserStyleLevel.USER,
                                                                             allow_list, null));
-
-          _config = null;
         }
 
       public Wakit.IWebView create_view ()

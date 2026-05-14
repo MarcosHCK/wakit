@@ -19,8 +19,8 @@
 -->
 <gresources>
 
-  <gresource prefix="/org/hck/wakit/host/gtk">
+  <gresource prefix="/org/hck/wakit/host_simple/gtk">
 
-    <file preprocess="xml-stripblanks">message.ui</file>
+    <file preprocess="xml-stripblanks">window.ui</file>
   </gresource>
 </gresources>

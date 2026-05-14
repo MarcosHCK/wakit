@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE gresources PUBLIC "-//GNOME//DTD GResource Specification 1.0//EN" "/usr/share/glib-2.0/dtds/gresource.dtd">
-<!--
- * Copyright (C) 2025-2026 MarcosHCK
+/* Copyright (C) 2025-2026 MarcosHCK
  * This file is part of wakit.
  *
  * wakit is free software: you can redistribute it and/or modify
@@ -16,11 +13,19 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
--->
-<gresources>
+ */
+#include <config.h>
+#include <common/commandline.h>
 
-  <gresource prefix="/org/hck/wakit/host/gtk">
+gchar** wakit_command_line_ensure_argv (int* argc, char*** argv)
+{
+#if !defined(G_OS_WIN32)
 
-    <file preprocess="xml-stripblanks">message.ui</file>
-  </gresource>
-</gresources>
+return NULL;
+#else // defined(G_OS_WIN32)
+  gchar** new_argv = g_win32_get_command_line ();
+  gint new_argc = g_strv_length (new_argv);
+
+return (*argc = new_argc, *argv = new_argv, new_argv);
+#endif // defined(G_OS_WIN32)
+}

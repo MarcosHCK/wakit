@@ -26,7 +26,7 @@ namespace Wakit.Gui
       YES = 1,
     }
 
-  [GtkTemplate (ui = "/org/hck/wakit/gtk/message.ui")] public class Message: Gtk.Window
+  [GtkTemplate (ui = "/org/hck/wakit/host/gtk/message.ui")] public class Message: Gtk.Window
     {
 
       [GtkChild] private unowned Gtk.Grid? grid1 = null;

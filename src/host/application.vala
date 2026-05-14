@@ -29,7 +29,7 @@ namespace Wakit
 
       public IAppBus appbus { get { return _appbus_bus; } }
       public IBrowser browser { get { return _browser_browser; } }
-      public BrowserConfig? browser_config { construct; }
+      public BrowserConfig? browser_config { get; construct; }
       public IExtensionHost extension_host { get { return _browser_extension_host; } }
       public bool ready { get; private set; default = false; }
 

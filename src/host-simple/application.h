@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE gresources PUBLIC "-//GNOME//DTD GResource Specification 1.0//EN" "/usr/share/glib-2.0/dtds/gresource.dtd">
-<!--
- * Copyright (C) 2025-2026 MarcosHCK
+/* Copyright (C) 2025-2026 MarcosHCK
  * This file is part of wakit.
  *
  * wakit is free software: you can redistribute it and/or modify
@@ -16,11 +13,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
--->
-<gresources>
+ */
+#pragma once
+#include <glib-object.h>
 
-  <gresource prefix="/org/hck/wakit/host/gtk">
+typedef struct _WakitSimpleApplicationClass WakitSimpleApplicationClass;
 
-    <file preprocess="xml-stripblanks">message.ui</file>
-  </gresource>
-</gresources>
+G_BEGIN_DECLS
+
+  G_GNUC_INTERNAL void wakit_simple_application_class_extend (WakitSimpleApplicationClass* klass);
+
+G_END_DECLS

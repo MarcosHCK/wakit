@@ -29,9 +29,11 @@ subdir ('appbus')
 gio_unix_dep = dependency ('gio-unix-2.0', required: false)
 gio_win32_dep = dependency ('gio-win32-2.0', required: false)
 
+json_dep = dependency ('json-glib-1.0', required: true)
+
 __common_src = [ 'bits.h', 'boxing.h', 'constmap.h', 'constpairs.h', 'mixin.h', 'slice.h', 'value.h' ]
 
-foreach lib: [ ]
+foreach lib: [ 'commandline' ]
 
   __common_src += [ '@0@.cc'.format (lib) ]
   __common_src += [ '@0@.h'.format (lib) ]
@@ -47,7 +49,7 @@ foreach lib: [ 'guest', 'host' ]
   __common_src += [ 'extensiondata@0@.vala'.format (lib) ]
 endforeach
 
-foreach lib: [ 'collection', 'collectioniter', 'resource', 'standardfiles', 'variant' ]
+foreach lib: [ 'collection', 'collectioniter', 'commandline', 'resource', 'standardfiles', 'variant' ]
 
   __common_src += [ '@0@.vala'.format (lib) ]
 endforeach
@@ -58,17 +60,19 @@ __common_deps = [ __common_appbus_dep.as_link_whole (),
                   __common_hex_dep.as_link_whole (),
                   __common_krypt_dep.as_link_whole (), ]
 
+__common_fwds = [ __common_appbus_dep,
+                  __common_asynchelp_dep,
+                  __common_enum_dep, ]
+
 if gio_unix_dep.found ()
   __common_deps += [ gio_unix_dep ]
+  __common_fwds += [ gio_unix_dep ]
 endif
 
 if gio_win32_dep.found ()
   __common_deps += [ gio_win32_dep ]
+  __common_fwds += [ gio_win32_dep ]
 endif
-
-__common_fwds = [ __common_appbus_dep,
-                  __common_asynchelp_dep,
-                  __common_enum_dep, ]
 
 __common_lib = library ('wakit-common',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Common"', '-DG_LOG_USE_STRUCTURED=1',

@@ -31,3 +31,6 @@ subdir ('common')
 subdir ('busmaster')
 subdir ('extension')
 subdir ('host')
+
+# level 3
+subdir ('host-simple')

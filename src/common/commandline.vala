@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE gresources PUBLIC "-//GNOME//DTD GResource Specification 1.0//EN" "/usr/share/glib-2.0/dtds/gresource.dtd">
-<!--
- * Copyright (C) 2025-2026 MarcosHCK
+/* Copyright (C) 2025-2026 MarcosHCK
  * This file is part of wakit.
  *
  * wakit is free software: you can redistribute it and/or modify
@@ -16,11 +13,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
--->
-<gresources>
+ */
 
-  <gresource prefix="/org/hck/wakit/host/gtk">
+namespace Wakit.CommandLine
+{
 
-    <file preprocess="xml-stripblanks">message.ui</file>
-  </gresource>
-</gresources>
+  [CCode (array_length = false)]
+  public extern static string[] ensure_argv ([CCode (array_length_cname = "argc", array_length_pos = 0.9, array_length_type = "int")] ref string[] argv);
+}

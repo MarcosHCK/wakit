@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE gresources PUBLIC "-//GNOME//DTD GResource Specification 1.0//EN" "/usr/share/glib-2.0/dtds/gresource.dtd">
-<!--
- * Copyright (C) 2025-2026 MarcosHCK
+/* Copyright (C) 2025-2026 MarcosHCK
  * This file is part of wakit.
  *
  * wakit is free software: you can redistribute it and/or modify
@@ -16,11 +13,23 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
--->
-<gresources>
+ */
 
-  <gresource prefix="/org/hck/wakit/host/gtk">
+namespace Wakit.Simple.Configuration
+{
 
-    <file preprocess="xml-stripblanks">message.ui</file>
-  </gresource>
-</gresources>
+  public class Config: BrowserConfig
+    {
+
+      public bool decorated { get; construct; default = false; }
+      public string? default_route { get; construct; default = null; }
+      public GenericArray<Scheme> schemes { get; construct; }
+
+      public override void constructed ()
+        {
+
+          base.constructed ();
+          _schemes = _schemes ?? new GenericArray<Scheme> ();
+        }
+    }
+}

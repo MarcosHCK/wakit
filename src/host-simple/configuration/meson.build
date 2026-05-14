@@ -15,36 +15,25 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__busmaster_transport_src = [ ]
+__host_simple_configuration_src = [ ]
 
-foreach bit: [ ]
+foreach bit: [ 'capture', 'config', 'scheme', 'schemealias', 'schemealiases' ]
 
-  __busmaster_transport_src += [ '@0@.cc'.format (bit) ]
-  __busmaster_transport_src += [ '@0@.h'.format (bit) ]
+  __host_simple_configuration_src += [ '@0@.vala'.format (bit) ]
 endforeach
 
-foreach bit: [ 'server' ]
+__host_simple_configuration_deps = [ __common_dep, __host_dep ]
 
-  __busmaster_transport_src += [ '@0@.vala'.format (bit) ]
-endforeach
-
-if not gio_unix_dep.found ()
-
-  __busmaster_transport_src += [ 'unixsocket.vapi' ]
-endif
-
-__busmaster_transport_deps = [ __common_dep ]
-
-__busmaster_transport_lib = static_library ('wakit-busmaster-transport',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.BusMaster.Transport"', '-DG_LOG_USE_STRUCTURED=1',
+__host_simple_configuration_lib = static_library ('wakit-host-simple-configuration',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.Configuration"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.BusMaster.Transport"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.Configuration"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_dep, gio_dep, __busmaster_transport_deps ],
-  sources: __busmaster_transport_src,
+  dependencies: [ config_vala_dep, json_dep, __host_simple_configuration_deps ],
+  sources: __host_simple_configuration_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__busmaster_transport_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
-  link_with: __busmaster_transport_lib)
+__host_simple_configuration_dep = declare_dependency (dependencies: [ config_dep, json_dep, __common_dep, __host_dep ],
+  link_with: __host_simple_configuration_lib)
