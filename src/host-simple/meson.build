@@ -56,7 +56,9 @@ __host_simple_lib = library ('wakit-host-simple',
 __host_simple_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __common_dep, __host_simple_fwds ],
   link_with: __host_simple_lib)
 
-executable ('wakit-host-simple-app',
+meson.override_dependency ('wakit-host-simple', __host_simple_dep)
+
+__host_simple_bin = executable ('wakit-host-simple-app',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.App"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
@@ -67,4 +69,23 @@ executable ('wakit-host-simple-app',
   sources: 'main.cc',
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-meson.override_dependency ('wakit-host-simple', __host_simple_dep)
+__host_simple_runner_cfg = configuration_data ()
+
+__host_simple_runner_cfg.set ('host_simple_bin_path', __host_simple_bin.full_path ())
+
+foreach tuple: [ [ __common_lib, 'common_lib_path' ],
+                 [ __extension_lib, 'extension_lib_path' ],
+                 [ __extension_mod, 'extension_mod_path' ],
+                 [ __host_lib, 'host_lib_path' ],
+                 [ __host_simple_lib, 'host_simple_lib_path' ] ]
+
+  path = tuple.get (0).full_path ()
+  list = path.split ('/')
+
+  path = path.replace (list.get (list.length () - 1), '')
+
+  __host_simple_runner_cfg.set (tuple.get (1), path)
+
+endforeach
+
+configure_file (configuration: __host_simple_runner_cfg, input: 'runner.sh.in', output: 'runner.sh')

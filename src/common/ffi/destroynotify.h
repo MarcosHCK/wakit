@@ -20,6 +20,7 @@
 G_BEGIN_DECLS
 
   GDestroyNotify wakit_ffi_destroy_notify_for_boxed (GType g_type) G_GNUC_CONST;
+  gboolean wakit_ffi_destroy_notify_type_is_primitive (GType g_type) G_GNUC_CONST;
   GDestroyNotify wakit_ffi_destroy_notify_using_value_table (GType g_type, GTypeValueTable* table) G_GNUC_CONST;
 
   static __inline GDestroyNotify wakit_ffi_destroy_notify_for_type (GType g_type)
@@ -40,11 +41,15 @@ G_BEGIN_DECLS
       else if (g_type_is_a (g_type, G_TYPE_VARIANT))
         return (GDestroyNotify) g_variant_unref;
 
+      else if (wakit_ffi_destroy_notify_type_is_primitive (g_type))
+        return (GDestroyNotify) NULL;
+
       else if (auto table = g_type_value_table_peek (g_type))
         return wakit_ffi_destroy_notify_using_value_table (g_type, table);
 
       else
-        g_error ("could not guess destroy function for type %s", g_type_name (g_type));
+        g_critical ("could not guess destroy function for type %s", g_type_name (g_type));
+        return (GDestroyNotify) NULL;
     }
 
 G_END_DECLS

@@ -18,13 +18,59 @@
 namespace Wakit.Simple.Configuration
 {
 
-  public abstract class SchemeAlias: GLib.Object
+  [Compact (opaque = false),
+   CCode (cheader_filename = "host-simple/configuration/schemealias.h")]
+  public extern class SchemeAbsoluteAlias
     {
+
+      public string path;
+      public string replacement;
+
+      internal extern void free ();
     }
 
-  public abstract class SchemeAliasWithReplacement: SchemeAlias
+  [Compact (opaque = false)]
+  [CCode (cheader_filename = "host-simple/configuration/schemealias.h",
+          ref_function = "wakit_simple_configuration_scheme_alias_ref",
+          unref_function = "wakit_simple_configuration_scheme_alias_unref",
+          type_id = "WAKIT_SIMPLE_CONFIGURATION_TYPE_SCHEME_ALIAS")]
+  public extern class SchemeAlias
     {
 
-      public string replacement { get; construct; }
+      public SchemeAliasType type;
+      private extern SchemeAlias (SchemeAliasType type);
+
+      internal extern void free () requires (null != SchemeAbsoluteAlias.free)
+                                   requires (null != SchemeRegexAlias.free)
+                                   requires (null != SchemeVerbatimAlias.free);
+    }
+
+  [CCode (cheader_filename = "host-simple/configuration/schemealias.h")]
+  public extern enum SchemeAliasType
+    {
+      ABSOLUTE,
+      INVALID,
+      REGEX,
+      VERBATIM;
+      public extern static GLib.Type get_type ();
+    }
+
+  [Compact (opaque = false),
+   CCode (cheader_filename = "host-simple/configuration/schemealias.h")]
+  public extern class SchemeRegexAlias
+    {
+
+      public string pattern;
+      public string replacement;
+
+      internal extern void free ();
+    }
+
+  [Compact (opaque = false),
+   CCode (cheader_filename = "host-simple/configuration/schemealias.h")]
+  public extern class SchemeVerbatimAlias
+    {
+
+      internal extern void free ();
     }
 }

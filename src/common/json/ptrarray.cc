@@ -15,16 +15,18 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
+#include <common/boxing.h>
 #include <common/ffi/destroynotify.h>
 #include <common/ffi/function.h>
 #include <common/genericmap.h>
 #include <common/json/takepointer.h>
 #include <common/json/wakit-common-json.h>
 #include <json-glib/json-glib.h>
-#include <vector>
 
-std::vector<ffi::function<GPtrArray*, JsonNode*>> _ptr_array_deserializers;
-std::vector<ffi::function<JsonNode*, GPtrArray*>> _ptr_array_serializers;
+boxing::destructible_box<GPtrArray, g_ptr_array_unref> _ptr_array_deserializers (
+        g_ptr_array_new_full (0, g_slice_free_<ffi::function<GPtrArray*, JsonNode*>>));
+boxing::destructible_box<GPtrArray, g_ptr_array_unref> _ptr_array_serializers (
+        g_ptr_array_new_full (0, g_slice_free_<ffi::function<JsonNode*, GPtrArray*>>));
 generic_map::generic_map<1> _ptr_array_types;
 
 [[gnu::always_inline]]
@@ -51,8 +53,8 @@ return result;
 static std::function<GPtrArray* (JsonNode*)> deserialize_func (GType a_type)
 {
 
-  auto take = json::take_pointer_for_type (a_type);
   auto notify = wakit_ffi_destroy_notify_for_type (a_type);
+  auto take = json::take_pointer_for_type (a_type);
 
 return [=](JsonNode* node) { return deserialize (node, a_type, take, notify); };
 }
@@ -65,7 +67,8 @@ static GType ensure (GType a_type) noexcept
   auto type = g_boxed_type_register_static (name, (GBoxedCopyFunc) g_ptr_array_ref,
                                                   (GBoxedFreeFunc) g_ptr_array_unref);
 
-  auto deserialize = _ptr_array_deserializers.emplace_back (deserialize_func (a_type)).get_codeloc ();
+  auto deserializer = g_slice_new_<ffi::function<GPtrArray*, JsonNode*>> (deserialize_func (a_type));
+  auto deserialize = (g_ptr_array_add (*_ptr_array_deserializers, (gpointer) deserializer), deserializer->get_codeloc ());
 
   json_boxed_register_deserialize_func (type, JSON_NODE_ARRAY, (JsonBoxedDeserializeFunc) deserialize);
 
@@ -75,7 +78,7 @@ return type;
 GType wakit_json_generic_ptr_array_get_type (GType g_type)
 {
 
-  g_return_val_if_fail (g_type_is_a (g_type, G_TYPE_BOXED) || g_type_is_a (g_type, G_TYPE_OBJECT), G_TYPE_INVALID);
+  g_return_val_if_fail (json::take_pointer_would_work_for_type (g_type), G_TYPE_INVALID);
 
 return _ptr_array_types.ensure_type (ensure, g_type);
 }

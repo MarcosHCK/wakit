@@ -18,21 +18,16 @@
 namespace Wakit.Simple.Configuration
 {
 
-  public class Config: BrowserConfig
+  [CCode (cheader_filename = "glib.h,common/json/wakit-common-json.h",
+          cname = "GPtrArray",
+          type_id = "(wakit_json_generic_ptr_array_get_type (WAKIT_SIMPLE_CONFIGURATION_TYPE_SCHEME_ALIAS))"),
+   Compact (opaque = true)]
+  public class SchemeAliasArray: GenericArray<SchemeAlias>
     {
 
-      public bool decorated { get; construct; default = false; }
-      public string? default_route { get; construct; default = null; }
-      public string? extensions_dir { get; construct; default = null; }
-      public SchemeArray schemes { get; construct; }
-      public StringArray secure_schemes { get; construct; }
-
-      public override void constructed ()
+      public SchemeAliasArray () requires (null != SchemeAlias.free)
         {
-
-          base.constructed ();
-          _schemes = _schemes ?? new SchemeArray ();
-          _secure_schemes = _secure_schemes ?? new StringArray ();
+          base ();
         }
     }
 }

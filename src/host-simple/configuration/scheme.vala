@@ -21,7 +21,7 @@ namespace Wakit.Simple.Configuration
   public sealed class Scheme: GLib.Object
     {
 
-      // public GenericArray<SchemeAlias> aliases { get; construct; }
+      public SchemeAliasArray aliases { get; construct; }
       public string? bundle { get; construct; default = null; }
       public bool local { get; construct; default = true; }
       public string name { get; construct; }
@@ -32,7 +32,7 @@ namespace Wakit.Simple.Configuration
         {
 
           base.constructed ();
-          // _aliases = _aliases ?? new GenericArray<SchemeAlias> ();
+          _aliases = _aliases ?? new SchemeAliasArray ();
         }
     }
 }

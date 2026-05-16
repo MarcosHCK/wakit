@@ -46,4 +46,11 @@ static inline void pmain (int argc, char* argv[], GError** error)
 
   if (G_UNLIKELY (NULL != tmperr))
     return (g_propagate_error (error, tmperr), g_strfreev (args));
+
+  auto application = wakit_simple_application_new (config);
+
+  g_object_unref (config);
+  g_application_run ((GApplication*) application, argc, argv);
+
+return (g_object_unref (application), g_strfreev (args));
 }

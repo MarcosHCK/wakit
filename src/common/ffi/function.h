@@ -16,6 +16,7 @@
  */
 #pragma once
 #include <common/ffi/functioncfi.h>
+#include <ffi.h>
 #include <functional>
 #include <type_traits>
 
@@ -77,22 +78,22 @@ namespace ffi
         {
 
           if (nullptr != _closure)
-            ffi_closure_free (_closure);
+            _closure = (ffi_closure_free (_closure), nullptr);
         }
 
       function () = delete;
       function (const function&) = delete;
 
-      inline function (function&& o) noexcept (std::is_nothrow_move_constructible_v<function_type>):
-          _codeloc (o._codeloc),
-          _closure (o._closure),
-          _function_cif (std::move (o._function_cif)),
-          _target (std::move (o._target))
-        { o._codeloc = NULL; o._closure = NULL; }
+      inline function (function&& o): function (std::move (o._target), o._function_cif.get_cif ()->abi)
+        {
+
+          if (nullptr != o._closure)
+            o._closure = (ffi_closure_free (o._closure), nullptr);
+        }
 
       template<typename Fn>
         requires (std::is_invocable_r_v<R, Fn, Args ...>)
-      inline function (Fn&& callable): _function_cif (), _target (std::move (callable))
+      inline function (Fn&& callable, ffi_abi abi = FFI_DEFAULT_ABI): _function_cif (abi), _target (std::move (callable))
         {
 
           if (G_UNLIKELY (NULL == (_closure = (ffi_closure*) ffi_closure_alloc (sizeof (ffi_closure), (void**) &_codeloc))))

@@ -22,8 +22,14 @@ namespace json
 
   typedef gpointer (*TakePointerFunc) (GType, JsonNode*);
 
-  gpointer take_pointer_for_boxed (GType g_type, JsonNode* node) noexcept;
-  gpointer take_pointer_for_object (GType g_type, JsonNode* node) noexcept;
+  static gpointer take_pointer_for_string (GType g_type, JsonNode* node) noexcept
+    {
+
+      const gchar* str;
+
+      return !JSON_NODE_HOLDS_VALUE (node) || NULL == (str = json_node_get_string (node))
+        ? nullptr : g_strdup (str);
+    }
 
   static inline constexpr TakePointerFunc take_pointer_for_type (GType g_type) noexcept
     {
@@ -34,7 +40,18 @@ namespace json
       else if (g_type_is_a (g_type, G_TYPE_OBJECT))
         return (TakePointerFunc) json_gobject_deserialize;
 
+      else if (g_type_is_a (g_type, G_TYPE_STRING))
+        return (TakePointerFunc) take_pointer_for_string;
+
       else
         g_error ("can not take pointer for type %s", g_type_name (g_type));
+    }
+
+  static inline constexpr bool take_pointer_would_work_for_type (GType g_type) noexcept
+    {
+
+      return g_type_is_a (g_type, G_TYPE_BOXED) ||
+            g_type_is_a (g_type, G_TYPE_OBJECT) ||
+            g_type_is_a (g_type, G_TYPE_STRING);
     }
 }

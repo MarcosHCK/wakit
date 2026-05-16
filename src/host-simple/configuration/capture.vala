@@ -28,11 +28,16 @@ namespace Wakit.Simple.Configuration
         throw new GLib.OptionError.BAD_VALUE ("file is too big");
     }
 
+  public const GLib.OptionEntry CONFIG_ENTRY = { "config", 'c', 0, GLib.OptionArg.FILENAME, null,
+    "Configuration file to use (default: wakit.config.json)", "FILE" };
+
   public static Config capture ([CCode (array_length_cname = "argc", array_length_pos = 0.9)] ref unowned string[] argv) throws GLib.Error
     {
 
       var context = new GLib.OptionContext ();
+      unowned var entries = capture_entries ();
 
+      context.add_main_entries (entries, "en_US");
       context.set_help_enabled (false);
       context.set_ignore_unknown_options (true);
       context.parse (ref argv);
@@ -48,6 +53,18 @@ namespace Wakit.Simple.Configuration
       var json_length = bounded_cast (mapped_file.get_length ());
 
     return _json_gobject_from_data<Config> ((string) config_json, json_length);
+    }
+
+  [CCode (array_null_terminated = true,
+          array_length = false)]
+  public static unowned GLib.OptionEntry[] capture_entries ()
+    {
+
+      const GLib.OptionEntry entries [] = {
+        Wakit.Simple.Configuration.CONFIG_ENTRY,
+        GLib.OptionEntry.NULL,
+      };
+    return entries;
     }
 
   [CCode (cheader_filename = "json-glib/json-glib.h", cname = "json_gobject_from_data", simple_generics = true)]

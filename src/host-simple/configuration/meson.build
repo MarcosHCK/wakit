@@ -17,7 +17,13 @@
 
 __host_simple_configuration_src = [ ]
 
-foreach bit: [ 'capture', 'config', 'scheme', 'schemealias', 'schemealiases', 'schemearray' ]
+foreach bit: [ 'schemealias' ]
+
+  __host_simple_configuration_src += [ '@0@.cc'.format (bit) ]
+  __host_simple_configuration_src += [ '@0@.h'.format (bit) ]
+endforeach
+
+foreach bit: [ 'capture', 'config', 'scheme', 'schemealias', 'schemealiasarray', 'schemearray', 'stringarray' ]
 
   __host_simple_configuration_src += [ '@0@.vala'.format (bit) ]
 endforeach

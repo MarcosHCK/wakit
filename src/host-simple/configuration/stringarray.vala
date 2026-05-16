@@ -18,19 +18,9 @@
 namespace Wakit.Simple.Configuration
 {
 
-  public sealed class SchemeAbsoluteAlias: SchemeAliasWithReplacement
-    {
-
-      public string path { get; construct; }
-    }
-
-  public sealed class SchemeRegexAlias: SchemeAliasWithReplacement
-    {
-
-      public string pattern { get; construct; }
-    }
-
-  public sealed class SchemeVerbatimAlias: SchemeAlias
-    {
-    }
+  [CCode (cheader_filename = "glib.h,common/json/wakit-common-json.h",
+          cname = "GPtrArray",
+          type_id = "(wakit_json_generic_ptr_array_get_type (G_TYPE_STRING))"),
+   Compact (opaque = true)]
+  public class StringArray: GenericArray<string> { }
 }

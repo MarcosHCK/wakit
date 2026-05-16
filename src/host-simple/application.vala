@@ -28,16 +28,27 @@ namespace Wakit.Simple
           class_extend ();
         }
 
+      public Application (Configuration.Config configuration)
+        {
+
+          Object (application_id: configuration.application_id,
+                  browser_config: configuration,
+                           flags: GLib.ApplicationFlags.HANDLES_OPEN);
+        }
+
       public override void activate ()
         {
 
           string route;
+          GLib.File files [1];
 
-          if (null == (route = configuration.default_route))
+          if (null != (route = configuration.default_route))
 
-            open_uri (GLib.File.new_for_uri (route), "default_route");
+            files [0] = GLib.File.new_for_uri (route);
           else
-            open_uri (GLib.File.new_for_uri ("about:blank"), "default_route:not");
+            files [0] = GLib.File.new_for_uri ("about:blank");
+
+          open (files, "default-route");
         }
 
       [CCode (cheader_filename = "host-simple/application.h")]
@@ -57,8 +68,22 @@ namespace Wakit.Simple
             browser.register_uri_scheme_as_secure (scheme);
         }
 
+      public override void constructed ()
+        {
+
+          base.constructed ();
+          unowned var entries = Configuration.capture_entries ();
+
+          add_main_option_entries (entries);
+        }
+
       public override int handle_local_options (GLib.VariantDict options)
         {
+
+          if (null != configuration.extensions_dir)
+            {
+              extension_host.extension_dir = configuration.extensions_dir;
+            }
 
           foreach (unowned var scheme_config in configuration.schemes.data) try
             {
@@ -79,6 +104,11 @@ namespace Wakit.Simple
               return 1;
             }
 
+          foreach (unowned var secure_scheme in configuration.secure_schemes.data)
+            {
+              extension_host.secure_schemes.add (secure_scheme);
+            }
+
         return base.handle_local_options (options);
         }
 
@@ -94,6 +124,7 @@ namespace Wakit.Simple
 
           web_view.bind_window (window);
           web_view.open_uri (file, hint);
+
         return window;
         }
 
@@ -119,36 +150,36 @@ namespace Wakit.Simple
 
           if (null != loader_tree)
             loader = new Loaders.TreeLoader (GLib.File.new_for_path (loader_tree));
-/*
-          foreach (unowned var scheme_alias_config in scheme_config.aliases)
+
+          foreach (unowned var scheme_alias_config in scheme_config.aliases.data)
             {
               var alias = prepare_loader_alias (scheme_alias_config);
               loader.aliases.add (alias);
-            }*/
+            }
         return loader;
         }
 
       static Loaders.Alias prepare_loader_alias (Configuration.SchemeAlias scheme_alias_config) throws GLib.Error
         {
 
-          switch (GLib.Type.from_instance (scheme_alias_config).name ())
+          switch (scheme_alias_config.type)
             {
 
-          case "Wakit.Simple.Configuration.SchemaAbsoluteAlias":
+          case Wakit.Simple.Configuration.SchemeAliasType.ABSOLUTE:
             { unowned var config = (Configuration.SchemeAbsoluteAlias) scheme_alias_config;
               return new Loaders.AbsoluteAlias (config.path, config.replacement); }
 
-          case "Wakit.Simple.Configuration.SchemaRegexAlias":
+          case Wakit.Simple.Configuration.SchemeAliasType.REGEX:
             { unowned var config = (Configuration.SchemeRegexAlias) scheme_alias_config;
               unowned var flags = GLib.RegexCompileFlags.OPTIMIZE;
               var regex = new GLib.Regex (config.pattern, flags, 0);
               return new Loaders.RegexAlias (regex, config.replacement); }
 
-          case "Wakit.Simple.Configuration.SchemaVerbatimAlias":
+          case Wakit.Simple.Configuration.SchemeAliasType.VERBATIM:
             { return new Loaders.VerbatimAlias (); }
 
           default:
-            GLib.error ("unknown object type '%s'", GLib.Type.from_instance (scheme_alias_config).name ());
+            assert_not_reached ();
         } }
     }
 }
