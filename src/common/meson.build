@@ -18,10 +18,12 @@
 # level 1
 subdir ('asynchelp')
 subdir ('enum')
+subdir ('ffi')
 subdir ('hex')
 
 # level 2
 subdir ('krypt')
+subdir ('json')
 
 # level 3
 subdir ('appbus')
@@ -29,9 +31,7 @@ subdir ('appbus')
 gio_unix_dep = dependency ('gio-unix-2.0', required: false)
 gio_win32_dep = dependency ('gio-win32-2.0', required: false)
 
-json_dep = dependency ('json-glib-1.0', required: true)
-
-__common_src = [ 'bits.h', 'boxing.h', 'constmap.h', 'constpairs.h', 'mixin.h', 'slice.h', 'value.h' ]
+__common_src = [ 'bits.h', 'boxing.h', 'constmap.h', 'constpairs.h', 'genericmap.h', 'mixin.h', 'slice.h', 'value.h' ]
 
 foreach lib: [ 'commandline' ]
 
@@ -57,7 +57,9 @@ endforeach
 __common_deps = [ __common_appbus_dep.as_link_whole (),
                   __common_asynchelp_dep.as_link_whole (),
                   __common_enum_dep.as_link_whole (),
+                  __common_ffi_dep.as_link_whole (),
                   __common_hex_dep.as_link_whole (),
+                  __common_json_dep.as_link_whole (),
                   __common_krypt_dep.as_link_whole (), ]
 
 __common_fwds = [ __common_appbus_dep,

@@ -15,25 +15,33 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__host_simple_configuration_src = [ ]
+json_dep = dependency ('json-glib-1.0', required: true)
 
-foreach bit: [ 'capture', 'config', 'scheme', 'schemealias', 'schemealiases', 'schemearray' ]
+__common_json_src = [ 'takepointer.h', 'wakit-common-json.h' ]
 
-  __host_simple_configuration_src += [ '@0@.vala'.format (bit) ]
+foreach bit: [ 'ptrarray' ] 
+
+  __common_json_src += [ '@0@.cc'.format (bit) ]
 endforeach
 
-__host_simple_configuration_deps = [ __common_dep, __host_dep ]
+foreach bit: [ ] 
 
-__host_simple_configuration_lib = static_library ('wakit-host-simple-configuration',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.Configuration"', '-DG_LOG_USE_STRUCTURED=1',
+  __common_json_src += [ '@0@.cc'.format (bit) ]
+  __common_json_src += [ '@0@.h'.format (bit) ]
+endforeach
+
+__common_json_deps = [ __common_ffi_dep ]
+
+__common_json_lib = static_library ('wakit-common-json',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Json"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.Configuration"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Json"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_vala_dep, json_dep, __host_simple_configuration_deps ],
-  sources: __host_simple_configuration_src,
+  dependencies: [ config_dep, json_dep, __common_json_deps ],
+  sources: __common_json_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__host_simple_configuration_dep = declare_dependency (dependencies: [ config_dep, json_dep, __common_dep, __host_dep ],
-  link_with: __host_simple_configuration_lib)
+__common_json_dep = declare_dependency (dependencies: [ config_dep, json_dep ],
+  link_with: __common_json_lib)

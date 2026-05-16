@@ -14,22 +14,5 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
-namespace Wakit.Simple.Configuration
-{
-
-  public class Config: BrowserConfig
-    {
-
-      public bool decorated { get; construct; default = false; }
-      public string? default_route { get; construct; default = null; }
-      public SchemeArray schemes { get; construct; }
-
-      public override void constructed ()
-        {
-
-          base.constructed ();
-          _schemes = _schemes ?? new SchemeArray ();
-        }
-    }
-}
+#include <config.h>
+#include <common/ffi/function.h>

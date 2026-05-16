@@ -60,7 +60,7 @@ namespace Wakit.Simple
       public override int handle_local_options (GLib.VariantDict options)
         {
 
-          foreach (unowned var scheme_config in configuration.schemes) try
+          foreach (unowned var scheme_config in configuration.schemes.data) try
             {
               configure_scheme (scheme_config);
             }
@@ -119,12 +119,12 @@ namespace Wakit.Simple
 
           if (null != loader_tree)
             loader = new Loaders.TreeLoader (GLib.File.new_for_path (loader_tree));
-
+/*
           foreach (unowned var scheme_alias_config in scheme_config.aliases)
             {
               var alias = prepare_loader_alias (scheme_alias_config);
               loader.aliases.add (alias);
-            }
+            }*/
         return loader;
         }
 

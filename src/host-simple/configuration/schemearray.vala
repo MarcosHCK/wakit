@@ -18,18 +18,9 @@
 namespace Wakit.Simple.Configuration
 {
 
-  public class Config: BrowserConfig
-    {
-
-      public bool decorated { get; construct; default = false; }
-      public string? default_route { get; construct; default = null; }
-      public SchemeArray schemes { get; construct; }
-
-      public override void constructed ()
-        {
-
-          base.constructed ();
-          _schemes = _schemes ?? new SchemeArray ();
-        }
-    }
+  [CCode (cheader_filename = "glib.h,common/json/wakit-common-json.h",
+          cname = "GPtrArray",
+          type_id = "(wakit_json_generic_ptr_array_get_type (WAKIT_SIMPLE_CONFIGURATION_TYPE_SCHEME))"),
+   Compact (opaque = true)]
+  public class SchemeArray: GenericArray<Scheme> { }
 }

@@ -15,23 +15,20 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-subdir ('ffi')
-subdir ('krypt')
-
 c_args = [ '-DG_LOG_DOMAIN="Wakit.Tests"', '-DG_LOG_USE_STRUCTURED=1',
            '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()), ]
 
 testpath = meson.current_source_dir ().replace (basepath + '/', '')
 
-test ((testpath + '/boxing').replace ('/', '.'),
-      executable ('boxing',
+test ((testpath + '/function').replace ('/', '.'),
+      executable ('function',
             c_args: c_args +
-                    [ '-DTESTPATHROOT="@0@"'.format (testpathroot / testpath / 'boxing') ],
+                    [ '-DTESTPATHROOT="@0@"'.format (testpathroot / testpath / 'function') ],
             cpp_args: c_args +
-                      [ '-DTESTPATHROOT="@0@"'.format (testpathroot / testpath / 'boxing') ],
+                      [ '-DTESTPATHROOT="@0@"'.format (testpathroot / testpath / 'function') ],
             build_by_default: false,
-            dependencies: [ config_dep, __common_dep, __testing_dep ],
-            sources: 'boxing.cc'),
+            dependencies: [ config_dep, __common_dep, __common_ffi_dep, __testing_dep ],
+            sources:'function.cc'),
       env: [ 'G_TEST_BUILDDIR=@0@'.format (meson.current_build_dir ()),
              'G_TEST_SRCDIR=@0@'.format (meson.current_source_dir ()) ], )

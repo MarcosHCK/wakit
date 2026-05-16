@@ -15,25 +15,34 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__host_simple_configuration_src = [ ]
+ffi_dep = cc.find_library ('libffi', required: true)
+glib_dep = dependency ('glib-2.0', required: true)
 
-foreach bit: [ 'capture', 'config', 'scheme', 'schemealias', 'schemealiases', 'schemearray' ]
+__common_ffi_src = [ 'primitives.h' ]
 
-  __host_simple_configuration_src += [ '@0@.vala'.format (bit) ]
+foreach bit: [ 'cfi', 'cfitype' ] 
+
+  __common_ffi_src += [ 'function@0@.h'.format (bit) ]
 endforeach
 
-__host_simple_configuration_deps = [ __common_dep, __host_dep ]
+foreach bit: [ 'destroynotify', 'function' ] 
 
-__host_simple_configuration_lib = static_library ('wakit-host-simple-configuration',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.Configuration"', '-DG_LOG_USE_STRUCTURED=1',
+  __common_ffi_src += [ '@0@.cc'.format (bit) ]
+  __common_ffi_src += [ '@0@.h'.format (bit) ]
+endforeach
+
+__common_ffi_deps = []
+
+__common_ffi_lib = static_library ('wakit-common-ffi',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.FFI"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.Configuration"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Common.FFI"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_vala_dep, json_dep, __host_simple_configuration_deps ],
-  sources: __host_simple_configuration_src,
+  dependencies: [ config_dep, ffi_dep, glib_dep, __common_ffi_deps ],
+  sources: __common_ffi_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__host_simple_configuration_dep = declare_dependency (dependencies: [ config_dep, json_dep, __common_dep, __host_dep ],
-  link_with: __host_simple_configuration_lib)
+__common_ffi_dep = declare_dependency (dependencies: [ config_dep, ffi_dep ],
+  link_with: __common_ffi_lib)

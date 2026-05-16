@@ -14,22 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+#include <json-glib/json-glib.h>
 
-namespace Wakit.Simple.Configuration
+namespace json
 {
 
-  public class Config: BrowserConfig
+  typedef gpointer (*TakePointerFunc) (GType, JsonNode*);
+
+  gpointer take_pointer_for_boxed (GType g_type, JsonNode* node) noexcept;
+  gpointer take_pointer_for_object (GType g_type, JsonNode* node) noexcept;
+
+  static inline constexpr TakePointerFunc take_pointer_for_type (GType g_type) noexcept
     {
 
-      public bool decorated { get; construct; default = false; }
-      public string? default_route { get; construct; default = null; }
-      public SchemeArray schemes { get; construct; }
+      if (g_type_is_a (g_type, G_TYPE_BOXED))
+        return (TakePointerFunc) json_boxed_deserialize;
 
-      public override void constructed ()
-        {
+      else if (g_type_is_a (g_type, G_TYPE_OBJECT))
+        return (TakePointerFunc) json_gobject_deserialize;
 
-          base.constructed ();
-          _schemes = _schemes ?? new SchemeArray ();
-        }
+      else
+        g_error ("can not take pointer for type %s", g_type_name (g_type));
     }
 }
