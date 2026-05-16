@@ -26,10 +26,6 @@
       <object class="GtkGrid" id="_grid">
 
         <property name="hexpand">True</property>
-        <property name="margin-bottom">5</property>
-        <property name="margin-end">5</property>
-        <property name="margin-start">5</property>
-        <property name="margin-top">5</property>
         <property name="vexpand">True</property>
       </object>
     </child>
