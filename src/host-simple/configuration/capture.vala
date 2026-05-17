@@ -34,15 +34,19 @@ namespace Wakit.Simple.Configuration
   public static Config capture ([CCode (array_length_cname = "argc", array_length_pos = 0.9)] ref unowned string[] argv) throws GLib.Error
     {
 
+      unowned string config = "wakit.config.json";
+
       var context = new GLib.OptionContext ();
-      unowned var entries = capture_entries ();
+      var entries = capture_entries ();
+
+      entries [0].arg_data = &config;
 
       context.add_main_entries (entries, "en_US");
       context.set_help_enabled (false);
       context.set_ignore_unknown_options (true);
       context.parse (ref argv);
 
-    return capture_construct ("wakit.config.json");
+    return capture_construct (config);
     }
 
   private static Config capture_construct (string filename) throws GLib.Error

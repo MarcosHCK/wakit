@@ -18,7 +18,7 @@
 namespace Wakit.Simple
 {
 
-  public class Application: Wakit.Application
+  public class Application: Wakit.Application, GLib.Initable
     {
 
       public Configuration.Config configuration { get { return (Configuration.Config) browser_config; } }
@@ -28,12 +28,17 @@ namespace Wakit.Simple
           class_extend ();
         }
 
-      public Application (Configuration.Config configuration)
+      public Application (Configuration.Config configuration, GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
           Object (application_id: configuration.application_id,
                   browser_config: configuration,
                            flags: GLib.ApplicationFlags.HANDLES_OPEN);
+
+          if (null != configuration.application_version)
+            set_version (configuration.application_version);
+
+          init (cancellable);
         }
 
       public override void activate ()
@@ -77,39 +82,19 @@ namespace Wakit.Simple
           add_main_option_entries (entries);
         }
 
-      public override int handle_local_options (GLib.VariantDict options)
+      public bool init (GLib.Cancellable? cancellable) throws GLib.Error
         {
-
+  
           if (null != configuration.extensions_dir)
-            {
-              extension_host.extension_dir = configuration.extensions_dir;
-            }
+            extension_host.extension_dir = configuration.extensions_dir;
 
-          foreach (unowned var scheme_config in configuration.schemes.data) try
-            {
-              configure_scheme (scheme_config);
-            }
-          catch (GLib.OptionError error)
-            {
-              printerr ("%s", error.message);
-              return 1;
-            }
-          catch (GLib.Error error)
-            {
-              unowned uint code = error.code;
-              unowned string domain = error.domain.to_string ();
-              unowned string message = error.message.to_string ();
-
-              printerr ("Wakit.Simple.Application.configure_scheme ()!: %s: %u: %s\n", domain, code, message);
-              return 1;
-            }
+          foreach (unowned var scheme_config in configuration.schemes.data)
+            configure_scheme (scheme_config);
 
           foreach (unowned var secure_scheme in configuration.secure_schemes.data)
-            {
-              extension_host.secure_schemes.add (secure_scheme);
-            }
+            extension_host.secure_schemes.add (secure_scheme);
 
-        return base.handle_local_options (options);
+        return true;
         }
 
       Gtk.Window open_uri (GLib.File file, string hint)

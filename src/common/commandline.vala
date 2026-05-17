@@ -18,6 +18,6 @@
 namespace Wakit.CommandLine
 {
 
-  [CCode (array_length = false)]
-  public extern static string[] ensure_argv ([CCode (array_length_cname = "argc", array_length_pos = 0.9, array_length_type = "int")] ref string[] argv);
+  [CCode (array_length = false, array_null_terminated = true)]
+  public extern static string[] ensure_argv ([CCode (array_length_cname = "argc", array_length_pos = 0.9, array_length_type = "int")] ref unowned string[] argv);
 }

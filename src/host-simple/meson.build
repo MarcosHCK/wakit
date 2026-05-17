@@ -25,7 +25,7 @@ foreach bit: [ 'application' ]
   __host_simple_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'application', 'window' ]
+foreach bit: [ 'application', 'host', 'window' ]
 
   __host_simple_src += [ '@0@.vala'.format (bit) ]
 endforeach
