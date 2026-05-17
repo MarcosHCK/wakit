@@ -21,6 +21,7 @@ namespace Wakit.AppBus
   public class Bus: GLib.Object, IAppBus
     {
 
+      public string bus_name { get; construct set; }
       public ICollection<IPostable> postables { get { return _postables; } }
 
       private uint _own_id;
@@ -30,7 +31,7 @@ namespace Wakit.AppBus
         {
 
           base.constructed ();
-
+          _bus_name = _bus_name ?? IAppBus.BUS_NAME;
           _postables = new PostableCollection ();
         }
 
@@ -40,7 +41,7 @@ namespace Wakit.AppBus
           unowned var flag1 = GLib.BusNameOwnerFlags.DO_NOT_QUEUE;
           unowned var flags = flag1;
 
-          _own_id = yield own_name_async (connection, IAppBus.BUS_NAME, flags, cancellable);
+          _own_id = yield own_name_async (connection, _bus_name, flags, cancellable);
           _postables.post (connection, GLib.Path.build_filename (IAppBus.BUS_OBJECT_PATH, "services"));
         return true;
         }

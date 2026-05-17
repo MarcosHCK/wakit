@@ -20,5 +20,6 @@
 G_BEGIN_DECLS
 
   gchar** wakit_command_line_ensure_argv (int* argc, char*** argv);
+  GSource* wakit_command_line_interrupt_source_new (void);
 
 G_END_DECLS

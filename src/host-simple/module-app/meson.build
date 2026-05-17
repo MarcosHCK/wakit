@@ -15,16 +15,12 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__example_src = [ ]
-
-foreach bit: [ 'interface', 'module' ]
-
-  __example_src += [ '@0@.vala'.format (bit) ]
-endforeach
-
-shared_module ('wakit-example-mod',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Example"', '-DG_LOG_USE_STRUCTURED=1',
+executable ('wakit-host-simple-module-app',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.Module.App"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_vala_dep, __host_simple_dep ],
-  sources: __example_src)
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.Module.App"', '-DG_LOG_USE_STRUCTURED=1',
+              '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
+              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+  dependencies: [ config_dep, __host_simple_dep, __host_simple_module_dep ],
+  sources: 'main.cc')

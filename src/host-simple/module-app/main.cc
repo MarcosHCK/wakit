@@ -14,18 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#include <config.h>
+#include <host-simple/module/wakit-host-simple-module.h>
 
-namespace Wakit.CommandLine
+int main (int argc, char* argv[])
 {
 
-  [CCode (cheader_filename = "common/commandline.h",
-          array_length = false, array_null_terminated = true)]
-  public extern static string[] ensure_argv ([CCode (array_length_cname = "argc", array_length_pos = 0.9, array_length_type = "int")] ref unowned string[] argv);
+  auto application = wakit_simple_module_application_new ();
+  auto result = wakit_simple_module_application_run (application, argc, argv);
 
-  [CCode (cheader_filename = "common/commandline.h", cname = "GSource"), Compact] public extern class InterruptSource: GLib.Source
-    {
-
-      public extern InterruptSource ();
-      protected override extern bool dispatch (SourceFunc? _callback);
-    }
+return (g_object_unref (application), result);
 }

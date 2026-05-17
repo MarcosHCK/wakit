@@ -15,17 +15,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.CommandLine
+namespace Wakit.Simple
 {
 
-  [CCode (cheader_filename = "common/commandline.h",
-          array_length = false, array_null_terminated = true)]
-  public extern static string[] ensure_argv ([CCode (array_length_cname = "argc", array_length_pos = 0.9, array_length_type = "int")] ref unowned string[] argv);
-
-  [CCode (cheader_filename = "common/commandline.h", cname = "GSource"), Compact] public extern class InterruptSource: GLib.Source
+  [ModuleInit] public static bool module_init (GLib.TypeModule module, Module.Application application)
     {
 
-      public extern InterruptSource ();
-      protected override extern bool dispatch (SourceFunc? _callback);
+      application.app_bus.postables.add (new Example.Interface ());
+    return true;
     }
 }

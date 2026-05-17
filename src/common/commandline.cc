@@ -19,13 +19,49 @@
 
 gchar** wakit_command_line_ensure_argv (int* argc, char*** argv)
 {
-#if !defined(G_OS_WIN32)
+# if !defined(G_OS_WIN32)
 
 return NULL;
-#else // defined(G_OS_WIN32)
+# else // defined(G_OS_WIN32)
   gchar** new_argv = g_win32_get_command_line ();
   gint new_argc = g_strv_length (new_argv);
 
 return (*argc = new_argc, *argv = new_argv, new_argv);
-#endif // defined(G_OS_WIN32)
+# endif // defined(G_OS_WIN32)
+}
+
+# if defined(G_OS_WIN32)
+
+static GSourceFuncs never_source_callbacks =
+{
+
+  .prepare = [](GSource*, int*) -> gboolean
+    { return false; },
+
+  .check = [](GSource*) -> gboolean
+    { return false; },
+
+  .dispatch = [](GSource*, GSourceFunc, gpointer) -> gboolean
+    { return G_SOURCE_REMOVE; },
+
+  .finalize = nullptr,
+  .closure_callback = nullptr,
+  .closure_marshal = nullptr,
+};
+
+# else // !defined(G_OS_WIN32)
+# include <glib-unix.h>
+
+# endif // !defined(G_OS_WIN32)
+
+GSource* wakit_command_line_interrupt_source_new ()
+{
+
+  GSource* source;
+# if defined(G_OS_WIN32)
+  source = g_source_new (&never_source_callbacks, sizeof (GSource));
+# else // !defined(G_OS_WIN32)
+  source = g_unix_signal_source_new (SIGINT);
+# endif // defined(G_OS_WIN32)
+return source;
 }

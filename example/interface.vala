@@ -19,68 +19,39 @@ namespace Wakit.Example
 {
 
   [DBus (name = "org.hck.wakit.Example.Interface")]
-
-  public interface Interface: GLib.Object
-    {
-
-      [DBus (name = "AlwaysReturns")]
-      public abstract string always_returns (string value) throws GLib.Error;
-
-      [DBus (name = "AlwaysThrows")]
-      public abstract string always_throws (string value) throws GLib.Error;
-
-      [DBus (name = "EmitSignal1")]
-      public abstract void emit_signal_1 (string value) throws GLib.Error;
-
-      [DBus (name = "RandomNumbers")]
-      public abstract uint[] random_numbers () throws GLib.Error;
-
-      [DBus (name = "RandomUUID")]
-      public abstract string random_uuid () throws GLib.Error;
-
-      [DBus (name = "RandomUUIDs")]
-      public abstract string[] random_uuids () throws GLib.Error;
-
-      [DBus (name = "Signal1")]
-      public abstract signal void signal1 (string value);
-
-      [DBus (name = "Store")]
-      public abstract string store { owned get; set; }
-    }
-
-  public sealed class InterfaceImpl: GLib.Object, IPostable, Interface
+  public sealed class Interface: GLib.Object, IPostable
     {
 
       private string _store = "<nothing>";
 
+      [DBus (name = "Store")]
       public string store { owned get { return _store; } set { _store = value; } }
 
-      public string always_returns (string value) throws GLib.Error
+      [DBus (name = "AlwaysReturns")] public string always_returns (string value) throws GLib.Error
         {
 
           return value;
         }
 
-      public string always_throws (string value) throws GLib.Error
+      [DBus (name = "AlwaysThrows")] public string always_throws (string value) throws GLib.Error
         {
 
           throw new GLib.IOError.FAILED ("got '%s'", value);
         }
 
-      public void emit_signal_1 (string value) throws GLib.Error
+      [DBus (name = "EmitSignal1")] public void emit_signal_1 (string value) throws GLib.Error
         {
 
           signal1 (value);
         }
 
-      [DBus (visible = false)]
-      public uint post (GLib.DBusConnection connection, string object_path) throws GLib.Error
+      [DBus (visible = false)] public uint post (GLib.DBusConnection connection, string object_path) throws GLib.Error
         {
 
-          return connection.register_object<Interface> (object_path, this);
+          return connection.register_object (object_path, this);
         }
 
-      public uint[] random_numbers () throws GLib.Error
+      [DBus (name = "RandomNumbers")] public uint[] random_numbers () throws GLib.Error
         {
 
           var length = GLib.Random.int_range (2, 20);
@@ -93,13 +64,13 @@ namespace Wakit.Example
         return (owned) ar;
         }
 
-      public string random_uuid () throws GLib.Error
+      [DBus (name = "RandomUUID")] public string random_uuid () throws GLib.Error
         {
 
           return GLib.Uuid.string_random ();
         }
 
-      public string[] random_uuids () throws GLib.Error
+      [DBus (name = "RandomUUIDs")] public string[] random_uuids () throws GLib.Error
         {
 
           var length = GLib.Random.int_range (2, 20);
@@ -111,5 +82,7 @@ namespace Wakit.Example
             }
         return (owned) ar;
         }
+
+      [DBus (name = "Signal1")] public abstract signal void signal1 (string value);
     }
 }

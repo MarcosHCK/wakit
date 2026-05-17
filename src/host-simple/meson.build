@@ -16,6 +16,7 @@
 #
 
 subdir ('configuration')
+subdir ('module')
 
 __host_simple_src = [ ]
 
@@ -31,10 +32,12 @@ foreach bit: [ 'application', 'host', 'window' ]
 endforeach
 
 __host_simple_deps = [ __common_dep, __host_dep,
-                       __host_simple_configuration_dep.as_link_whole () ]
+                       __host_simple_configuration_dep.as_link_whole (),
+                       __host_simple_module_dep.as_link_whole () ]
 
 __host_simple_fwds = [ __host_dep,
-                       __host_simple_configuration_dep ]
+                       __host_simple_configuration_dep,
+                       __host_simple_module_dep ]
 
 __host_simple_src += import ('gnome').compile_resources ('wakit-host-simple-resoures',
   'resources.xml',
@@ -57,6 +60,8 @@ __host_simple_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __c
   link_with: __host_simple_lib)
 
 meson.override_dependency ('wakit-host-simple', __host_simple_dep)
+
+subdir ('module-app')
 
 __host_simple_bin = executable ('wakit-host-simple-app',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.App"', '-DG_LOG_USE_STRUCTURED=1',
