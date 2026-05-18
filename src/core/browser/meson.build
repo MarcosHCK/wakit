@@ -53,6 +53,7 @@ __core_browser_src += custom_target ('wakit-core-browser-resources',
   output: [ 'resources.bundle.h', 'resources.bundle.c' ])
 
 __core_browser_deps = [ __common_dep,
+                        __core_configuration_dep,
                         __core_gui_dep,
                         __core_interfaces_dep ]
 

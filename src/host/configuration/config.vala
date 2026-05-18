@@ -19,7 +19,7 @@ using Wakit.JsonTypes;
 namespace Wakit.Host.Configuration
 {
 
-  public class Config: BrowserConfig
+  public class Config: Wakit.Configuration.Config
     {
 
       public bool decorated { get; construct; default = false; }

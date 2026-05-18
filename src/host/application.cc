@@ -24,7 +24,7 @@ extern "C" GType wakit_host_configuration_config_get_type (void) G_GNUC_CONST;
 #define _define_param_tag(name_,NAME) \
   struct name_##_tag { static inline constexpr const char* name = #NAME; };
 
-_define_param_tag (browser_config, browser-config)
+_define_param_tag (configuration, configuration)
 
 gpointer wakit_simple_application_parent_class;
 #define _parent wakit_simple_application_parent_class
@@ -46,12 +46,13 @@ template<typename param_tag>
 return __static_pspec;
 }
 
-[[gnu::always_inline]] static inline bool has_param (const gchar* name, guint n_params, GObjectConstructParam* params)
+template<typename param_tag>
+[[gnu::always_inline]] static inline bool has_param (guint n_params, GObjectConstructParam* params)
 {
 
   for (guint i = 0; i < n_params; ++i)
   
-    if (g_str_equal (name, params [i].pspec->name))
+    if (g_str_equal (param_tag::name, params [i].pspec->name))
       return true;
 
 return false;
@@ -60,7 +61,9 @@ return false;
 static GObject* wakit_host_application_class_constructor (GType g_type, guint n_params, GObjectConstructParam* params)
 {
 
-  if (has_param ("browser-config", n_params, params))
+  using param_tag = configuration_tag;
+
+  if (has_param<param_tag> (n_params, params))
     return G_OBJECT_CLASS (_parent)->constructor (g_type, n_params, params);
 
   auto _params_mixin = _mixin<GObjectConstructParam, 16> (1 + n_params);
@@ -69,7 +72,7 @@ static GObject* wakit_host_application_class_constructor (GType g_type, guint n_
 
   std::uninitialized_copy_n (params, n_params, &_params_mixin.actual () [1]);
 
-  _param_zero->pspec = get_param_spec<browser_config_tag> ();
+  _param_zero->pspec = get_param_spec<param_tag> ();
   _param_zero->value = &_param_value;
 
   GType g_type2 = wakit_host_configuration_config_get_type ();

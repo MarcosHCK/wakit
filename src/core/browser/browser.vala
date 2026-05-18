@@ -21,12 +21,12 @@ namespace Wakit.Browser
   public class Browser: GLib.Object, IBrowser
     {
 
-      public Wakit.BrowserConfig config { construct; }
+      public Configuration.Config config { construct; }
       public WebKit.WebContext context { get; private set; }
       public WebKit.Settings settings { get; private set; }
       public WebKit.UserContentManager user_content_manager { get; private set; }
 
-      public Browser (BrowserConfig config)
+      public Browser (Configuration.Config config)
         {
 
           Object (config: config);

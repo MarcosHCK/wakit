@@ -29,7 +29,7 @@ namespace Wakit
 
       public IAppBus appbus { get { return _appbus_bus; } }
       public IBrowser browser { get { return _browser_browser; } }
-      public BrowserConfig? browser_config { get; construct; }
+      public Configuration.Config? configuration { get; construct; }
       public IExtensionHost extension_host { get { return _browser_extension_host; } }
       public bool ready { get; private set; default = false; }
 
@@ -43,12 +43,12 @@ namespace Wakit
 
           _appbus_watcher.crashed.connect (on_appbus_crashed);
 
-          _browser_config = _browser_config ?? (BrowserConfig) GLib.Object.new (typeof (BrowserConfig),
+          _configuration = _configuration ?? (Configuration.Config) GLib.Object.new (typeof (Configuration.Config),
             "application-id", application_id,
             "application-version", get_version (),
             null);
 
-          _browser_browser = new Browser.Browser (_browser_config);
+          _browser_browser = new Browser.Browser (_configuration);
           _browser_extension_host = new Browser.ExtensionHost (_browser_browser.context);
           _deferred_open = new GLib.Queue<DeferredUrls?> ();
           _ready = false;
@@ -134,7 +134,7 @@ namespace Wakit
 
           var context = GLib.MainContext.ref_thread_default ();
           var loop = new GLib.MainLoop (context, false);
-          var timeout = _browser_config.appbus_shutdown_timeout;
+          var timeout = _configuration.appbus_shutdown_timeout;
 
           _appbus_bus.reap_on_connection (_appbus_watcher.connection);
 
@@ -159,7 +159,7 @@ namespace Wakit
       private async bool startup_appbus (GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
-          var timeout = _browser_config.appbus_launch_timeout;
+          var timeout = _configuration.appbus_launch_timeout;
 
           bool result = (yield _appbus_watcher.launch (timeout, cancellable))
                      && (yield _appbus_bus.graft_on_connection (_appbus_watcher.connection, cancellable));

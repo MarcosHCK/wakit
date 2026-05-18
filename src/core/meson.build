@@ -18,6 +18,7 @@
 gtk_dep = dependency ('gtk4', required: true)
 
 # level 0
+subdir ('configuration')
 subdir ('interfaces')
 
 # level 1
@@ -45,12 +46,14 @@ endforeach
 __core_deps = [ __common_dep,
                 __core_appbus_dep.as_link_whole (),
                 __core_browser_dep.as_link_whole (),
+                __core_configuration_dep.as_link_whole (),
                 __core_gui_dep.as_link_whole (),
                 __core_interfaces_dep.as_link_whole (),
                 __core_loaders_dep.as_link_whole (),
                 __core_process_dep.as_link_whole () ]
 
-__core_fwds = [ __core_interfaces_dep,
+__core_fwds = [ __core_configuration_dep,
+                __core_interfaces_dep,
                 __core_loaders_dep ]
 
 __core_lib = library ('wakit-core',

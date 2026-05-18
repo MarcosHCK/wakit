@@ -15,10 +15,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit
+namespace Wakit.Configuration
 {
 
-  public class BrowserConfig: GLib.Object
+  public class Config: GLib.Object
     {
 
       public override void constructed ()

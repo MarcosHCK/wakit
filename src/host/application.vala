@@ -21,8 +21,6 @@ namespace Wakit.Host
   public class Application: Wakit.Application, GLib.Initable
     {
 
-      public Configuration.Config configuration { get { return (Configuration.Config) browser_config; } }
-
       class construct
         {
           class_extend ();
@@ -32,7 +30,7 @@ namespace Wakit.Host
         {
 
           Object (application_id: configuration.application_id,
-                  browser_config: configuration,
+                   configuration: configuration,
                            flags: GLib.ApplicationFlags.HANDLES_OPEN);
 
           if (null != configuration.application_version)
@@ -47,7 +45,7 @@ namespace Wakit.Host
           string route;
           GLib.File files [1];
 
-          if (null != (route = configuration.default_route))
+          if (null != (route = ((Configuration.Config) configuration).default_route))
 
             files [0] = GLib.File.new_for_uri (route);
           else
@@ -84,14 +82,16 @@ namespace Wakit.Host
 
       public bool init (GLib.Cancellable? cancellable) throws GLib.Error
         {
-  
-          if (null != configuration.extensions_dir)
-            extension_host.extension_dir = configuration.extensions_dir;
 
-          foreach (unowned var scheme_config in configuration.schemes.data)
+          unowned var config = (Configuration.Config) configuration;
+  
+          if (null != config.extensions_dir)
+            extension_host.extension_dir = config.extensions_dir;
+
+          foreach (unowned var scheme_config in config.schemes.data)
             configure_scheme (scheme_config);
 
-          foreach (unowned var secure_scheme in configuration.secure_schemes.data)
+          foreach (unowned var secure_scheme in config.secure_schemes.data)
             extension_host.secure_schemes.add (secure_scheme);
 
         return true;
@@ -102,7 +102,7 @@ namespace Wakit.Host
 
           IWebView web_view;
 
-          var window = new ApplicationWindow (configuration, this);
+          var window = new ApplicationWindow ((Configuration.Config) configuration, this);
 
           window.set_child (web_view = browser.create_view ());
           window.set_default_size (800, 600);
