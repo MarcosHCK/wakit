@@ -134,17 +134,22 @@ namespace Wakit
 
           var context = GLib.MainContext.ref_thread_default ();
           var loop = new GLib.MainLoop (context, false);
-          var timeout = _configuration.appbus_shutdown_timeout;
 
-          _appbus_bus.reap_on_connection (_appbus_watcher.connection);
-
-          _appbus_watcher.quit_async.begin (timeout, (o, res) =>
+          shutdown_async.begin ((o, res) =>
             {
-              ((AppBus.Watcher) o).quit_async.end (res);
+              ((Application) o).shutdown_async.end (res);
               loop.quit ();
             });
 
         loop.run ();
+        }
+
+      public virtual async void shutdown_async ()
+        {
+
+          _appbus_bus.reap_on_connection (_appbus_watcher.connection);
+
+          yield _appbus_watcher.quit_async (_configuration.appbus_shutdown_timeout);
         }
 
       public override void startup ()
