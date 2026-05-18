@@ -15,13 +15,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Host
+namespace Wakit.Host.Module
 {
 
-  [ModuleInit] public static bool module_init (Module.Host host, GLib.TypeModule module)
+  public sealed class Registry: GLib.Object, GLib.AsyncInitable
     {
 
-      host.postables.add (new Example.Interface ());
-    return true;
+      public Configuration.Modules configuration { get; construct; }
+
+      public async bool init_async (int io_priority, GLib.Cancellable? cancellable) throws GLib.Error
+        {
+        return true;
+        }
     }
 }

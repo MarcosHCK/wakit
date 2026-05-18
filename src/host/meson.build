@@ -16,6 +16,7 @@
 #
 
 subdir ('configuration')
+subdir ('module')
 
 __host_src = [ ]
 
@@ -30,11 +31,14 @@ foreach bit: [ 'application', 'runner', 'window' ]
   __host_src += [ '@0@.vala'.format (bit) ]
 endforeach
 
-__host_deps = [ __common_dep, __core_dep,
-                       __host_configuration_dep.as_link_whole () ]
+__host_deps = [ __common_dep,
+                __core_dep,
+                __host_configuration_dep.as_link_whole (),
+                __host_module_dep.as_link_whole (), ]
 
 __host_fwds = [ __core_dep,
-                       __host_configuration_dep ]
+                __host_configuration_dep,
+                __host_module_dep ]
 
 __host_src += import ('gnome').compile_resources ('wakit-host-resoures',
   'resources.xml',

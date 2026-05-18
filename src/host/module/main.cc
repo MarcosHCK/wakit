@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#include <config.h>
+#include <host/module/wakit-host-module.h>
 
-namespace Wakit.Host
+int main (int argc, char* argv[])
 {
 
-  [ModuleInit] public static bool module_init (Module.Host host, GLib.TypeModule module)
-    {
+  auto application = wakit_host_module_host_application_new ();
+  auto result = wakit_host_module_host_application_run (application, argc, argv);
 
-      host.postables.add (new Example.Interface ());
-    return true;
-    }
+return (g_object_unref (application), result);
 }

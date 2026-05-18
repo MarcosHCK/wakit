@@ -21,6 +21,8 @@ namespace Wakit.Host
   public class Application: Wakit.Application, GLib.Initable
     {
 
+      private Module.Registry _module_registry;
+
       class construct
         {
           class_extend ();
@@ -75,6 +77,11 @@ namespace Wakit.Host
         {
 
           base.constructed ();
+          unowned var config = (Configuration.Config) configuration;
+
+          _module_registry = (Module.Registry) GLib.Object.new (typeof (Module.Registry),
+            "configuration", config.modules,
+            null);
 
           unowned var entries = Configuration.capture_entries ();
           add_main_option_entries (entries);
@@ -166,5 +173,13 @@ namespace Wakit.Host
           default:
             assert_not_reached ();
         } }
+
+      public override async bool startup_async (GLib.Cancellable? cancellable) throws GLib.Error
+        {
+
+          yield base.startup_async ();
+          yield _module_registry.init_async (GLib.Priority.DEFAULT, cancellable);
+        return true;
+        }
     }
 }

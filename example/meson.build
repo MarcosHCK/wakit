@@ -26,5 +26,5 @@ shared_module ('wakit-example-mod',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Example"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_vala_dep, __host_simple_dep ],
+  dependencies: [ config_vala_dep, __host_dep ],
   sources: __example_src)

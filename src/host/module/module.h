@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+#include <glib-object.h>
 
-namespace Wakit.Host
-{
+G_BEGIN_DECLS
 
-  [ModuleInit] public static bool module_init (Module.Host host, GLib.TypeModule module)
-    {
+  GHashTable* wakit_host_module_imodule_get_loader_mapping (void) G_GNUC_CONST;
+  GHashTable* wakit_host_module_imodule_get_loader_mapping_once (void);
 
-      host.postables.add (new Example.Interface ());
-    return true;
-    }
-}
+G_END_DECLS
