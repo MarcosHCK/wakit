@@ -153,10 +153,10 @@ namespace Wakit
           base.startup ();
 
           hold ();
-          startup_appbus.begin (null, startup_appbus_finished);
+          startup_async.begin (null, startup_finished);
         }
 
-      private async bool startup_appbus (GLib.Cancellable? cancellable = null) throws GLib.Error
+      async bool startup_appbus (GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
           var timeout = _configuration.appbus_launch_timeout;
@@ -183,32 +183,36 @@ namespace Wakit
         return result;
         }
 
-      private void startup_complete ()
+      public virtual async bool startup_async (GLib.Cancellable? cancellable = null) throws GLib.Error
+        {
+
+          try
+            { yield startup_appbus (); }
+
+          catch (GLib.Error error)
+            {
+              GLib.Error.prefix_literal (out error, "couldn't launch appbus: ");
+              throw (owned) error;
+            }
+
+        return true;
+        }
+
+      void startup_complete ()
         {
 
           ready = true;
 
           for (DeferredUrls? deferred; null != (deferred = _deferred_open.pop_head ());)
-            {
-              var builder = new StringBuilder ("[ ");
-              foreach (unowned var file in deferred.files)
-                builder.append_printf ("'%s', ", file.get_uri ());
-              if (deferred.files.length > 0)
-              builder.truncate (builder.len - 2);
-              builder.append (" ]");
-
-              print ("here %s\n", builder.str);
-              open_uris (deferred.files, deferred.hint);
-            }
+            open_uris (deferred.files, deferred.hint);
         }
 
-      private static void startup_appbus_finished (GLib.Object? source_object, GLib.AsyncResult result)
+      static void startup_finished (GLib.Object? source_object, GLib.AsyncResult result)
         {
 
           try
             {
-
-              ((Application) source_object).startup_appbus.end (result);
+              ((Application) source_object).startup_async.end (result);
               ((Application) source_object).startup_complete ();
               ((Application) source_object).release ();
             }
@@ -219,7 +223,7 @@ namespace Wakit
               unowned string domain = error.domain.to_string ();
               unowned string message = error.message.to_string ();
 
-              critical ("can not acquire AppBus: %s: %u: %s", domain, code, message);
+              critical ("Wakit.Application.startup_async()!: %s: %u: %s", domain, code, message);
               ((Application) source_object).quit ();
             }
         }
