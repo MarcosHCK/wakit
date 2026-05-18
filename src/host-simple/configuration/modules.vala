@@ -18,23 +18,18 @@
 namespace Wakit.Simple.Configuration
 {
 
-  public class Config: BrowserConfig
+  public sealed class Modules: GLib.Object
     {
 
-      public bool decorated { get; construct; default = false; }
-      public string? default_route { get; construct; default = null; }
-      public string? extensions_dir { get; construct; default = null; }
-      public Modules modules { get; construct; }
-      public SchemeArray schemes { get; construct; }
-      public StringArray secure_schemes { get; construct; }
+      public string? base_dir { get; construct; }
+      public ModuleArray items { get; construct; }
 
       public override void constructed ()
         {
 
           base.constructed ();
-          _modules = _modules ?? new Modules ();
-          _schemes = _schemes ?? new SchemeArray ();
-          _secure_schemes = _secure_schemes ?? new StringArray ();
+          _base_dir = _base_dir ?? ".";
+          _items = _items ?? new ModuleArray ();
         }
     }
 }

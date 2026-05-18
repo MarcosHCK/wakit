@@ -31,11 +31,11 @@ foreach bit: [ 'application', 'host', 'window' ]
   __host_simple_src += [ '@0@.vala'.format (bit) ]
 endforeach
 
-__host_simple_deps = [ __common_dep, __host_dep,
+__host_simple_deps = [ __common_dep, __core_dep,
                        __host_simple_configuration_dep.as_link_whole (),
                        __host_simple_module_dep.as_link_whole () ]
 
-__host_simple_fwds = [ __host_dep,
+__host_simple_fwds = [ __core_dep,
                        __host_simple_configuration_dep,
                        __host_simple_module_dep ]
 
@@ -81,7 +81,7 @@ __host_simple_runner_cfg.set ('host_simple_bin_path', __host_simple_bin.full_pat
 foreach tuple: [ [ __common_lib, 'common_lib_path' ],
                  [ __extension_lib, 'extension_lib_path' ],
                  [ __extension_mod, 'extension_mod_path' ],
-                 [ __host_lib, 'host_lib_path' ],
+                 [ __core_lib, 'host_lib_path' ],
                  [ __host_simple_lib, 'host_simple_lib_path' ] ]
 
   path = tuple.get (0).full_path ()

@@ -14,27 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+#include <glib.h>
+#include <core/interfaces/wakit-core-interfaces.h>
+#include <libsoup/soup-message-headers.h>
 
-namespace Wakit.Simple.Configuration
-{
+G_BEGIN_DECLS
 
-  public class Config: BrowserConfig
+  static __inline void wakit_browser_uri_request_headers_foreach_impl (SoupMessageHeaders* headers, WakitIUriRequestHeadersForeachHeader foreach, gpointer user_data)
     {
-
-      public bool decorated { get; construct; default = false; }
-      public string? default_route { get; construct; default = null; }
-      public string? extensions_dir { get; construct; default = null; }
-      public Modules modules { get; construct; }
-      public SchemeArray schemes { get; construct; }
-      public StringArray secure_schemes { get; construct; }
-
-      public override void constructed ()
-        {
-
-          base.constructed ();
-          _modules = _modules ?? new Modules ();
-          _schemes = _schemes ?? new SchemeArray ();
-          _secure_schemes = _secure_schemes ?? new StringArray ();
-        }
+      soup_message_headers_foreach (headers, foreach, user_data);
     }
-}
+
+G_END_DECLS

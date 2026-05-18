@@ -23,6 +23,8 @@ namespace Wakit.Simple
 
       public Configuration.Config configuration { get { return (Configuration.Config) browser_config; } }
 
+      private Module.Host _module_host;
+
       class construct
         {
           class_extend ();
@@ -77,8 +79,9 @@ namespace Wakit.Simple
         {
 
           base.constructed ();
-          unowned var entries = Configuration.capture_entries ();
+          _module_host = new Module.Host (configuration.modules);
 
+          unowned var entries = Configuration.capture_entries ();
           add_main_option_entries (entries);
         }
 

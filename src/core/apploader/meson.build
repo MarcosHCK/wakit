@@ -15,30 +15,42 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-gmodule_dep = dependency ('gmodule-2.0', required: true)
+__core_loaders_src = [ ]
 
-__host_simple_module_src = [ ]
+foreach lib: [ ]
 
-foreach bit: [ 'application', 'host', 'typemodule' ]
-
-  __host_simple_module_src += [ '@0@.vala'.format (bit) ]
+  __core_loaders_src += [ '@0@.cc'.format (lib) ]
+  __core_loaders_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-__host_simple_module_deps = [ __common_dep,
-                              __core_dep,
-                              __core_appbus_dep,
-                              __host_simple_configuration_dep ]
+foreach lib: [ 'register' ]
 
-__host_simple_module_lib = static_library ('wakit-host-simple-module',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.Module"', '-DG_LOG_USE_STRUCTURED=1',
+  __core_loaders_src += [ '@0@.vala'.format (lib) ]
+endforeach
+
+foreach lib: [ '', 'absolute', 'regex', 'verbatim' ]
+
+  __core_loaders_src += [ '@0@alias.vala'.format (lib) ]
+endforeach
+
+foreach lib: [ '', 'bundle', 'tree' ]
+
+  __core_loaders_src += [ '@0@loader.vala'.format (lib) ]
+endforeach
+
+__core_loaders_deps = [ __common_dep,
+                        __core_interfaces_dep ]
+
+__core_loaders_lib = static_library ('wakit-core-loaders',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Core.Loader"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.Module"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Core.Loader"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_vala_dep, gmodule_dep, json_dep, __host_simple_module_deps ],
-  sources: __host_simple_module_src,
+  dependencies: [ config_vala_dep, gio_dep, __core_loaders_deps ],
+  sources: __core_loaders_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__host_simple_module_dep = declare_dependency (dependencies: [ config_dep, json_dep, __common_dep, __core_dep ],
-  link_with: __host_simple_module_lib)
+__core_loaders_dep = declare_dependency (dependencies: [ config_dep, gio_dep, __common_dep ],
+  link_with: __core_loaders_lib)

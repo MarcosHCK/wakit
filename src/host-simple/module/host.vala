@@ -15,26 +15,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Simple.Configuration
+namespace Wakit.Simple.Module
 {
 
-  public class Config: BrowserConfig
+  public sealed class Host: GLib.Object
     {
 
-      public bool decorated { get; construct; default = false; }
-      public string? default_route { get; construct; default = null; }
-      public string? extensions_dir { get; construct; default = null; }
-      public Modules modules { get; construct; }
-      public SchemeArray schemes { get; construct; }
-      public StringArray secure_schemes { get; construct; }
+      public Configuration.Modules configuration { get; construct; }
 
-      public override void constructed ()
+      public Host (Configuration.Modules configuration)
         {
-
-          base.constructed ();
-          _modules = _modules ?? new Modules ();
-          _schemes = _schemes ?? new SchemeArray ();
-          _secure_schemes = _secure_schemes ?? new StringArray ();
+          Object (configuration: configuration);
         }
     }
 }

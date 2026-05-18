@@ -15,26 +15,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Simple.Configuration
+namespace Wakit
 {
 
-  public class Config: BrowserConfig
+  internal struct DeferredUrls
     {
 
-      public bool decorated { get; construct; default = false; }
-      public string? default_route { get; construct; default = null; }
-      public string? extensions_dir { get; construct; default = null; }
-      public Modules modules { get; construct; }
-      public SchemeArray schemes { get; construct; }
-      public StringArray secure_schemes { get; construct; }
+      public GLib.File[] files;
+      public string hint;
 
-      public override void constructed ()
+      public DeferredUrls (GLib.File[] files, string hint)
         {
 
-          base.constructed ();
-          _modules = _modules ?? new Modules ();
-          _schemes = _schemes ?? new SchemeArray ();
-          _secure_schemes = _secure_schemes ?? new StringArray ();
+          this.files = files;
+          this.hint = hint;
         }
     }
 }

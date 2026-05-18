@@ -15,37 +15,37 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-basepath = meson.current_source_dir ()
-testpathroot = '/org/hck/wakit'
+__core_gui_src = [ ]
 
-glib_dep = dependency ('glib-2.0', required: true)
+foreach bit: []
 
-__testing_src = [ ]
-
-foreach lib: [ 'testing' ]
-
-  __testing_src += [ '@0@.cc'.format (lib) ]
-  __testing_src += [ '@0@.h'.format (lib) ]
+  __core_gui_src += [ '@0@.c'.format (bit) ]
+  __core_gui_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-__testing_lib = static_library ('testing',
-  c_args: [ '-DG_LOG_DOMAIN="Testing"', '-DG_LOG_USE_STRUCTURED=1',
+foreach bit: [ 'message' ]
+
+  __core_gui_src += [ '@0@.vala'.format (bit) ]
+endforeach
+
+__core_gui_src += import ('gnome').compile_resources ('wakit-core-gui-resoures',
+  'resources.xml',
+  c_name: 'wakit_gui',
+  export: false,
+  source_dir: meson.current_source_dir ())
+
+__core_gui_deps = [ __common_dep ]
+
+__core_gui_lib = static_library ('wakit-core-gui',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Core.Gui"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Testing"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Core.Gui"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_pch: 'pch/pch.h',
-  build_by_default: false,
-  dependencies: [ config_dep, glib_dep ],
-  include_directories: include_directories ('.'),
-  sources: __testing_src)
+  dependencies: [ config_vala_dep, gtk_dep, __core_gui_deps ],
+  sources: __core_gui_src,
+  vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__testing_dep = declare_dependency (dependencies: [ config_dep, glib_dep ],
-  include_directories: include_directories ('.'),
-  link_with: __testing_lib)
-
-foreach bit: [ 'common', 'core', 'extension' ]
-
-  subdir (bit)
-endforeach
+__core_gui_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __common_dep ],
+  link_with: __core_gui_lib)

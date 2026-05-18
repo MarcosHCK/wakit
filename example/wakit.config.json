@@ -3,6 +3,14 @@
   "application-version": "v0.0.0-devel",
   "default-route": "app:///",
   "extensions-dir": "src/extension/",
+  "modules": {
+    "base-dir": "example/",
+    "items": [
+      {
+        "name": "wakit-example"
+      }
+    ]
+  },
   "schemes": [
     {
       "aliases": [

@@ -23,12 +23,18 @@ foreach bit: [ 'schemealias' ]
   __host_simple_configuration_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'capture', 'config', 'scheme', 'schemealias', 'schemealiasarray', 'schemearray', 'stringarray' ]
+foreach bit: [ 'capture', 'config', 'modules', 'stringarray' ]
 
   __host_simple_configuration_src += [ '@0@.vala'.format (bit) ]
 endforeach
 
-__host_simple_configuration_deps = [ __common_dep, __host_dep ]
+foreach bit: [ 'module', 'scheme', 'schemealias' ] 
+
+  __host_simple_configuration_src += [ '@0@.vala'.format (bit) ]
+  __host_simple_configuration_src += [ '@0@array.vala'.format (bit) ]
+endforeach
+
+__host_simple_configuration_deps = [ __common_dep, __core_dep ]
 
 __host_simple_configuration_lib = static_library ('wakit-host-simple-configuration',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.Configuration"', '-DG_LOG_USE_STRUCTURED=1',
@@ -41,5 +47,5 @@ __host_simple_configuration_lib = static_library ('wakit-host-simple-configurati
   sources: __host_simple_configuration_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__host_simple_configuration_dep = declare_dependency (dependencies: [ config_dep, json_dep, __common_dep, __host_dep ],
+__host_simple_configuration_dep = declare_dependency (dependencies: [ config_dep, json_dep, __common_dep, __core_dep ],
   link_with: __host_simple_configuration_lib)
