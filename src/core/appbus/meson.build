@@ -17,13 +17,13 @@
 
 __core_appbus_src = [ 'watcher.vala' ]
 
-foreach lib: [ 'ownname', 'postablecollection' ]
+foreach lib: [ 'postablecollection' ]
 
   __core_appbus_src += [ '@0@.cc'.format (lib) ]
   __core_appbus_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'bus', 'ownname', 'postablecollection', 'watcher' ]
+foreach lib: [ 'bus', 'postablecollection', 'watcher' ]
 
   __core_appbus_src += [ '@0@.vala'.format (lib) ]
 endforeach

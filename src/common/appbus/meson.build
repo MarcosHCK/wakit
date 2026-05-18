@@ -17,13 +17,13 @@
 
 __common_appbus_src = [ ]
 
-foreach lib: [ 'address' ]
+foreach lib: [ 'address', 'ownname' ]
 
   __common_appbus_src += [ '@0@.cc'.format (lib) ]
   __common_appbus_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'address', 'addressoption', 'addressstring', 'connectclient', 'connectserver', 'cookie' ]
+foreach lib: [ 'address', 'addressoption', 'addressstring', 'connectclient', 'connectserver', 'cookie', 'ownname' ]
 
   __common_appbus_src += [ '@0@.vala'.format (lib) ]
 endforeach

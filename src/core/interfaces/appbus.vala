@@ -35,7 +35,5 @@ namespace Wakit
       public const string BUS_OBJECT_PATH = "/org/hck/wakit/AppBus";
 
       public abstract ICollection<IPostable> postables { get; }
-
-      public extern void set_bus_name (string name);
     }
 }

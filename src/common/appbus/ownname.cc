@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
-#include <core/appbus/ownname.h>
+#include <common/appbus/ownname.h>
 
 struct _OwnData
 {

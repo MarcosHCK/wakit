@@ -18,6 +18,6 @@
 namespace Wakit.AppBus
 {
 
-  [CCode (cheader_filename = "core/appbus/ownname.h")]
+  [CCode (cheader_filename = "common/appbus/ownname.h")]
   public extern static async uint own_name_async (GLib.DBusConnection connection, string name, GLib.BusNameOwnerFlags flags, GLib.Cancellable? cancellable = null) throws GLib.Error;
 }

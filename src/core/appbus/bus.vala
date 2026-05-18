@@ -35,21 +35,37 @@ namespace Wakit.AppBus
           _postables = new PostableCollection ();
         }
 
+      static string build_path (string name)
+        {
+
+          var length = name.length;
+          var builder = new StringBuilder.sized (2 + length);
+
+          builder.append_c ('/');
+          builder.append_len (name, ssize_t.MAX < length ? -1 : (ssize_t) length);
+          builder.replace (".", "/");
+
+        return builder.free_and_steal ();
+        }
+
       public async bool graft_on_connection (GLib.DBusConnection connection, GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
           unowned var flag1 = GLib.BusNameOwnerFlags.DO_NOT_QUEUE;
           unowned var flags = flag1;
+          var object_path = build_path (_bus_name);
 
           _own_id = yield own_name_async (connection, _bus_name, flags, cancellable);
-          _postables.post (connection, GLib.Path.build_filename (IAppBus.BUS_OBJECT_PATH, "services"));
+          _postables.post (connection, object_path);
         return true;
         }
 
       public void reap_on_connection (GLib.DBusConnection connection)
         {
 
-          _postables.unpost (connection, GLib.Path.build_filename (IAppBus.BUS_OBJECT_PATH, "services"));
+          var object_path = build_path (_bus_name);
+
+          _postables.unpost (connection, object_path);
           GLib.Bus.unown_name (_own_id);
         }
     }
