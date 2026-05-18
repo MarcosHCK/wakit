@@ -15,12 +15,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Simple.Configuration
+namespace Wakit.Host.Configuration
 {
 
-  [CCode (cheader_filename = "glib.h,common/json/wakit-common-json.h",
-          cname = "GPtrArray",
-          type_id = "(wakit_json_generic_ptr_array_get_type (WAKIT_SIMPLE_CONFIGURATION_TYPE_MODULE))"),
-   Compact (opaque = true)]
-  public extern class ModuleArray: GenericArray<Module> { }
+  public sealed class Modules: GLib.Object
+    {
+
+      public string? base_dir { get; construct; }
+      public ModuleArray items { get; construct; }
+
+      public override void constructed ()
+        {
+
+          base.constructed ();
+          _base_dir = _base_dir ?? ".";
+          _items = _items ?? new ModuleArray ();
+        }
+    }
 }

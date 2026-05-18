@@ -15,26 +15,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Simple.Configuration
+namespace Wakit.Host.Configuration
 {
 
-  public class Config: BrowserConfig
+  [CCode (cheader_filename = "glib.h,common/jsontypes/wakit-common-json.h",
+          cname = "GPtrArray",
+          type_id = "(wakit_json_types_generic_ptr_array_get_type (WAKIT_HOST_CONFIGURATION_TYPE_SCHEME_ALIAS))"),
+   Compact (opaque = true)]
+  public class SchemeAliasArray: GenericArray<SchemeAlias>
     {
 
-      public bool decorated { get; construct; default = false; }
-      public string? default_route { get; construct; default = null; }
-      public string? extensions_dir { get; construct; default = null; }
-      public Modules modules { get; construct; }
-      public SchemeArray schemes { get; construct; }
-      public StringArray secure_schemes { get; construct; }
-
-      public override void constructed ()
+      public SchemeAliasArray () requires (null != SchemeAlias.free)
         {
-
-          base.constructed ();
-          _modules = _modules ?? new Modules ();
-          _schemes = _schemes ?? new SchemeArray ();
-          _secure_schemes = _secure_schemes ?? new StringArray ();
+          base ();
         }
     }
 }

@@ -14,15 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+#include <glib-object.h>
 
-namespace Wakit.Simple.Configuration
-{
+G_BEGIN_DECLS
 
-  public sealed class Module: GLib.Object
-    {
+  GType wakit_json_types_generic_ptr_array_get_type (GType type) G_GNUC_CONST;
 
-      public string? digest { get; construct; default = null; }
-      public string? file { get; construct; default = null; }
-      public string? name { get; construct; default = null; }
-    }
-}
+G_END_DECLS

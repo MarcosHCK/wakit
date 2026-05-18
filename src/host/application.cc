@@ -16,10 +16,10 @@
  */
 #include <config.h>
 #include <common/mixin.h>
-#include <host-simple/application.h>
+#include <host/application.h>
 #include <memory>
 
-extern "C" GType wakit_simple_configuration_config_get_type (void) G_GNUC_CONST;
+extern "C" GType wakit_host_configuration_config_get_type (void) G_GNUC_CONST;
 
 #define _define_param_tag(name_,NAME) \
   struct name_##_tag { static inline constexpr const char* name = #NAME; };
@@ -57,7 +57,7 @@ return __static_pspec;
 return false;
 }
 
-static GObject* wakit_simple_application_class_constructor (GType g_type, guint n_params, GObjectConstructParam* params)
+static GObject* wakit_host_application_class_constructor (GType g_type, guint n_params, GObjectConstructParam* params)
 {
 
   if (has_param ("browser-config", n_params, params))
@@ -72,7 +72,7 @@ static GObject* wakit_simple_application_class_constructor (GType g_type, guint 
   _param_zero->pspec = get_param_spec<browser_config_tag> ();
   _param_zero->value = &_param_value;
 
-  GType g_type2 = wakit_simple_configuration_config_get_type ();
+  GType g_type2 = wakit_host_configuration_config_get_type ();
 
   g_value_init (&_param_value, g_type2);
   g_value_take_object (&_param_value, g_object_new (g_type2, NULL));
@@ -82,10 +82,10 @@ static GObject* wakit_simple_application_class_constructor (GType g_type, guint 
 return (g_value_unset (&_param_value), result);
 }
 
-void wakit_simple_application_class_extend (WakitSimpleApplicationClass* klass)
+void wakit_host_application_class_extend (WakitHostApplicationClass* klass)
 {
 
   wakit_simple_application_parent_class = g_type_class_peek_parent ((gpointer) klass);
 
-  G_OBJECT_CLASS (klass)->constructor = wakit_simple_application_class_constructor;
+  G_OBJECT_CLASS (klass)->constructor = wakit_host_application_class_constructor;
 }

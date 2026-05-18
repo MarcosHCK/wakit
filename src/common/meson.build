@@ -23,7 +23,7 @@ subdir ('hex')
 
 # level 2
 subdir ('krypt')
-subdir ('json')
+subdir ('jsontypes')
 
 # level 3
 subdir ('appbus')
@@ -64,7 +64,8 @@ __common_deps = [ __common_appbus_dep.as_link_whole (),
 
 __common_fwds = [ __common_appbus_dep,
                   __common_asynchelp_dep,
-                  __common_enum_dep, ]
+                  __common_enum_dep,
+                  __common_json_dep ]
 
 if gio_unix_dep.found ()
   __common_deps += [ gio_unix_dep ]

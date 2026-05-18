@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+#include <glib-object.h>
 
-namespace Wakit.Simple.Configuration
-{
+typedef struct _WakitHostApplicationClass WakitHostApplicationClass;
 
-  [CCode (cheader_filename = "glib.h,common/json/wakit-common-json.h",
-          cname = "GPtrArray",
-          type_id = "(wakit_json_generic_ptr_array_get_type (WAKIT_SIMPLE_CONFIGURATION_TYPE_SCHEME))"),
-   Compact (opaque = true)]
-  public class SchemeArray: GenericArray<Scheme> { }
-}
+G_BEGIN_DECLS
+
+  G_GNUC_INTERNAL void wakit_host_application_class_extend (WakitHostApplicationClass* klass);
+
+G_END_DECLS

@@ -15,11 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Simple.Configuration
+namespace Wakit.Host.Configuration
 {
 
   [Compact (opaque = false),
-   CCode (cheader_filename = "host-simple/configuration/schemealias.h")]
+   CCode (cheader_filename = "host/configuration/schemealias.h")]
   public extern class SchemeAbsoluteAlias
     {
 
@@ -30,10 +30,10 @@ namespace Wakit.Simple.Configuration
     }
 
   [Compact (opaque = false)]
-  [CCode (cheader_filename = "host-simple/configuration/schemealias.h",
-          ref_function = "wakit_simple_configuration_scheme_alias_ref",
-          unref_function = "wakit_simple_configuration_scheme_alias_unref",
-          type_id = "WAKIT_SIMPLE_CONFIGURATION_TYPE_SCHEME_ALIAS")]
+  [CCode (cheader_filename = "host/configuration/schemealias.h",
+          ref_function = "wakit_host_configuration_scheme_alias_ref",
+          unref_function = "wakit_host_configuration_scheme_alias_unref",
+          type_id = "WAKIT_HOST_CONFIGURATION_TYPE_SCHEME_ALIAS")]
   public extern class SchemeAlias
     {
 
@@ -45,7 +45,7 @@ namespace Wakit.Simple.Configuration
                                    requires (null != SchemeVerbatimAlias.free);
     }
 
-  [CCode (cheader_filename = "host-simple/configuration/schemealias.h")]
+  [CCode (cheader_filename = "host/configuration/schemealias.h")]
   public extern enum SchemeAliasType
     {
       ABSOLUTE,
@@ -56,7 +56,7 @@ namespace Wakit.Simple.Configuration
     }
 
   [Compact (opaque = false),
-   CCode (cheader_filename = "host-simple/configuration/schemealias.h")]
+   CCode (cheader_filename = "host/configuration/schemealias.h")]
   public extern class SchemeRegexAlias
     {
 
@@ -67,7 +67,7 @@ namespace Wakit.Simple.Configuration
     }
 
   [Compact (opaque = false),
-   CCode (cheader_filename = "host-simple/configuration/schemealias.h")]
+   CCode (cheader_filename = "host/configuration/schemealias.h")]
   public extern class SchemeVerbatimAlias
     {
 

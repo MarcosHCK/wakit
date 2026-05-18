@@ -17,17 +17,17 @@
 
 json_dep = dependency ('json-glib-1.0', required: true)
 
-__common_json_src = [ 'takepointer.h', 'wakit-common-json.h' ]
+__common_json_src = [ 'takepointer.h' ]
 
 foreach bit: [ 'ptrarray' ] 
 
   __common_json_src += [ '@0@.cc'.format (bit) ]
+  __common_json_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ ] 
+foreach bit: [ 'ptrarray', 'stringarray' ]
 
-  __common_json_src += [ '@0@.cc'.format (bit) ]
-  __common_json_src += [ '@0@.h'.format (bit) ]
+  __common_json_src += [ '@0@.vala'.format (bit) ]
 endforeach
 
 __common_json_deps = [ __common_ffi_dep ]

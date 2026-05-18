@@ -14,25 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#include <config.h>
+#include <common/wakit-common.h>
+#include <host/wakit-host.h>
 
-namespace Wakit.Simple
+int main (int argc, char* argv[])
 {
 
-  [GtkTemplate (ui = "/org/hck/wakit/host_simple/gtk/window.ui")]
-  public class ApplicationWindow: Gtk.ApplicationWindow
-    {
+  auto host = wakit_host_runner_new ();
+  auto result = wakit_host_runner_run (host, argc, argv);
 
-      [GtkChild] unowned Gtk.Grid? _grid = null;
-      public Configuration.Config configuration { get; construct; }
-
-      public ApplicationWindow (Configuration.Config configuration, Gtk.Application? application = null)
-        {
-          Object (application: application, configuration: configuration, decorated: configuration.decorated);
-        }
-
-      public new void set_child (Gtk.Widget widget)
-        {
-          _grid.attach (widget, 0, 0, 1, 1);
-        }
-    }
+return (g_object_unref (host), result);
 }

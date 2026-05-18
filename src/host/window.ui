@@ -19,7 +19,7 @@
 -->
 <interface domain="en_US">
 
-  <template class="WakitSimpleApplicationWindow" parent="GtkApplicationWindow">
+  <template class="WakitHostApplicationWindow" parent="GtkApplicationWindow">
 
     <child>
 

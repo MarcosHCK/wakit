@@ -1,4 +1,7 @@
-/* Copyright (C) 2025-2026 MarcosHCK
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gresources PUBLIC "-//GNOME//DTD GResource Specification 1.0//EN" "/usr/share/glib-2.0/dtds/gresource.dtd">
+<!--
+ * Copyright (C) 2025-2026 MarcosHCK
  * This file is part of wakit.
  *
  * wakit is free software: you can redistribute it and/or modify
@@ -13,16 +16,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
-#include <config.h>
-#include <common/wakit-common.h>
-#include <host-simple/wakit-host-simple.h>
+-->
+<gresources>
 
-int main (int argc, char* argv[])
-{
+  <gresource prefix="/org/hck/wakit/host/gtk">
 
-  auto host = wakit_simple_host_new ();
-  auto result = wakit_simple_host_run (host, argc, argv);
-
-return (g_object_unref (host), result);
-}
+    <file preprocess="xml-stripblanks">window.ui</file>
+  </gresource>
+</gresources>

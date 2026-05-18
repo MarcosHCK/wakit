@@ -19,8 +19,8 @@
 #include <common/ffi/destroynotify.h>
 #include <common/ffi/function.h>
 #include <common/genericmap.h>
-#include <common/json/takepointer.h>
-#include <common/json/wakit-common-json.h>
+#include <common/jsontypes/ptrarray.h>
+#include <common/jsontypes/takepointer.h>
 #include <json-glib/json-glib.h>
 
 boxing::destructible_box<GPtrArray, g_ptr_array_unref> _ptr_array_deserializers (
@@ -75,7 +75,7 @@ static GType ensure (GType a_type) noexcept
 return type;
 }
 
-GType wakit_json_generic_ptr_array_get_type (GType g_type)
+GType wakit_json_types_generic_ptr_array_get_type (GType g_type)
 {
 
   g_return_val_if_fail (json::take_pointer_would_work_for_type (g_type), G_TYPE_INVALID);

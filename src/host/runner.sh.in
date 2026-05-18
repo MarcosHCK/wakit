@@ -16,13 +16,13 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-binary="@host_simple_bin_path@"
+binary="@host_bin_path@"
 
 extra_paths=("@common_lib_path@"
+             "@core_lib_path@"
              "@extension_lib_path@"
              "@extension_mod_path@"
              "@host_lib_path@"
-             "@host_simple_lib_path@"
              $LD_LIBRARY_PATH)
 
 IFS=":"

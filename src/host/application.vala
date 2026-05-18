@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Simple
+namespace Wakit.Host
 {
 
   public class Application: Wakit.Application, GLib.Initable
@@ -56,7 +56,7 @@ namespace Wakit.Simple
           open (files, "default-route");
         }
 
-      [CCode (cheader_filename = "host-simple/application.h")]
+      [CCode (cheader_filename = "host/application.h")]
       extern class void class_extend ();
 
       void configure_scheme (Configuration.Scheme scheme_config) throws GLib.Error
@@ -150,17 +150,17 @@ namespace Wakit.Simple
           switch (scheme_alias_config.type)
             {
 
-          case Wakit.Simple.Configuration.SchemeAliasType.ABSOLUTE:
+          case Wakit.Host.Configuration.SchemeAliasType.ABSOLUTE:
             { unowned var config = (Configuration.SchemeAbsoluteAlias) scheme_alias_config;
               return new Loaders.AbsoluteAlias (config.path, config.replacement); }
 
-          case Wakit.Simple.Configuration.SchemeAliasType.REGEX:
+          case Wakit.Host.Configuration.SchemeAliasType.REGEX:
             { unowned var config = (Configuration.SchemeRegexAlias) scheme_alias_config;
               unowned var flags = GLib.RegexCompileFlags.OPTIMIZE;
               var regex = new GLib.Regex (config.pattern, flags, 0);
               return new Loaders.RegexAlias (regex, config.replacement); }
 
-          case Wakit.Simple.Configuration.SchemeAliasType.VERBATIM:
+          case Wakit.Host.Configuration.SchemeAliasType.VERBATIM:
             { return new Loaders.VerbatimAlias (); }
 
           default:

@@ -15,13 +15,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Simple
+namespace Wakit.Host
 {
 
-  public sealed class Host: GLib.Object
+  public sealed class Runner: GLib.Object
     {
 
-      public signal void configure_application (Simple.Application application);
+      public signal void configure_application (Wakit.Host.Application application);
       public signal void configure_capture (Configuration.Config config);
 
       public int run ([CCode (array_length_cname = "argc", array_length_pos = 0.9, array_length_type = "int")] string[] argv)
@@ -34,7 +34,7 @@ namespace Wakit.Simple
             { printerr ("%s\n", error.message); }
 
           catch (GLib.Error error)
-            { GLib.critical ("Wakit.Simple.Host.run()!: %s: %u: %s",
+            { GLib.critical ("Wakit.Host.Runner.run()!: %s: %u: %s",
                 error.domain.to_string (), error.code, error.message); }
         return 1;
         }
@@ -47,7 +47,7 @@ namespace Wakit.Simple
 
           configure_capture (config);
 
-          var application = new Simple.Application (config);
+          var application = new Wakit.Host.Application (config);
 
           configure_application (application);
 

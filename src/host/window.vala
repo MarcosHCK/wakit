@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE gresources PUBLIC "-//GNOME//DTD GResource Specification 1.0//EN" "/usr/share/glib-2.0/dtds/gresource.dtd">
-<!--
- * Copyright (C) 2025-2026 MarcosHCK
+/* Copyright (C) 2025-2026 MarcosHCK
  * This file is part of wakit.
  *
  * wakit is free software: you can redistribute it and/or modify
@@ -16,11 +13,26 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
--->
-<gresources>
+ */
 
-  <gresource prefix="/org/hck/wakit/host_simple/gtk">
+namespace Wakit.Host
+{
 
-    <file preprocess="xml-stripblanks">window.ui</file>
-  </gresource>
-</gresources>
+  [GtkTemplate (ui = "/org/hck/wakit/host/gtk/window.ui")]
+  public class ApplicationWindow: Gtk.ApplicationWindow
+    {
+
+      [GtkChild] unowned Gtk.Grid? _grid = null;
+      public Configuration.Config configuration { get; construct; }
+
+      public ApplicationWindow (Configuration.Config configuration, Gtk.Application? application = null)
+        {
+          Object (application: application, configuration: configuration, decorated: configuration.decorated);
+        }
+
+      public new void set_child (Gtk.Widget widget)
+        {
+          _grid.attach (widget, 0, 0, 1, 1);
+        }
+    }
+}

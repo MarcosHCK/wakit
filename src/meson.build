@@ -33,4 +33,4 @@ subdir ('core')
 subdir ('extension')
 
 # level 3
-subdir ('host-simple')
+subdir ('host')

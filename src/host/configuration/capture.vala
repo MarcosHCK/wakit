@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Simple.Configuration
+namespace Wakit.Host.Configuration
 {
 
   static ssize_t bounded_cast (size_t value) throws GLib.Error
@@ -65,7 +65,7 @@ namespace Wakit.Simple.Configuration
     {
 
       const GLib.OptionEntry entries [] = {
-        Wakit.Simple.Configuration.CONFIG_ENTRY,
+        Wakit.Host.Configuration.CONFIG_ENTRY,
         GLib.OptionEntry.NULL,
       };
     return entries;

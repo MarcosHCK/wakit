@@ -14,13 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
-#include <glib-object.h>
 
-typedef struct _WakitSimpleApplicationClass WakitSimpleApplicationClass;
+namespace Wakit.JsonTypes
+{
 
-G_BEGIN_DECLS
-
-  G_GNUC_INTERNAL void wakit_simple_application_class_extend (WakitSimpleApplicationClass* klass);
-
-G_END_DECLS
+  [CCode (cheader_filename = "common/jsontypes/ptrarray.h")]
+  public static extern GLib.Type generic_ptr_array_get_type (GLib.Type T);
+}

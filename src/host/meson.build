@@ -17,75 +17,74 @@
 
 subdir ('configuration')
 
-__host_simple_src = [ ]
+__host_src = [ ]
 
 foreach bit: [ 'application' ]
 
-  __host_simple_src += [ '@0@.cc'.format (bit) ]
-  __host_simple_src += [ '@0@.h'.format (bit) ]
+  __host_src += [ '@0@.cc'.format (bit) ]
+  __host_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'application', 'host', 'window' ]
+foreach bit: [ 'application', 'runner', 'window' ]
 
-  __host_simple_src += [ '@0@.vala'.format (bit) ]
+  __host_src += [ '@0@.vala'.format (bit) ]
 endforeach
 
-__host_simple_deps = [ __common_dep, __core_dep,
-                       __host_simple_configuration_dep.as_link_whole () ]
+__host_deps = [ __common_dep, __core_dep,
+                       __host_configuration_dep.as_link_whole () ]
 
-__host_simple_fwds = [ __core_dep,
-                       __host_simple_configuration_dep ]
+__host_fwds = [ __core_dep,
+                       __host_configuration_dep ]
 
-__host_simple_src += import ('gnome').compile_resources ('wakit-host-simple-resoures',
+__host_src += import ('gnome').compile_resources ('wakit-host-resoures',
   'resources.xml',
-  c_name: 'wakit_host_simple',
+  c_name: 'wakit_host',
   export: false,
   source_dir: meson.current_source_dir ())
 
-__host_simple_lib = library ('wakit-host-simple',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple"', '-DG_LOG_USE_STRUCTURED=1',
+__host_lib = library ('wakit-host',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_vala_dep, gtk_dep, __host_simple_deps ],
-  sources: __host_simple_src,
+  dependencies: [ config_vala_dep, gtk_dep, __host_deps ],
+  sources: __host_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__host_simple_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __common_dep, __host_simple_fwds ],
-  link_with: __host_simple_lib)
+__host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __common_dep, __host_fwds ],
+  link_with: __host_lib)
 
-meson.override_dependency ('wakit-host-simple', __host_simple_dep)
+meson.override_dependency ('wakit-host', __host_dep)
 
-__host_simple_bin = executable ('wakit-host-simple-app',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.App"', '-DG_LOG_USE_STRUCTURED=1',
+__host_bin = executable ('wakit-host-app',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.App"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Simple.App"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.App"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_dep, gtk_dep, __host_simple_dep ],
+  dependencies: [ config_dep, gtk_dep, __host_dep ],
   sources: 'main.cc',
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__host_simple_runner_cfg = configuration_data ()
+__host_runner_cfg = configuration_data ()
 
-__host_simple_runner_cfg.set ('host_simple_bin_path', __host_simple_bin.full_path ())
+__host_runner_cfg.set ('host_bin_path', __host_bin.full_path ())
 
 foreach tuple: [ [ __common_lib, 'common_lib_path' ],
+                 [ __core_lib, 'core_lib_path' ],
                  [ __extension_lib, 'extension_lib_path' ],
                  [ __extension_mod, 'extension_mod_path' ],
-                 [ __core_lib, 'host_lib_path' ],
-                 [ __host_simple_lib, 'host_simple_lib_path' ] ]
+                 [ __host_lib, 'host_lib_path' ] ]
 
   path = tuple.get (0).full_path ()
   list = path.split ('/')
 
   path = path.replace (list.get (list.length () - 1), '')
 
-  __host_simple_runner_cfg.set (tuple.get (1), path)
-
+  __host_runner_cfg.set (tuple.get (1), path)
 endforeach
 
-configure_file (configuration: __host_simple_runner_cfg, input: 'runner.sh.in', output: 'runner.sh')
+configure_file (configuration: __host_runner_cfg, input: 'runner.sh.in', output: 'runner.sh')

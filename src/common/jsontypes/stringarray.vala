@@ -15,24 +15,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Simple.Configuration
+namespace Wakit.JsonTypes
 {
 
-  public sealed class Scheme: GLib.Object
-    {
-
-      public SchemeAliasArray aliases { get; construct; }
-      public string? bundle { get; construct; default = null; }
-      public bool local { get; construct; default = true; }
-      public string name { get; construct; }
-      public bool secure { get; construct; default = false; }
-      public string? tree { get; construct; default = null; }
-
-      public override void constructed ()
-        {
-
-          base.constructed ();
-          _aliases = _aliases ?? new SchemeAliasArray ();
-        }
-    }
+  [CCode (cheader_filename = "glib.h,common/jsontypes/wakit-common-json.h",
+          cname = "GPtrArray",
+          type_id = "(wakit_json_types_generic_ptr_array_get_type (G_TYPE_STRING))"),
+   Compact (opaque = true)]
+  public class StringArray: GenericArray<string> { }
 }
