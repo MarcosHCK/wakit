@@ -79,7 +79,7 @@ namespace Wakit.Busmaster
               _main_loop = main_loop;
               sigint_source_add (main_context, on_sigint);
 
-              run_async.begin (argv_, (o, res) =>
+              run_async.begin (argv_, null, (o, res) =>
                 {
 
                   try
@@ -117,19 +117,15 @@ namespace Wakit.Busmaster
       [CCode (cheader_filename = "busmaster/application.c")]
       extern static void sigint_source_add (GLib.MainContext context, owned GLib.SourceFunc func);
 
-      private async int run_async (string[] args) throws GLib.Error
+      private async int run_async (string[] args, GLib.Cancellable? cancellable) throws GLib.Error
         {
 
           Json.Parser parser;
-          GLib.InputStream stream;
 
-          if (GLib.str_equal ("-", _config))
+          var file = GLib.File.new_for_commandline_arg (_config);
+          var stream = yield file.read_async (GLib.Priority.HIGH, cancellable);
 
-            stream = StandardFiles.open_stdin ();
-          else
-            stream = yield File.new_for_commandline_arg (_config).read_async (GLib.Priority.HIGH);
-
-          yield (parser = new Json.Parser ()).load_from_stream_async (stream);
+          yield (parser = new Json.Parser ()).load_from_stream_async (stream, cancellable);
 
           Configuration configuration = _json_gobject_deserialize<Configuration> (parser.get_root ());
 
@@ -142,7 +138,7 @@ namespace Wakit.Busmaster
 
           _timeout = configuration.timeout;
 
-          _transport_server = yield open_transport (configuration);
+          _transport_server = yield open_transport (configuration, cancellable);
           _bus_server = new Bus.Server (GLib.DBus.generate_guid ());
 
           _transport_server.start ();
@@ -185,7 +181,7 @@ namespace Wakit.Busmaster
         return GLib.Source.REMOVE;
         }
 
-      private async Transport.Server open_transport (Configuration configuration) throws GLib.Error
+      private async Transport.Server open_transport (Configuration configuration, GLib.Cancellable? cancellable) throws GLib.Error
         {
 
           GLib.Error? last_error = null;
@@ -194,7 +190,7 @@ namespace Wakit.Busmaster
             {
 
               try
-                { return yield new Transport.Server.async (address); }
+                { return yield new Transport.Server.async (address, GLib.Priority.DEFAULT, cancellable); }
 
               catch (GLib.Error error)
                 {
