@@ -24,7 +24,7 @@ namespace Wakit.Host.Module
       public string bus_address { get; construct; }
       public Configuration.Config configuration { get; construct; }
 
-      private GenericArray<Watcher> _watchers;
+      public GenericArray<Watcher> watchers { get; }
 
       public override void constructed ()
         {

@@ -18,8 +18,15 @@
 namespace Wakit.Host.Module
 {
 
+  /**
+   * Keep well-known bus things in sync with extension/extension.ts
+   * - note: the constants at the top (OBJECT_PATH := MODULE_OBJECT_PATH)
+   */
+
   public interface IModuleHost: GLib.Object
     {
+
+      public const string OBJECT_PATH = "/org/hck/wakit/Host/Module";
 
       public abstract ICollection<IPostable> postables { get; }
     }

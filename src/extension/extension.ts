@@ -17,19 +17,25 @@
 
 const BUS_NAME = 'org.hck.wakit.AppBus' as const
 const BUS_OBJECT_PATH = '/org/hck/wakit/AppBus' as const
+const MODULE_OBJECT_PATH = "/org/hck/wakit/Host/Module" as const
 
-export type ProxyBase =
+export interface ProxyBase
 {
 }
 
-export type ProxyBuilder =
+export interface ProxyBuilder
 {
-  create: (interface_name: string, object_path: string) => Promise<ProxyBase>
+  create: (bus_name: string, interface_name: string, object_path: string) => Promise<ProxyBase>;
 }
 
-export type ProxyLister =
+export interface ProxyLister
 {
-  list_path: (object_path: string) => Promise<string[]>
+  list_path: (bus_name: string, object_path: string) => Promise<string[]>;
+}
+
+export interface ModuleRegistry extends ProxyBase
+{
+  list_names: () => Promise<string[]>;
 }
 
 export const setup = async (page_id: string, proxyBuilder: ProxyBuilder, proxyLister: ProxyLister) =>
@@ -44,27 +50,40 @@ export const setup = async (page_id: string, proxyBuilder: ProxyBuilder, proxyLi
 export const setupUnsafe = async (page_id: string, proxyBuilder: ProxyBuilder, proxyLister: ProxyLister) =>
 {
 
-  await makeBridge (proxyBuilder, proxyLister)
-  await makeBrowserWindow (page_id, proxyBuilder)
+  const globals = (globalThis as unknown as { bridge: Record<string, ProxyBase>; browserWindow: ProxyBase })
+  const names = await listModuleNames (proxyBuilder)
+
+  globals.bridge = await makeBridge (names, proxyBuilder, proxyLister)
+  globals.browserWindow = await makeBrowserWindow (page_id, proxyBuilder)
 }
 
-export const makeBridge = async (proxyBuilder: ProxyBuilder, proxyLister: ProxyLister) =>
+export const listModuleNames = async (proxyBuilder: ProxyBuilder) =>
 {
 
-  const object_path = `${BUS_OBJECT_PATH}/services`
+  const interface_name = 'org.hck.wakit.Host.Module.Registry'
+  const object_path = BUS_OBJECT_PATH
 
-  const interfaces = await proxyLister.list_path (object_path)
-  const typenames = interfaces.map (v => { let l = v.split ('.'); return l [l.length - 1] })
-  const types = Object.fromEntries (Array.from ({ length: interfaces.length }).map ((_, i) => ([ typenames[i], interfaces[i] ])))
+  const proxy = await proxyBuilder.create (BUS_NAME, interface_name, object_path)
+  const names = await (proxy as ModuleRegistry).list_names ()
+return names
+}
 
-  const proxies: { [typename: string]: ProxyBase } = { }
+export const makeBridge = async (names: string[], proxyBuilder: ProxyBuilder, proxyLister: ProxyLister) =>
+{
 
-  for (const [ typename, interface_name ] of Object.entries (types))
+  const proxies = new Map<string, ProxyBase> ()
+
+  for (const name of names)
+  for (const [ typename, proxyBase ] of await makeProxyListForName (name, proxyBuilder, proxyLister))
     {
-      proxies [typename] = await proxyBuilder.create (interface_name, object_path)
-    }
 
-  ;(globalThis as unknown as { bridge: typeof proxies }).bridge = proxies
+      if (false === proxies.has (typename))
+
+        proxies.set (typename, proxyBase)
+      else
+        logging.warning (`duplicated bridge type '${typename}'`)
+    }
+return Object.fromEntries (proxies.entries ())
 }
 
 export const makeBrowserWindow = async (page_id: string, proxyBuilder: ProxyBuilder) =>
@@ -73,7 +92,21 @@ export const makeBrowserWindow = async (page_id: string, proxyBuilder: ProxyBuil
   const interface_name = 'org.hck.wakit.Browser.Window'
   const object_path = `${BUS_OBJECT_PATH}/windows/${page_id}`
 
-  const proxy = await proxyBuilder.create (interface_name, object_path)
+  const proxy = await proxyBuilder.create (BUS_NAME, interface_name, object_path)
 
-  ;(globalThis as unknown as { browserWindow: ProxyBase }).browserWindow = proxy
+return proxy
+}
+
+export const makeProxyListForName = async (name: string, proxyBuilder: ProxyBuilder, proxyLister: ProxyLister) =>
+{
+
+  const object_path = MODULE_OBJECT_PATH
+  const interfaces = await proxyLister.list_path (name, object_path)
+  const typenames = interfaces.map (v => { let l = v.split ('.'); return l [l.length - 1] })
+  const types = [] as [ typename: string, proxyBase: ProxyBase ][]
+
+  for (let i = 0; i < interfaces.length; ++i)
+    types.push ([ typenames[i], await proxyBuilder.create (name, interfaces[i], object_path) ])
+
+return types
 }

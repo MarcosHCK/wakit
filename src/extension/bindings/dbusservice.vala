@@ -44,10 +44,9 @@ namespace Wakit.Binding
           _infos = new GLib.HashTable<string, GLib.DBusNodeInfo> (hash_func, key_equal_func);
         }
 
-      private async GLib.DBusNodeInfo introspect (string object_path) throws GLib.Error
+      private async GLib.DBusNodeInfo introspect (string bus_name, string object_path) throws GLib.Error
         {
 
-          unowned var bus_name = _bus_name;
           unowned var flag1 = GLib.DBusCallFlags.NO_AUTO_START;
           unowned var flags = flag1;
           unowned var interface_name = "org.freedesktop.DBus.Introspectable";
@@ -61,13 +60,13 @@ namespace Wakit.Binding
         return new GLib.DBusNodeInfo.for_xml (reply.get_child_value (0).get_string ());
         }
 
-      public async unowned GLib.DBusInterfaceInfo lookup_info (string object_path, string interface_name) throws GLib.Error
+      public async unowned GLib.DBusInterfaceInfo lookup_info (string bus_name, string interface_name, string object_path) throws GLib.Error
         {
 
           unowned GLib.DBusInterfaceInfo? interface_info;
           unowned GLib.DBusNodeInfo? node_info;
 
-          node_info = yield lookup_node_info (object_path);
+          node_info = yield lookup_node_info (bus_name, object_path);
 
           if (null == (interface_info = node_info.lookup_interface (interface_name)))
             {
@@ -77,29 +76,29 @@ namespace Wakit.Binding
         return interface_info;
         }
 
-      public async unowned GLib.DBusNodeInfo lookup_node_info (string object_path) throws GLib.Error
+      public async unowned GLib.DBusNodeInfo lookup_node_info (string bus_name, string object_path) throws GLib.Error
         {
 
           unowned GLib.DBusNodeInfo? info;
+          var key = bus_name.concat (object_path);
 
-          if (null == (info = _infos.lookup (object_path)))
+          if (null == (info = _infos.lookup (key)))
             {
 
-              var owned_ = yield introspect (object_path);
+              var owned_ = yield introspect (bus_name, object_path);
 
               info = owned_;
-              _infos.insert (object_path, (owned) owned_);
+              _infos.insert ((owned) key, (owned) owned_);
             }
         return info;
         }
 
-      public async GLib.DBusProxy make_proxy (string interface_name, string object_path, GLib.DBusProxyFlags flags, GLib.Cancellable? cancellable = null) throws GLib.Error
+      public async GLib.DBusProxy make_proxy (string bus_name, string interface_name, string object_path, GLib.DBusProxyFlags flags, GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
-          unowned var info = yield lookup_info (object_path, interface_name);
-          unowned var name = _bus_name;
+          unowned var info = yield lookup_info (bus_name, interface_name, object_path);
 
-        return yield new GLib.DBusProxy (_connection, flags, info, name, object_path, interface_name, cancellable);
+        return yield new GLib.DBusProxy (_connection, flags, info, bus_name, object_path, interface_name, cancellable);
         }
     }
 }

@@ -181,6 +181,9 @@ namespace Wakit.Host
       public override async bool startup_async (GLib.Cancellable? cancellable) throws GLib.Error
         {
 
+          Module.RegistryPostable postable;
+          appbus.postables.add (postable = new Module.RegistryPostable ());
+
           yield base.startup_async ();
 
           _module_registry = (Module.Registry) GLib.Object.new (typeof (Module.Registry),
@@ -188,7 +191,7 @@ namespace Wakit.Host
             "configuration", configuration,
             null);
 
-          yield _module_registry.init_async (GLib.Priority.DEFAULT, cancellable);
+          yield (postable.registry = _module_registry).init_async (GLib.Priority.DEFAULT, cancellable);
         return true;
         }
     }

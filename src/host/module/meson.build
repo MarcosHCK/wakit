@@ -72,7 +72,7 @@ __host_module_server_lib = static_library ('wakit-host-module-server',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ] + __host_module_server_args,
   dependencies: [ config_vala_dep, __host_module_client_dep, __host_module_server_deps ],
-  sources: [ 'registry.cc', 'registry.h', 'registry.vala', 'watcher.vala' ],
+  sources: [ 'registry.cc', 'registry.h', 'registry.vala', 'registrypostable.vala', 'watcher.vala' ],
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
 __host_module_server_dep = declare_dependency (dependencies: [ config_dep, __host_module_client_dep ],

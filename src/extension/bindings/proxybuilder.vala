@@ -39,33 +39,26 @@ namespace Wakit.Binding
           Object (dbus_service: dbus_service);
         }
 
-      private JSC.Value create (JSC.Context context, string interface_name, string object_path)
-        {
-
-          return Promise.create (context, p => create_async.begin (p.context, interface_name, object_path,
-            (o, res)  => ((ProxyBuilder) o).create_complete (p, res)));
-        }
-
-      async ProxyBase create_async (JSC.Context context, string interface_name, string object_path) throws GLib.Error
+      async ProxyBase create_async (JSC.Context context, string name, string interface_name, string object_path) throws GLib.Error
         {
 
           unowned var flag1 = GLib.DBusProxyFlags.DO_NOT_AUTO_START;
           unowned var flag2 = GLib.DBusProxyFlags.GET_INVALIDATED_PROPERTIES;
           unowned var flags = flag1 | flag2;
-          unowned var info = yield _dbus_service.lookup_info (object_path, interface_name);
+          unowned var info = yield _dbus_service.lookup_info (name, interface_name, object_path);
           unowned var type = GLib.Type.INVALID;
 
           yield async_lock (_types_lock);
 
-          if (! _types.lookup_extended (interface_name, null, out type))
-            type = _types.add (info, interface_name);
+          if (! _types.lookup_extended (info, null, out type))
+            type = _types.add (info);
 
           if (null == IBinding<ProxyBase>.get_class (context, type))
             ProxyBase.register (context, info, type.name (), type);
 
           _types_lock.unlock ();
 
-          var dbus_proxy = yield _dbus_service.make_proxy (interface_name, object_path, flags);
+          var dbus_proxy = yield _dbus_service.make_proxy (name, interface_name, object_path, flags);
           var proxy = GLib.Object.new (type, "dbus-proxy", dbus_proxy, null);
         return (ProxyBase) proxy;
         }
@@ -83,13 +76,21 @@ namespace Wakit.Binding
       private JSC.Value? create_method (GenericArray<JSC.Value> args)
         {
 
-          if (args.length < 2)
+          if (args.length < 3)
             {
               JSC.Context.get_current ().throw ("expected two arguments");
               return null;
             }
 
-          string interface_name = args [0].to_string ();
+          string name = args [0].to_string ();
+
+          if (! GLib.DBus.is_name (name))
+            {
+              JSC.Context.get_current ().throw ("invalid bus name");
+              return null;
+            }
+
+          string interface_name = args [1].to_string ();
 
           if (! GLib.DBus.is_interface_name (interface_name))
             {
@@ -97,7 +98,7 @@ namespace Wakit.Binding
               return null;
             }
 
-          string object_path = args [1].to_string ();
+          string object_path = args [2].to_string ();
 
           if (! GLib.Variant.is_object_path (object_path))
             {
@@ -105,7 +106,10 @@ namespace Wakit.Binding
               return null;
             }
 
-        return create (JSC.Context.get_current (), interface_name, object_path);
+          var context = JSC.Context.get_current ();
+
+          return Promise.create (context, p => create_async.begin (p.context, name, interface_name, object_path,
+              (o, res)  => ((ProxyBuilder) o).create_complete (p, res)));
         }
 
       public static unowned Class register (JSC.Context context)

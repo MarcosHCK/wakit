@@ -30,6 +30,7 @@ namespace Wakit.Host.Module
 #endif // DEVELOP
 
       public Arguments arguments { get; construct; }
+      public string bus_name { get; construct set; default = null; }
       public string executable { get; construct; }
       public uint kill_timeout { get; construct; default = 600; }
 
@@ -45,7 +46,7 @@ namespace Wakit.Host.Module
           _executable = _executable ?? DEFAULT_EXECUTABLE;
         }
 
-      public async bool boot_async (int io_priority, GLib.Cancellable? cancellable) throws GLib.Error
+      public async string boot_async (int io_priority, GLib.Cancellable? cancellable) throws GLib.Error
           requires (null == _watcher)
         {
 
@@ -69,7 +70,8 @@ namespace Wakit.Host.Module
       public async bool init_async (int io_priority, GLib.Cancellable? cancellable) throws GLib.Error
         {
 
-        return yield boot_async (io_priority, cancellable);
+          bus_name = yield boot_async (io_priority, cancellable);
+        return true;
         }
 
       public async bool quit_async (uint timeout) throws GLib.Error
@@ -104,7 +106,7 @@ namespace Wakit.Host.Module
         return length == written;
         }
 
-      private async bool wait_ready (GLib.Subprocess subprocess, int io_priority, GLib.Cancellable? cancellable) throws GLib.Error
+      private async string wait_ready (GLib.Subprocess subprocess, int io_priority, GLib.Cancellable? cancellable) throws GLib.Error
         {
 
           var stdin = subprocess.get_stdin_pipe ();
@@ -118,7 +120,7 @@ namespace Wakit.Host.Module
           if (unlikely (null == unique_name || false == GLib.DBus.is_unique_name (unique_name)))
             throw new GLib.IOError.INVALID_DATA ("bad dbus address");
 
-        return true;
+        return unique_name;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Wakit.Binding
 {
 
   [Compact (opaque = true)]
-  internal class ProxyBuilderTypes: GLib.HashTable<string, GLib.Type>
+  internal class ProxyBuilderTypes: GLib.HashTable<GLib.DBusInterfaceInfo, GLib.Type>
     {
 
       public ProxyBuilderTypes ()
@@ -31,7 +31,7 @@ namespace Wakit.Binding
       [CCode (cheader_filename = "glib.h", cname = "g_intern_string")]
       extern static unowned string _g_intern_string (string value);
 
-      public new GLib.Type add (GLib.DBusInterfaceInfo dbus_info, string name)
+      public new GLib.Type add (GLib.DBusInterfaceInfo dbus_info)
         {
 
           unowned GLib.Type derived_type;
@@ -50,7 +50,7 @@ namespace Wakit.Binding
             (InstanceInitFunc) derived_type_instance_init,
             flags);
 
-          insert (name, derived_type);
+          insert (dbus_info, derived_type);
         return derived_type;
         }
 

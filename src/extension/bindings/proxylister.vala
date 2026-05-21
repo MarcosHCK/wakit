@@ -43,10 +43,10 @@ namespace Wakit.Binding
           _hidden_interfaces.add ("org.freedesktop.DBus.Peer");
         }
 
-      async JSC.Value? list_path_async (JSC.Context context, string object_path) throws GLib.Error
+      async JSC.Value? list_path_async (JSC.Context context, string name, string object_path) throws GLib.Error
         {
 
-          unowned var info = yield _dbus_service.lookup_node_info (object_path);
+          unowned var info = yield _dbus_service.lookup_node_info (name, object_path);
           var array = new GenericArray<JSC.Value> (info.interfaces.length);
 
           foreach (unowned var interface_ in info.interfaces)
@@ -69,13 +69,21 @@ namespace Wakit.Binding
       private JSC.Value? list_path_method (GenericArray<JSC.Value> args)
         {
 
-          if (args.length < 1)
+          if (args.length < 2)
             {
               JSC.Context.get_current ().throw ("expected one arguments");
               return null;
             }
 
-          string object_path = args [0].to_string ();
+          string name = args [0].to_string ();
+
+          if (! GLib.DBus.is_name (name))
+            {
+              JSC.Context.get_current ().throw ("invalid bus name");
+              return null;
+            }
+
+          string object_path = args [1].to_string ();
 
           if (! GLib.Variant.is_object_path (object_path))
             {
@@ -85,7 +93,7 @@ namespace Wakit.Binding
 
           unowned JSC.Context context = JSC.Context.get_current ();
 
-          return Promise.create (context, p => list_path_async.begin (context, object_path, (o, res) =>
+          return Promise.create (context, p => list_path_async.begin (context, name, object_path, (o, res) =>
             ((ProxyLister) o).list_path_complete (p, res)));
         }
 

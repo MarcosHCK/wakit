@@ -25,7 +25,6 @@ namespace Wakit.Host.Module
       public string module_loader { construct; }
       public ICollection<IPostable> postables { get; }
 
-      private const string OBJECT_PATH = "/org/hck/wakit/host/module";
       private IModule? _module = null;
 
       public Host (string module_filename, string module_loader, GLib.Cancellable? cancellable = null) throws GLib.Error
