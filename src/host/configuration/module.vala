@@ -23,7 +23,7 @@ namespace Wakit.Host.Configuration
 
       public string? digest { get; construct; default = null; }
       public string? file { get; construct; default = null; }
-      public string? loader { get; construct; default = null; }
+      public string loader { get; construct; default = "c"; }
       public string? name { get; construct; default = null; }
     }
 }

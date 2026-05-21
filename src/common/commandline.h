@@ -15,11 +15,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #pragma once
-#include <glib.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 
   gchar** wakit_command_line_ensure_argv (int* argc, char*** argv);
+  GInputStream* wakit_command_line_get_stdin ();
+  GOutputStream* wakit_command_line_get_stdout ();
   GSource* wakit_command_line_interrupt_source_new (void);
 
 G_END_DECLS

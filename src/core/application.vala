@@ -27,6 +27,8 @@ namespace Wakit
       private Browser.ExtensionHost _browser_extension_host;
       private GLib.Queue<DeferredUrls?> _deferred_open;
 
+      protected string appbus_address { get { return _appbus_watcher.address; } }
+
       public IAppBus appbus { get { return _appbus_bus; } }
       public IBrowser browser { get { return _browser_browser; } }
       public Configuration.Config? configuration { get; construct; }

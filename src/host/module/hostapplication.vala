@@ -23,10 +23,10 @@ namespace Wakit.Host.Module
 
       public string appbus_address { get; construct set; }
       public uint appbus_timeout { get; construct set; default = 1200; }
+      public uint launch_timeout { get; construct set; default = 600; }
       public string? module_digest { get; construct set; }
       public string module_filename { get; construct set; }
       public string module_loader { get; construct set; }
-      public uint module_timeout { get; construct set; default = 600; }
 
       private GLib.DBusConnection? _connection = null;
       private Host? _host = null;
@@ -47,11 +47,17 @@ namespace Wakit.Host.Module
         return GLib.str_equal (expected, checksum.get_string ());
         }
 
-      public int run ([CCode (array_length_cname = "argc", array_length_pos = 0.9, array_length_type = "int")] string[] argv)
+      static int main (string[] argv)
+        {
+
+        return (new HostApplication ()).run ();
+        }
+
+      public int run ()
         {
 
           try
-            { return run_ (argv); }
+            { return run_ (); }
 
           catch (GLib.OptionError error)
             { printerr ("%s\n", error.message); }
@@ -62,10 +68,10 @@ namespace Wakit.Host.Module
         return 1;
         }
 
-      private int run_ ([CCode (array_length_cname = "argc", array_length_pos = 0.9, array_length_type = "int")] string[] argv) throws GLib.Error
+      private int run_ () throws GLib.Error
         {
 
-          run_parse (argv);
+          run_parse ();
           run_prepare ();
 
           var main_context = GLib.MainContext.ref_thread_default ();
@@ -128,65 +134,45 @@ namespace Wakit.Host.Module
           ((HostApplication) o).quit ();
         }
 
-      private int run_parse ([CCode (array_length_cname = "argc", array_length_pos = 0.9, array_length_type = "int")] string[] argv) throws GLib.Error
+      private int run_parse () throws GLib.Error
         {
 
-          var args = CommandLine.ensure_argv (ref argv);
-          var context = new GLib.OptionContext ();
+          var stream = CommandLine.get_stdin ();
+          var parser = new Json.Parser.immutable_new ();
+          parser.load_from_stream (stream);
 
-          unowned string? appbus_address = null;
-          unowned string? module_digest = null;
-          unowned string? module_filename = null;
-          unowned string? module_loader = null;
+          var root = parser.steal_root ();
+          var arguments = (Arguments) Json.gobject_deserialize (typeof (Arguments), root);
 
-          GLib.OptionEntry entries [] = {
-            { "appbus-address", 0, 0, GLib.OptionArg.STRING, ref appbus_address, "AppBus address", "ADDRESS" },
-            { "appbus-timeout", 0, 0, GLib.OptionArg.INT, ref _appbus_timeout, "AppBus connection timeout (default: 1200)", "MSECS" },
-            { "module-digest", 0, 0, GLib.OptionArg.STRING, ref module_digest, "Module filename digest (default: do not bother)", "SHA512" },
-            { "module-loader", 0, 0, GLib.OptionArg.STRING, ref module_loader, "Module loader", "LOADER" },
-            { "module-filename", 0, 0, GLib.OptionArg.FILENAME, ref module_filename, "Module filename", "FILE" },
-            { "module-timeout", 0, 0, GLib.OptionArg.INT, ref _module_timeout, "Module load timeout (default: 600)", "MSECS" },
-            { null, 0, 0, 0, null, null, null },
-          };
-
-          context.add_main_entries (entries, "en_US");
-          context.set_help_enabled (true);
-          context.set_ignore_unknown_options (false);
-          context.set_translation_domain ("en_US");
-          context.parse (ref argv);
-
-          if (likely (null != appbus_address))
-
-            _appbus_address = appbus_address;
-          else
+          if (unlikely (null == (_appbus_address = arguments.appbus_address)))
             throw new GLib.OptionError.FAILED ("specify the appbus address");
 
-          if (likely (null != module_loader))
+          if (unlikely (! GLib.DBus.is_address (_appbus_address)))
+            throw new GLib.OptionError.FAILED ("invalid appbus address");
 
-            _module_loader = module_loader;
-          else
-            throw new GLib.OptionError.FAILED ("specify the module type");
+          _appbus_timeout = arguments.appbus_timeout;
+          _launch_timeout = arguments.launch_timeout;
 
-          if (unlikely (null == module_filename))
+          if (unlikely (null == (module_filename = arguments.module_filename)))
             throw new GLib.OptionError.FAILED ("specify the module filename");
+
+          if (unlikely (null == (_module_loader = arguments.module_loader)))
+            throw new GLib.OptionError.FAILED ("specify the module type");
 
           GLib.File _file;
           _module_filename = (_file = GLib.File.new_for_commandline_arg (module_filename)).get_path ();
 
-          if (null != _module_digest && unlikely (false == check_digest (_file, _module_digest)))
+          if (null != (_module_digest = arguments.module_digest)
+            && unlikely (false == check_digest (_file, _module_digest)))
             throw new GLib.OptionError.FAILED ("module file digest mismatch");
 
-          _g_strfreev ((owned) args);
         return 0;
         }
-
-      [CCode (cheader_filename = "glib.h", cname = "g_strfreev")]
-      extern static void _g_strfreev ([CCode (array_length = false, array_null_terminated = true)] owned string[] strv);
 
       public bool run_prepare () throws GLib.Error
         {
 
-          var timeout = _module_timeout;
+          var timeout = _launch_timeout;
           var cancellable = new TimeoutCancellable (timeout);
 
           _host = new Host (_module_filename, _module_loader, cancellable);

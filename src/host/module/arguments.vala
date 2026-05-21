@@ -15,23 +15,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Host.Configuration
+namespace Wakit.Host
 {
 
-  public sealed class Modules: GLib.Object
+  public sealed class Arguments: GLib.Object
     {
 
-      public string? base_dir { get; construct; }
-      public ModuleArray items { get; construct; }
-      public uint launch_timeout { get; construct; default = 600; }
-      public uint shutdown_timeout { get; construct; default = 500; }
-
-      public override void constructed ()
-        {
-
-          base.constructed ();
-          _base_dir = _base_dir ?? ".";
-          _items = _items ?? new ModuleArray ();
-        }
+      public string appbus_address { get; construct set; }
+      public uint appbus_timeout { get; construct set; default = 1200; }
+      public uint launch_timeout { get; construct set; default = 600; }
+      public string? module_digest { get; construct set; }
+      public string module_filename { get; construct set; }
+      public string module_loader { get; construct set; }
     }
 }

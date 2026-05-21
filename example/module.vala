@@ -18,7 +18,7 @@
 namespace Wakit.Host
 {
 
-  [ModuleInit] public static bool module_init (Module.Host host, GLib.TypeModule module)
+  [ModuleInit] public static bool module_init (Module.IModuleHost host, GLib.TypeModule module)
     {
 
       host.postables.add (new Example.Interface ());

@@ -24,15 +24,18 @@ namespace Wakit.Host.Module
       public const string MODULE_INIT_FUNC_NAME = "wakit_host_module_init";
 
       [CCode (has_target = false, scope = "forever")]
-      delegate bool ModuleInitFunc (Host host, TypeModule type_module);
+      delegate bool ModuleInitFunc (IModuleHost host, TypeModule type_module);
 
-      public unowned Host host { get; construct; }
+      public unowned IModuleHost host { get; construct; }
       public string filename { get; construct; }
+
+      internal const string EXPECTED_MIME_TYPE = "application/x-sharedlib";
+      internal const string SEARCH_PATTERNS = "?.so,lib?.so,lib?-mod.so";
 
       private GLib.Module? _module = null;
       private ModuleInitFunc? _module_init = null;
 
-      public TypeModule (string filename, Host host) throws GLib.Error
+      public TypeModule (string filename, IModuleHost host) throws GLib.Error
         {
 
           Object (filename: filename, host: host);

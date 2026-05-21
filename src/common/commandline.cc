@@ -15,7 +15,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
+#include <common/boxing.h>
 #include <common/commandline.h>
+#ifdef G_OS_UNIX
+#include <gio/gunixinputstream.h>
+#include <gio/gunixoutputstream.h>
+#include <unistd.h>
+#endif // G_OS_UNIX
 
 gchar** wakit_command_line_ensure_argv (int* argc, char*** argv)
 {
@@ -28,6 +34,40 @@ return NULL;
 
 return (*argc = new_argc, *argv = new_argv, new_argv);
 # endif // defined(G_OS_WIN32)
+}
+
+boxing::object<GInputStream> _stdin_stream;
+
+GInputStream* wakit_command_line_get_stdin ()
+{
+
+  static GInputStream* __static = NULL;
+
+  if (g_once_init_enter (&__static))
+    {
+    # ifdef G_OS_UNIX
+      _stdin_stream = g_unix_input_stream_new (STDIN_FILENO, FALSE);
+    # endif // G_OS_UNIX
+      g_once_init_leave (&__static, *_stdin_stream);
+    }
+return __static;
+}
+
+boxing::object<GOutputStream> _stdout_stream;
+
+GOutputStream* wakit_command_line_get_stdout ()
+{
+
+  static GOutputStream* __static = NULL;
+
+  if (g_once_init_enter (&__static))
+    {
+    # ifdef G_OS_UNIX
+      _stdout_stream = g_unix_output_stream_new (STDOUT_FILENO, FALSE);
+    # endif // G_OS_UNIX
+      g_once_init_leave (&__static, *_stdout_stream);
+    }
+return __static;
 }
 
 # if defined(G_OS_WIN32)

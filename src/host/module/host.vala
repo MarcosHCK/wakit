@@ -18,7 +18,7 @@
 namespace Wakit.Host.Module
 {
 
-  public sealed class Host: GLib.Object, GLib.Initable
+  public sealed class Host: GLib.Object, GLib.Initable, IModuleHost
     {
 
       public string module_filename { construct; }

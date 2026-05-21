@@ -77,13 +77,8 @@ namespace Wakit.Host
         {
 
           base.constructed ();
-          unowned var config = (Configuration.Config) configuration;
-
-          _module_registry = (Module.Registry) GLib.Object.new (typeof (Module.Registry),
-            "configuration", config.modules,
-            null);
-
           unowned var entries = Configuration.capture_entries ();
+
           add_main_option_entries (entries);
         }
 
@@ -174,10 +169,25 @@ namespace Wakit.Host
             assert_not_reached ();
         } }
 
+      public override async void shutdown_async ()
+        {
+
+          unowned var config = (Configuration.Config) configuration;
+
+          yield base.shutdown_async ();
+          yield _module_registry.quit_async (config.modules.shutdown_timeout);
+        }
+
       public override async bool startup_async (GLib.Cancellable? cancellable) throws GLib.Error
         {
 
           yield base.startup_async ();
+
+          _module_registry = (Module.Registry) GLib.Object.new (typeof (Module.Registry),
+            "bus-address", appbus_address,
+            "configuration", configuration,
+            null);
+
           yield _module_registry.init_async (GLib.Priority.DEFAULT, cancellable);
         return true;
         }

@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-#include <config.h>
-#include <host/module/wakit-host-module.h>
+#pragma once
+#include <gio/gio.h>
 
-int main (int argc, char* argv[])
-{
+G_BEGIN_DECLS
 
-  auto application = wakit_host_module_host_application_new ();
-  auto result = wakit_host_module_host_application_run (application, argc, argv);
+  G_GNUC_INTERNAL void wakit_host_module_registry_quit_impl (GPtrArray* watchers, guint timeout, GAsyncReadyCallback callback, gpointer user_data);
+  G_GNUC_INTERNAL gboolean wakit_host_module_registry_quit_impl_finish (GAsyncResult* result, GError** error);
 
-return (g_object_unref (application), result);
-}
+G_END_DECLS
