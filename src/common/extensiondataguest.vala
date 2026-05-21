@@ -45,7 +45,7 @@ namespace Wakit
 
           unowned string str;
           GLib.Variant var_;
-          GLib.VariantIter_ iter;
+          GLib.VariantIter iter;
 
           variant.get_child (0, "&s", out str);
           bus_address = str;
@@ -62,13 +62,13 @@ namespace Wakit
           unowned GLib.RegexCompileFlags compile_option1 = GLib.RegexCompileFlags.OPTIMIZE;
           unowned GLib.RegexCompileFlags compile_options = compile_option1;
 
-          for (iter = GLib.VariantIter_ (var_ = variant.get_child_value (3)); iter.next ("&s", out str);)
+          for (iter = new GLib.VariantIter (var_ = variant.get_child_value (3)); iter.next ("&s", out str);)
             accessible_uri_outsource.add (new GLib.Regex (str, compile_options));
 
-          for (iter = GLib.VariantIter_ (var_ = variant.get_child_value (4)); iter.next ("&s", out str);)
+          for (iter = new GLib.VariantIter (var_ = variant.get_child_value (4)); iter.next ("&s", out str);)
             accessible_uri_whitelist.add (new GLib.Regex (str, compile_options));
 
-          for (iter = GLib.VariantIter_ (var_ = variant.get_child_value (5)); iter.next ("&s", out str);)
+          for (iter = new GLib.VariantIter (var_ = variant.get_child_value (5)); iter.next ("&s", out str);)
             secure_schemes.add (str.dup ());
 
         return true;

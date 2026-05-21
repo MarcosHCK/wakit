@@ -49,7 +49,7 @@ foreach lib: [ 'guest', 'host' ]
   __common_src += [ 'extensiondata@0@.vala'.format (lib) ]
 endforeach
 
-foreach lib: [ 'collection', 'collectioniter', 'commandline', 'resource', 'variant' ]
+foreach lib: [ 'collection', 'collectioniter', 'commandline', 'resource' ]
 
   __common_src += [ '@0@.vala'.format (lib) ]
 endforeach
