@@ -34,40 +34,48 @@ namespace Wakit.Host.Module
         }
 
       public async bool init_async (int io_priority, GLib.Cancellable? cancellable) throws GLib.Error
+          requires (null != init_one)
         {
 
-          var base_dir = configuration.modules.base_dir;
+          yield init_impl (_watchers, configuration.modules.items, io_priority, cancellable);
 
-          uint appbus_timeout = configuration.appbus_launch_timeout;
-          uint launch_timeout = configuration.modules.launch_timeout;
-
-          foreach (unowned var module in configuration.modules.items.data)
-            {
-
-              unowned string loader = module.loader;
-              unowned string name = module.name;
-
-              string filename = module.file
-                             ?? yield search_filename (base_dir, loader, name, io_priority, cancellable);
-
-              var arguments = (Arguments) GLib.Object.new (typeof (Arguments),
-                "appbus-address", _bus_address,
-                "appbus-timeout", appbus_timeout,
-                "launch-timeout", launch_timeout,
-                "module-digest", module.digest,
-                "module-filename", filename,
-                "module-loader", loader,
-                null);
-
-              var watcher = (Watcher) GLib.Object.new (typeof (Watcher),
-                "arguments", arguments,
-                null);
-
-              yield watcher.init_async (io_priority, cancellable);
-
-              _watchers.add ((owned) watcher);
-            }
         return true;
+        }
+
+      [CCode (cheader_filename = "host/module/registry.h")]
+      extern async bool init_impl (GenericArray<Watcher> watchers,
+                                   GenericArray<Configuration.Module> modules,
+                                   int io_priority, GLib.Cancellable? cancellable) throws GLib.Error;
+
+      internal async Watcher init_one (Configuration.Module module, int io_priority, GLib.Cancellable? cancellable) throws GLib.Error
+        {
+
+          unowned string base_dir = _configuration.modules.base_dir;
+          unowned string loader = module.loader;
+          unowned string name = module.name;
+
+          uint appbus_timeout = _configuration.appbus_launch_timeout;
+          uint launch_timeout = _configuration.modules.launch_timeout;
+
+          string filename = module.file
+                         ?? yield search_filename (base_dir, loader, name, io_priority, cancellable);
+
+          var arguments = (Arguments) GLib.Object.new (typeof (Arguments),
+            "appbus-address", _bus_address,
+            "appbus-timeout", appbus_timeout,
+            "launch-timeout", launch_timeout,
+            "module-digest", module.digest,
+            "module-filename", filename,
+            "module-loader", loader,
+            null);
+
+          var watcher = (Watcher) GLib.Object.new (typeof (Watcher),
+            "arguments", arguments,
+            null);
+
+          yield watcher.init_async (io_priority, cancellable);
+
+        return watcher;
         }
 
       static size_t bigger_string ([CCode (array_length = false, array_null_terminated = true)] string[] strv)
@@ -129,6 +137,6 @@ namespace Wakit.Host.Module
         }
 
       [CCode (cheader_filename = "host/module/registry.h")]
-      extern static async bool quit_impl (GenericArray<Watcher> watched, uint timeout) throws GLib.Error;
+      extern async bool quit_impl (GenericArray<Watcher> watchers, uint timeout) throws GLib.Error;
     }
 }

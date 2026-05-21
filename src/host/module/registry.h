@@ -17,9 +17,27 @@
 #pragma once
 #include <gio/gio.h>
 
+typedef struct _WakitHostModuleRegistry WakitHostModuleRegistry;
+typedef struct _WakitHostModuleWatcher WakitHostModuleWatcher;
+
 G_BEGIN_DECLS
 
-  G_GNUC_INTERNAL void wakit_host_module_registry_quit_impl (GPtrArray* watchers, guint timeout, GAsyncReadyCallback callback, gpointer user_data);
-  G_GNUC_INTERNAL gboolean wakit_host_module_registry_quit_impl_finish (GAsyncResult* result, GError** error);
+  G_GNUC_INTERNAL void wakit_host_module_registry_init_impl (WakitHostModuleRegistry* registry,
+                                                             GPtrArray* watchers,
+                                                             GPtrArray* modules,
+                                                             int io_priority,
+                                                             GCancellable* cancellable,
+                                                             GAsyncReadyCallback callback, gpointer user_data);
+
+  G_GNUC_INTERNAL gboolean wakit_host_module_registry_init_impl_finish (WakitHostModuleRegistry* registry,
+                                                                        GAsyncResult* result, GError** error);
+
+  G_GNUC_INTERNAL void wakit_host_module_registry_quit_impl (WakitHostModuleRegistry* registry,
+                                                             GPtrArray* watchers,
+                                                             guint timeout,
+                                                             GAsyncReadyCallback callback, gpointer user_data);
+
+  G_GNUC_INTERNAL gboolean wakit_host_module_registry_quit_impl_finish (WakitHostModuleRegistry* registry,
+                                                                        GAsyncResult* result, GError** error);
 
 G_END_DECLS
