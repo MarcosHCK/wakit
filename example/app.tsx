@@ -18,7 +18,7 @@ import '@mantine/core/styles.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { createRoot } from 'react-dom/client'
 import { defaultColorScheme, theme } from './theme'
-import { MantineProvider } from '@mantine/core'
+import { Center, Loader, MantineProvider } from '@mantine/core'
 import { QueryClient, QueryClientProvider, useSuspenseQuery } from '@tanstack/react-query'
 import { routes } from '@wakit-example/routes'
 import React, { type ReactNode, Suspense } from 'react'
@@ -42,7 +42,7 @@ function Root ()
 
   return <BrowserRouter> <MantineProvider defaultColorScheme={defaultColorScheme} theme={theme}>
                          <QueryClientProvider client={queryClient}>
-                         <Suspense>
+                         <Suspense fallback={<Center h='100vh'> <Loader /> </Center>}>
             <Shell>
               <Routes> { routes.map (e => <Route {...e} />) }</Routes>
             </Shell>
