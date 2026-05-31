@@ -22,8 +22,7 @@ namespace Wakit.Host.Module
   public sealed class RegistryPostable: GLib.Object, IPostable
     {
 
-      [DBus (visible = false)]
-      public Registry? registry { set; }
+      [DBus (visible = false)] public Registry? registry { set; }
 
       [DBus (name = "list_names")] public async string[] list_names () throws GLib.Error
         {

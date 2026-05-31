@@ -67,6 +67,8 @@ namespace Wakit.Host.Module
             "module-digest", module.digest,
             "module-filename", filename,
             "module-loader", loader,
+            "module-name", module.name,
+            "module-type-prefix", module.type_prefix,
             null);
 
           var watcher = (Watcher) GLib.Object.new (typeof (Watcher),

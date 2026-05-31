@@ -14,17 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+import { BUS_NAME, BUS_OBJECT_PATH } from './constants'
+import { type ModuleRegistry } from './ModuleRegistry'
+import { type ProxyBuilder } from './ProxyBuilder'
 
-namespace Wakit.Host.Configuration
+export const listModuleNames = async (proxyBuilder: ProxyBuilder) =>
 {
 
-  public sealed class Module: GLib.Object
-    {
+  const interface_name = 'org.hck.wakit.Host.Module.Registry'
+  const object_path = BUS_OBJECT_PATH
 
-      public string? digest { get; construct; default = null; }
-      public string? file { get; construct; default = null; }
-      public string loader { get; construct; default = "c"; }
-      public string? name { get; construct; default = null; }
-      public string? type_prefix { get; construct; default = null; }
-    }
+  const proxy = await proxyBuilder.create (BUS_NAME, interface_name, object_path)
+  const names = await (proxy as ModuleRegistry).list_names ()
+return names
 }

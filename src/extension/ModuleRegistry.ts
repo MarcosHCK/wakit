@@ -14,17 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+import { type ProxyBase } from './ProxyBase'
 
-namespace Wakit.Host.Configuration
+export interface ModuleRegistry extends ProxyBase
 {
-
-  public sealed class Module: GLib.Object
-    {
-
-      public string? digest { get; construct; default = null; }
-      public string? file { get; construct; default = null; }
-      public string loader { get; construct; default = "c"; }
-      public string? name { get; construct; default = null; }
-      public string? type_prefix { get; construct; default = null; }
-    }
+  list_names: () => Promise<string[]>;
 }

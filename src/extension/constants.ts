@@ -15,16 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Host.Configuration
-{
-
-  public sealed class Module: GLib.Object
-    {
-
-      public string? digest { get; construct; default = null; }
-      public string? file { get; construct; default = null; }
-      public string loader { get; construct; default = "c"; }
-      public string? name { get; construct; default = null; }
-      public string? type_prefix { get; construct; default = null; }
-    }
-}
+export const BUS_NAME = 'org.hck.wakit.AppBus' as const
+export const BUS_OBJECT_PATH = '/org/hck/wakit/AppBus' as const
+export const MODULE_NAME = "org.hck.wakit.HostApplication" as const
+export const MODULE_OBJECT_PATH = "/org/hck/wakit/Host/Module" as const

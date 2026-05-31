@@ -26,6 +26,7 @@ namespace Wakit.Host.Module
       public ICollection<IPostable> postables { get; }
 
       private IModule? _module = null;
+      private const string OBJECT_PATH = IModuleHost.OBJECT_PATH + "/Types";
 
       public Host (string module_filename, string module_loader, GLib.Cancellable? cancellable = null) throws GLib.Error
         {

@@ -14,29 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
-const BUS_NAME = 'org.hck.wakit.AppBus' as const
-const BUS_OBJECT_PATH = '/org/hck/wakit/AppBus' as const
-const MODULE_OBJECT_PATH = "/org/hck/wakit/Host/Module" as const
-
-export interface ProxyBase
-{
-}
-
-export interface ProxyBuilder
-{
-  create: (bus_name: string, interface_name: string, object_path: string) => Promise<ProxyBase>;
-}
-
-export interface ProxyLister
-{
-  list_path: (bus_name: string, object_path: string) => Promise<string[]>;
-}
-
-export interface ModuleRegistry extends ProxyBase
-{
-  list_names: () => Promise<string[]>;
-}
+import { makeBridge } from './bridge'
+import { makeBrowserWindow } from './browserWindow'
+import { listModuleNames } from './module'
+import { type ProxyBase } from './ProxyBase'
+import { type ProxyBuilder } from './ProxyBuilder'
+import { type ProxyLister } from './ProxyLister'
 
 export const setup = async (page_id: string, proxyBuilder: ProxyBuilder, proxyLister: ProxyLister) =>
 {
@@ -55,58 +38,4 @@ export const setupUnsafe = async (page_id: string, proxyBuilder: ProxyBuilder, p
 
   globals.bridge = await makeBridge (names, proxyBuilder, proxyLister)
   globals.browserWindow = await makeBrowserWindow (page_id, proxyBuilder)
-}
-
-export const listModuleNames = async (proxyBuilder: ProxyBuilder) =>
-{
-
-  const interface_name = 'org.hck.wakit.Host.Module.Registry'
-  const object_path = BUS_OBJECT_PATH
-
-  const proxy = await proxyBuilder.create (BUS_NAME, interface_name, object_path)
-  const names = await (proxy as ModuleRegistry).list_names ()
-return names
-}
-
-export const makeBridge = async (names: string[], proxyBuilder: ProxyBuilder, proxyLister: ProxyLister) =>
-{
-
-  const proxies = new Map<string, ProxyBase> ()
-
-  for (const name of names)
-  for (const [ typename, proxyBase ] of await makeProxyListForName (name, proxyBuilder, proxyLister))
-    {
-
-      if (false === proxies.has (typename))
-
-        proxies.set (typename, proxyBase)
-      else
-        logging.warning (`duplicated bridge type '${typename}'`)
-    }
-return Object.fromEntries (proxies.entries ())
-}
-
-export const makeBrowserWindow = async (page_id: string, proxyBuilder: ProxyBuilder) =>
-{
-
-  const interface_name = 'org.hck.wakit.Browser.Window'
-  const object_path = `${BUS_OBJECT_PATH}/windows/${page_id}`
-
-  const proxy = await proxyBuilder.create (BUS_NAME, interface_name, object_path)
-
-return proxy
-}
-
-export const makeProxyListForName = async (name: string, proxyBuilder: ProxyBuilder, proxyLister: ProxyLister) =>
-{
-
-  const object_path = MODULE_OBJECT_PATH
-  const interfaces = await proxyLister.list_path (name, object_path)
-  const typenames = interfaces.map (v => { let l = v.split ('.'); return l [l.length - 1] })
-  const types = [] as [ typename: string, proxyBase: ProxyBase ][]
-
-  for (let i = 0; i < interfaces.length; ++i)
-    types.push ([ typenames[i], await proxyBuilder.create (name, interfaces[i], object_path) ])
-
-return types
 }

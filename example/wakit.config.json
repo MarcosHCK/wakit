@@ -8,7 +8,8 @@
     "items": [
       {
         "name": "wakit-example",
-        "loader": "c"
+        "loader": "c",
+        "type-prefix": "org.hck.wakit.Example"
       }
     ]
   },

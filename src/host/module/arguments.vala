@@ -27,5 +27,7 @@ namespace Wakit.Host
       public string? module_digest { get; construct set; }
       public string module_filename { get; construct set; }
       public string module_loader { get; construct set; }
+      public string? module_name { get; construct set; default = null; }
+      public string? module_type_prefix { get; construct set; default = null; }
     }
 }

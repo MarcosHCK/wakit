@@ -18,6 +18,12 @@
 namespace Wakit.Host.Module
 {
 
+  /**
+   * Keep well-known bus name in sync with extension/extension.ts
+   * - note: the constant named MODULE_NAME at the top with
+   *   HostApplication.Interface's bus name
+   */
+
   public sealed class HostApplication: GLib.Object
     {
 
@@ -27,9 +33,29 @@ namespace Wakit.Host.Module
       public string? module_digest { get; construct set; }
       public string module_filename { get; construct set; }
       public string module_loader { get; construct set; }
+      public string module_name { get; construct set; }
+      public string module_type_prefix { get; construct set; }
 
       private GLib.DBusConnection? _connection = null;
       private Host? _host = null;
+      private uint _registration_id = 0;
+
+      [DBus (name = "org.hck.wakit.HostApplication")] sealed class Interface: GLib.Object
+        {
+
+          [DBus (visible = false)] public string? name { get; construct; }
+          [DBus (visible = false)] public string? type_prefix { get; construct; }
+
+          [DBus (name = "get_name")] public async string get_name_ () throws GLib.Error
+            {
+              return _name ?? "";
+            }
+
+          [DBus (name = "get_type_prefix")] public async string get_type_prefix_ () throws GLib.Error
+            {
+              return _type_prefix ?? "";
+            }
+        }
 
       public signal void quit ();
 
@@ -95,6 +121,7 @@ namespace Wakit.Host.Module
           if (likely (null != _connection))
             {
               _host.reap_on_connection (_connection);
+              _connection.unregister_object (_registration_id);
               _connection.close.begin ();
             }
 
@@ -111,9 +138,15 @@ namespace Wakit.Host.Module
 
           var connection = yield AppBus.connect_client (_appbus_address, _appbus_timeout, cancellable);
           var success = _host.graft_on_connection (connection, cancellable);
-          _connection = connection;
 
-          print ("%s\n", _connection.unique_name);
+          var @interface = (Interface) GLib.Object.new (typeof (Interface),
+            "name", _module_name,
+            "type-prefix", _module_type_prefix,
+            null);
+
+          _registration_id = connection.register_object (IModuleHost.OBJECT_PATH, @interface);
+
+          print ("%s\n", (_connection = connection).unique_name);
         return success;
         }
 
@@ -166,10 +199,12 @@ namespace Wakit.Host.Module
             && unlikely (false == check_digest (_file, _module_digest)))
             throw new GLib.OptionError.FAILED ("module file digest mismatch");
 
+          _module_name = arguments.module_name;
+          _module_type_prefix = arguments.module_type_prefix;
         return 0;
         }
 
-      public bool run_prepare () throws GLib.Error
+      private bool run_prepare () throws GLib.Error
         {
 
           var timeout = _launch_timeout;

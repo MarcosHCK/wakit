@@ -15,16 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Host.Configuration
+export interface ProxyLister
 {
-
-  public sealed class Module: GLib.Object
-    {
-
-      public string? digest { get; construct; default = null; }
-      public string? file { get; construct; default = null; }
-      public string loader { get; construct; default = "c"; }
-      public string? name { get; construct; default = null; }
-      public string? type_prefix { get; construct; default = null; }
-    }
+  list_path: (bus_name: string, object_path: string) => Promise<string[]>;
 }
