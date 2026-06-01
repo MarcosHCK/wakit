@@ -27,7 +27,7 @@ dbus_info_generator::~dbus_info_generator ()
     _p_impl = (delete (impl*) _p_impl, nullptr);
 }
 
-dbus_info_generator::dbus_info_generator (std::string template_): _p_impl (new impl (std::move (template_)))
+dbus_info_generator::dbus_info_generator (std::string_view template_): _p_impl (new impl (template_))
 {
 }
 

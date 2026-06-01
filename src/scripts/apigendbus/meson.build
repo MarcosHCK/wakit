@@ -26,6 +26,20 @@ foreach bit: [ 'dbusinfo', 'dbusinfogenerator', 'dbusinfoimporter' ]
   __apigen_dbus_src += [ '@0@.h'.format (bit) ]
 endforeach
 
+__apigen_dbus_src += custom_target ('wakit-script-dbus-apigen-resources',
+  command: [ python_exe,
+             mkresources_py,
+             '--basedir', meson.current_source_dir (),
+             '--bin', resources_exe.full_path (),
+             '--dep', '@DEPFILE@',
+             '--header', '@OUTPUT0@',
+             '--source', '@OUTPUT1@',
+             '--name', 'wakit_script_dbus_apigen_',
+             '-s', '/org/hck/wakit', '@INPUT@' ],
+  depfile: 'resources.deps',
+  input: 'types.d.ts.j2',
+  output: [ 'apigen.resources.h', 'apigen.resources.c' ])
+
 __apigen_dbus_lib = static_library ('wakit-scripts-apigen-dbus',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.ApiGen.DBus"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),

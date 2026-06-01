@@ -30,7 +30,7 @@ public:
   dbus_info_generator (dbus_info_generator&&) = delete;
   dbus_info_generator (const dbus_info_generator&) = delete;
 
-  dbus_info_generator (std::string template_);
+  dbus_info_generator (std::string_view template_);
 
   void generate (std::ostream& stream, std::span<dbus_info> infos);
 };

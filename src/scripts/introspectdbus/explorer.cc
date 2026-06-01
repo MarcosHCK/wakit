@@ -28,7 +28,7 @@ explorer::explorer (const std::string& filename): _p_binary (LIEF::Parser::parse
 {
 
   if (nullptr == _p_binary)
-    throw new std::runtime_error ("unknown executable file format");
+    throw std::runtime_error ("unknown executable file format");
 }
 
 std::generator<explorer::symbol> explorer::suffixed_symbols (const std::string& suffix)

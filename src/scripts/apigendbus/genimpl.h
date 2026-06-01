@@ -36,8 +36,8 @@ class impl
 
 public:
 
-  inline impl (std::string template_): _environment (_make_environment ()),
-                                       _template (_environment.parse (template_))
+  inline impl (std::string_view template_): _environment (_make_environment ()),
+                                            _template (_environment.parse (template_))
     { }
 
   inline void render (std::ostream& stream, const nlohmann::json& data);

@@ -17,9 +17,6 @@
 
 gio_dep = dependency ('gio-2.0', required: true)
 
-subdir ('apigendbus')
-subdir ('introspectdbus')
-
 __script_common_lib = static_library ('wakit-script-common',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Script.Common"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
@@ -58,16 +55,39 @@ esbuild_js_gen = generator (python_exe,
 
 mkresources_py = meson.current_source_dir () / 'mkresources.py'
 
-apigen_dbus_exe = executable ('apigen-dbus',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.ApiGen.DBus"', '-DG_LOG_USE_STRUCTURED=1',
+subdir ('apigendbus')
+subdir ('introspectdbus')
+
+__dbus_apigen_exe = executable ('wakit-script-dbus-apigen',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.DBus.ApiGen"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.ApiGen.DBus"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.DBus.ApiGen"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   cpp_pch: 'pch/apigen-dbus.h',
-  dependencies: [ config_dep, gio_dep, __apigen_dbus_dep ],
+  dependencies: [ config_dep, __apigen_dbus_dep, __script_common_dep ],
   sources: 'apigendbus.cc')
+
+__dbus_introspect_exe = executable ('wakit-script-dbus-introspect',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.DBus.Introspect"', '-DG_LOG_USE_STRUCTURED=1',
+            '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
+            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.DBus.Introspect"', '-DG_LOG_USE_STRUCTURED=1',
+              '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
+              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+  cpp_pch: 'pch/introspect-dbus.h',
+  dependencies: [ config_dep, __introspect_dbus_dep, __script_common_dep ],
+  sources: 'introspectdbus.cc', )
+
+__dbus_apigen_cfg = configuration_data ()
+
+__dbus_apigen_cfg.set ('apigen_py', meson.current_source_dir () / 'apigen.py')
+__dbus_apigen_cfg.set ('apigen_exe', __dbus_apigen_exe.full_path ())
+__dbus_apigen_cfg.set ('introspect_exe', __dbus_introspect_exe.full_path ())
+__dbus_apigen_cfg.set ('python_exe', python_exe.full_path ())
+
+configure_file (configuration: __dbus_apigen_cfg, input: 'apigen.sh.in', output: 'apigen.sh')
 
 __fixvapis_src = [ 'fixvapis.cc' ]
 
@@ -104,24 +124,3 @@ __fixvapis_cfg.set ('fixvapis_exe', __fixvapis_exe.full_path ())
 __fixvapis_cfg.set ('fixvapis_py', meson.current_source_dir () / 'fixvapis.py')
 
 configure_file (configuration: __fixvapis_cfg, input: 'fixvapis.sh.in', output: 'fixvapis.sh')
-
-introspect_dbus_exe = executable ('introspect-dbus',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.Introspect.DBus"', '-DG_LOG_USE_STRUCTURED=1',
-            '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.Introspect.DBus"', '-DG_LOG_USE_STRUCTURED=1',
-              '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_pch: 'pch/introspect-dbus.h',
-  dependencies: [ config_dep, gio_dep, __introspect_dbus_dep ],
-  sources: 'introspectdbus.cc', )
-
-apigen_py = meson.current_source_dir () / 'apigen.py'
-
-apigen_gen = generator (python_exe, 
-  arguments: [ apigen_py,
-               '--apigen-bin', apigen_dbus_exe.full_path (),
-               '--introspect-bin', introspect_dbus_exe.full_path (),
-               '@EXTRA_ARGS@', '@INPUT@', '@OUTPUT@' ],
-  depends: [ apigen_dbus_exe, introspect_dbus_exe ],
-  output: '@BASENAME@.d.ts')
