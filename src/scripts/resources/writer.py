@@ -70,7 +70,7 @@ class Writer (_Writer[str]):
     if path.is_absolute ():
       raise Exception ('files must be an relative path')
 
-    self.write (f'>{path.relative_to (basedir)}</file>\n')
+    self.write (f'>{path.resolve ().relative_to (basedir)}</file>\n')
 
   def add_resource (self, base: PurePath, basedir: Path, files: Iterable[str | File]):
 

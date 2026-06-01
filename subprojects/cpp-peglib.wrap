@@ -1,0 +1,9 @@
+[wrap-git]
+depth = 1
+directory = cpp-peglib-1.9
+patch_directory = cpp-peglib-1.9
+revision = v1.9.1
+url = https://github.com/yhirose/cpp-peglib
+
+[provide]
+dependency_names = cpp-peglib

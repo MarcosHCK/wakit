@@ -64,6 +64,8 @@ config.set_quoted ('LIBEXEC_DIR', prefix / get_option ('libexecdir') / 'wakit')
 config_dep = declare_dependency (sources: configure_file (output: 'config.h', configuration: config))
 config_dep = declare_dependency (dependencies: config_dep, include_directories: include_directories ('.'))
 
+project_build_dir = meson.current_build_dir ()
+
 # Common warnings
 
 if cc.get_id () == 'gcc' or cc.get_id () == 'clang'

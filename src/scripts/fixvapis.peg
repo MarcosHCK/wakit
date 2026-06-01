@@ -1,0 +1,53 @@
+# Copyright (C) 2025-2026 MarcosHCK
+# This file is part of wakit.
+#
+# wakit is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# wakit is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+
+G <- attribute_list
+
+attribute <- attribute_head (~PARENTHESIS_OPEN _ attribute_args ~PARENTHESIS_CLOSE _)?
+attribute_arg <- attribute_arg_key ~EQUALS _ attribute_arg_value
+attribute_arg_key <- < IDENTIFIER > _
+attribute_arg_value <- < constant > _
+attribute_args <- attribute_arg (~COMMA _ attribute_arg)*
+attribute_head <- < IDENTIFIER > _
+attribute_list <- attribute (~COMMA _ attribute)*
+
+boolean <- < 'false' / 'true' >
+
+constant <- boolean / number / string
+
+bin_number <- ZERO [b] [01]+
+float_number <- float_number_a_form / float_number_b_form
+float_number_a_form <- [0-9]+ DOT [0-9]+ float_number_postfix?
+float_number_b_form <- (([0-9]+ DOT) / (DOT [0-9]+)) float_number_postfix?
+float_number_postfix <- [eE][-+]? integer_number
+hex_number <- ZERO [xX] [0-9a-fA-F]+
+integer_number <- ZERO / [1-9][0-9]*
+number <- < float_number / bin_number / hex_number / integer_number >
+
+string <- string_double_form / string_single_form
+string_double_form <- ["] < [^"\n]* > ["]
+string_single_form <- ['] < [^'\n]* > [']
+
+COMMA <- ','
+DOT <- '.'
+EQUALS <- '='
+IDENTIFIER <- [a-zA-Z_][0-9a-zA-Z_]*
+PARENTHESIS_CLOSE <- ')'
+PARENTHESIS_OPEN <- '('
+ZERO <- '0'
+
+~_ <- [ \t]*
