@@ -22,7 +22,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin'
 async function createWebpackConfig ()
 {
 
-  const entries = { 'app': './app.tsx' }
+  const entries = { 'app': './index.ts' }
   const baseConfig = await _createWebpackConfig ()
 
   const config: Configuration =
@@ -40,10 +40,13 @@ async function createWebpackConfig ()
         [
           ...(baseConfig.plugins as []),
 
-          ...Object.keys (entries).map (name => new HtmlWebpackPlugin ({
-            chunks: [ name ],
-            filename: `${name}.html`,
-          })),
+          ...Object.keys (entries).map (name => new HtmlWebpackPlugin (
+            {
+              chunks: [ name ],
+              filename: `${name}.html`,
+              template: './index.html',
+              xhtml: true,
+            })),
         ]
     }
 

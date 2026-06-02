@@ -16,42 +16,36 @@
  */
 import '@mantine/core/styles.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { createRoot } from 'react-dom/client'
-import { defaultColorScheme, theme } from './theme'
+import { Catch } from '@wakit-example/parts/Error/Overlay'
 import { Center, Loader, MantineProvider } from '@mantine/core'
+import { defaultColorScheme, theme } from './theme'
+import { ErrorBoundary } from 'react-error-boundary'
 import { QueryClient, QueryClientProvider, useSuspenseQuery } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { routes } from '@wakit-example/routes'
-import React, { type ReactNode, Suspense } from 'react'
+import { type ReactNode, Suspense } from 'react'
 
 const queryClient = new QueryClient ()
 
-const assert = function<T> (value: T, message?: string): T
+export function Root ()
 {
 
-  if (false === value || null === value || undefined === value)
-    {
+  return <MantineProvider defaultColorScheme={defaultColorScheme} theme={theme}>
+         <QueryClientProvider client={queryClient}>
+         <ErrorBoundary FallbackComponent={Catch}>
+         <Suspense fallback={<Center h='100vh'> <Loader /> </Center>}>
 
-      console.error (message ?? 'assertion failed', value)
-      throw new Error (message ?? 'assertion failed', { cause: value })
-    }
-return value
+            <BrowserRouter> <Shell> <Routes>{ routes.map (e => <Route {...e} />) }</Routes>
+                            </Shell>
+            </BrowserRouter>
+         </Suspense> </ErrorBoundary>
+      <ReactQueryDevtools buttonPosition='bottom-right' position='bottom' />
+  </QueryClientProvider> </MantineProvider>
 }
 
-function Root ()
+export function Shell ({ children }: { children: ReactNode })
 {
 
-  return <BrowserRouter> <MantineProvider defaultColorScheme={defaultColorScheme} theme={theme}>
-                         <QueryClientProvider client={queryClient}>
-                         <Suspense fallback={<Center h='100vh'> <Loader /> </Center>}>
-            <Shell>
-              <Routes> { routes.map (e => <Route {...e} />) }</Routes>
-            </Shell>
-      </Suspense>
-    </QueryClientProvider> </MantineProvider> </BrowserRouter>
-}
-
-function Shell ({ children }: { children: ReactNode })
-{
   const { data: Component, error, isFetching } = useSuspenseQuery (
     {
       queryFn: async () => (await import ('@wakit-example/parts/Shell')).Shell,
@@ -63,13 +57,3 @@ function Shell ({ children }: { children: ReactNode })
 
 return <Component>{ children }</Component>
 }
-
-const body = assert (document.getElementsByTagName ('body')) [0]
-
-const root = document.getElementById ('root')
-            ?? body.appendChild (document.createElement ('div'))
-
-const router = React.createElement (Root)
-const strict = React.createElement (React.StrictMode, { children: router })
-
-createRoot ((root.id = 'root', root)).render (strict)

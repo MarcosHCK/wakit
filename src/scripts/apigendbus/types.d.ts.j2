@@ -38,7 +38,7 @@ declare global
         {% for info_ in default (dbus_info.methods, []) %}
           {% set in_args = typename_from_in_args (info_.in_args) %}
           {% set out_args = typename_from_out_args (info_.out_args) %}
-          function {{ info_.name }} ({{ in_args }}): {{ out_args }};
+          function {{ info_.name }} ({{ in_args }}): Promise<{{ out_args }}>;
         {% endfor %}
 
         {% for info_ in default (dbus_info.properties, []) %}

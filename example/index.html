@@ -1,4 +1,6 @@
-/* Copyright (C) 2025-2026 MarcosHCK
+<!DOCTYPE html>
+<!--
+ * Copyright (C) 2025-2026 MarcosHCK
  * This file is part of wakit.
  *
  * wakit is free software: you can redistribute it and/or modify
@@ -13,30 +15,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
-import { Stack } from '@mantine/core'
-import { useQuery } from '@tanstack/react-query'
-
-export default function Page ()
-{
-
-  const { data: numbers } = useQuery (
-    {
-
-      queryFn: async () =>
-        {
-
-          const client = bridge.Interface
-          const numbers = await client.RandomNumbers ()
-          const value = numbers.reduce ((a, e) => a === '' ? `${e}` : `${a}, ${e}`, '')
-        return value
-        },
-
-      queryKey: [ 'interface', 'RandomNumbers' ]
-    })
-
-  return <Stack>
-
-    <p>Application showcase</p>
-  </Stack>
-}
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <%= htmlWebpackPlugin.tags.headTags %>
+  </head>
+  <body>
+    <%= htmlWebpackPlugin.tags.bodyTags %>
+  </body>
+</html>
