@@ -45,6 +45,8 @@ namespace Wakit
       public GLib.Variant parameters { construct; }
       public WebKit.WebProcessExtension wk_extension { get; construct; }
 
+      private Binding.DBusService _dbus_service;
+
       internal WebExtension (WebKit.WebProcessExtension wk_extension, GLib.Variant parameters)
         {
           Object (wk_extension: wk_extension, parameters: parameters);
@@ -86,6 +88,7 @@ namespace Wakit
         {
 
           _appbus = yield AppBus.connect_client (_bus_address, 0, cancellable);
+          _dbus_service = new Binding.DBusService (_appbus, BUS_NAME);
         }
 
       private void init_complete (GLib.Object? o, GLib.AsyncResult result)
@@ -161,21 +164,19 @@ namespace Wakit
           if (! is_uri_secure (frame.get_uri (), ((GenericSetCollection<string>) _secure_schemes).struct))
             return;
 
-          while (null == _appbus)
-            GLib.Thread.yield ();
+          for (var main_context = GLib.MainContext.get_thread_default (); null == _dbus_service; )
+            main_context.iteration (false);
 
           JSC.Context context = frame.get_js_context_for_script_world (_script_world);
 
           registration (context, web_page, frame);
-
           context.set_value ("logging", Libraries.Logging.register (context));
 
           Binding.ProxyBuilder.register (context);
           Binding.ProxyLister.register (context);
 
-          unowned var resource = Resource.peek ();
-
-          var bytes = lookup_build_script (resource, "/org/hck/wakit/extension/extension.min.js");
+          var bytes = lookup_build_script (Resource.peek (),
+            "/org/hck/wakit/extension/extension.min.js");
 
           unowned var size = (size_t) 0;
           unowned var code = (string) _g_bytes_get_data (bytes, out size);
@@ -183,13 +184,14 @@ namespace Wakit
           var setup = context.evaluate_with_source_uri (code, (ssize_t) size,
             "wakit:///extension/extension.ts", 1);
 
-          var dbus_service = new Binding.DBusService (_appbus, BUS_NAME);
           var page_id = new JSC.Value.string (context, web_page.get_id ().to_string ());
-          var proxy_builder = (new Binding.ProxyBuilder (dbus_service)).to_value (context);
-          var proxy_lister = (new Binding.ProxyLister (dbus_service)).to_value (context);
-          JSC.Value parameters [] = { page_id, proxy_builder, proxy_lister };
+          var proxy_builder = (new Binding.ProxyBuilder (_dbus_service)).to_value (context);
+          var proxy_lister = (new Binding.ProxyLister (_dbus_service)).to_value (context);
 
-          setup.object_get_property ("setup").function_callv (parameters);
+          JSC.Value parameters [] = { page_id, proxy_builder, proxy_lister };
+          JSC.Value promise = setup.object_get_property ("setup").function_callv (parameters);
+
+          context.set_value ("__setup_promise", promise);
         }
 
       [CCode (cname = "WAKIT_WEB_EXTENSION_GET_CLASS (self)->registration")]

@@ -18,6 +18,8 @@
 namespace Wakit.Binding
 {
 
+  static uint next_serial = 0;
+
   [Compact (opaque = true)]
   internal class ProxyBuilderTypes: GLib.HashTable<GLib.DBusInterfaceInfo, GLib.Type>
     {
@@ -25,7 +27,7 @@ namespace Wakit.Binding
       public ProxyBuilderTypes ()
         {
 
-          base (GLib.str_hash, GLib.str_equal);
+          base (interface_info_hash, interface_info_equal);
         }
 
       [CCode (cheader_filename = "glib.h", cname = "g_intern_string")]
@@ -40,7 +42,7 @@ namespace Wakit.Binding
           unowned GLib.Type parent_type = typeof (ProxyBase);
           string tmp_name;
 
-          tmp_name = ("WakitBindingProxyType%u").printf (length);
+          tmp_name = ("WakitBindingProxyType%u").printf (next_serial++);
 
           derived_type = _g_type_register_static_simple (parent_type,
             _g_intern_string (tmp_name),
@@ -61,6 +63,12 @@ namespace Wakit.Binding
       static void derived_type_instance_init (GLib.TypeInstance instance, GLib.TypeClass klass)
         {
         }
+
+      [CCode (cheader_filename = "extension/bindings/proxybuildertypes.h", cname = "g_dbus_interface_info_equal")]
+      extern static GLib.EqualFunc<GLib.DBusInterfaceInfo> interface_info_equal;
+
+      [CCode (cheader_filename = "extension/bindings/proxybuildertypes.h", cname = "g_dbus_interface_info_hash")]
+      extern static GLib.HashFunc<GLib.DBusInterfaceInfo> interface_info_hash;
 
       [CCode (cheader_filename = "glib-object.h", cname = "GClassInitFunc", has_target = false, scope = "forever")]
       extern delegate void ClassInitFunc (GLib.TypeClass klass, void* class_data);

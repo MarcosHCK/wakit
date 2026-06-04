@@ -31,7 +31,7 @@ subdir ('appbus')
 gio_unix_dep = dependency ('gio-unix-2.0', required: false)
 gio_win32_dep = dependency ('gio-win32-2.0', required: false)
 
-__common_src = [ 'bits.h', 'boxing.h', 'constmap.h', 'constpairs.h', 'genericmap.h', 'mixin.h', 'slice.h', 'value.h' ]
+__common_src = [ 'bits.h', 'boxing.h', 'ccompat.h', 'constmap.h', 'constpairs.h', 'genericmap.h', 'hashing.h', 'mixin.h', 'slice.h', 'value.h' ]
 
 foreach lib: [ 'commandline' ]
 

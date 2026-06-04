@@ -15,6 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #pragma once
+#include <gio/gio.h>
 #include <jsc/jsc.h>
 
 typedef struct _WakitPromise WakitPromise;
@@ -41,5 +42,8 @@ G_BEGIN_DECLS
                                     ...)  G_GNUC_PRINTF (2,3);
   void wakit_promise_resolve (WakitPromise* self,
                               JSCValue* value);
+
+  void wakit_promise_wait (JSCValue* promise, GAsyncReadyCallback callback, gpointer user_data);
+  gboolean wakit_promise_wait_finish (GAsyncResult* result, JSCValue** out_result);
 
 G_END_DECLS

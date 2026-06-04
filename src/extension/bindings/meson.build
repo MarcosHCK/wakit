@@ -17,7 +17,7 @@
 
 __extension_bindings_src = [ ]
 
-foreach bit: [ ]
+foreach bit: [ 'proxybuildertypes' ]
 
   __extension_bindings_src += [ '@0@.cc'.format (bit) ]
   __extension_bindings_src += [ '@0@.h'.format (bit) ]

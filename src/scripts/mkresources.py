@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
   (args, resources) = parse_args (parser)
 
-  basedir = Path (args.basedir)
+  basedir = Path (args.basedir).resolve ()
 
   if 0 == sum (( int (not not b) for b in [ args.header, args.source ] )):
     raise Exception ('at least one of --header or --source should be specified')

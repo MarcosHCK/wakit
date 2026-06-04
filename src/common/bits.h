@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #pragma once
+#include <climits>
+#include <concepts>
 #include <cstddef>
 
 namespace bits
@@ -32,14 +34,25 @@ namespace bits
   template<size_t bytes, typename T = unsigned> requires (is_2pow_v<bytes>)
     static inline constexpr const unsigned log2_v = log2<bytes, T>::value;
 
-  template<size_t bytes, typename T = unsigned> requires (is_2pow_v<bytes>)
-    struct mask { static inline constexpr T value = bytes - 1; };
-  template<size_t bytes, typename T = unsigned> requires (is_2pow_v<bytes>)
-    static inline constexpr const T mask_v = mask<bytes, T>::value;
-
   template<size_t to, typename T>
-    static inline constexpr T align_upto (T n) noexcept
-      { return ((n + (to - 1)) >> log2_v<to, T>) << log2_v<to, T>; }
+  [[gnu::always_inline]]
+  static inline constexpr T align_upto (T n) noexcept
+    {
+
+    return ((n + (to - 1)) >> log2_v<to, T>) << log2_v<to, T>;
+    }
+
   template<size_t n, size_t to>
     static inline constexpr const size_t align_upto_v = align_upto<to> (n);
+
+  template<std::unsigned_integral T, int _By>
+  [[gnu::always_inline]]
+  static inline constexpr T rot (T value) noexcept
+    {
+
+      constexpr int bits = sizeof (T) * CHAR_BIT;
+      static_assert (bits >= _By);
+
+    return (value << _By) | (value << (bits - _By));
+    }
 }

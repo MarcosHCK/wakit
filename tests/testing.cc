@@ -273,7 +273,7 @@ void testing::g_test_rand_data (guint8* data, size_t size)
   for (decltype (size) i = 0; i < (size >> bits::log2_v<sizeof (gint32)>); ++i)
     data [i] = g_test_rand_int ();
 
-  if (auto last = size & ~bits::mask_v<sizeof (gint32), size_t>; size != last)
+  if (auto last = size & ~((size_t) sizeof (gint32) - 1); size != last)
     {
 
       guint32 left = g_test_rand_int ();
