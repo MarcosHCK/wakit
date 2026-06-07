@@ -14,17 +14,5 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { type ComponentType } from 'react'
-import React from 'react'
-
-export interface RouteConfig
-{
-  Component: React.LazyExoticComponent<ComponentType<{}>>;
-  path: string;
-}
-
-export const routes: RouteConfig[] =
-[
-  { path: '/',
-    Component: React.lazy (() => import ('@wakit-example/pages/home')), }
-]
+export { Catch } from './Catch'
+export { type ErrorComponentProps as CatchProps } from '@tanstack/react-router'

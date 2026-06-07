@@ -14,27 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { Button, Group, Stack } from '@mantine/core'
-import { Display } from './Display'
-import { PiArrowCounterClockwiseFill } from 'react-icons/pi'
-import { type ErrorComponentProps } from '@tanstack/react-router'
+import { Catch, type CatchProps } from '@wakit-example/parts/Error'
+import { createRootRoute, Outlet } from '@tanstack/react-router'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { Shell } from '@wakit-example/parts/Shell'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-export function Catch ({ error, reset }: ErrorComponentProps)
+export const Route = createRootRoute (
+{
+  component: Root,
+  errorComponent: Error,
+})
+
+function Error (props: CatchProps)
 {
 
-  return <Group h='100%' justify='center'>
+return <Shell> <Catch {...props} /> </Shell>
+}
 
-    <Stack gap={7} h='100%' justify='center'>
+function Root ()
+{
 
-      <Display error={error} />
-
-      <Group justify='center'>
-
-        <Button color = 'var(--mantine-color-dimmed)'
-              onClick = {() => reset ()}
-                radius = 'xl'
-              variant = 'light'> <PiArrowCounterClockwiseFill />
-        </Button>
-      </Group>
-  </Stack> </Group>
+  return <> <Shell> <Outlet /> </Shell>
+            <ReactQueryDevtools />
+            <TanStackRouterDevtools />
+         </>
 }

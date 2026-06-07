@@ -15,45 +15,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 import '@mantine/core/styles.css'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Catch } from '@wakit-example/parts/Error/Overlay'
-import { Center, Loader, MantineProvider } from '@mantine/core'
+import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { defaultColorScheme, theme } from './theme'
-import { ErrorBoundary } from 'react-error-boundary'
-import { QueryClient, QueryClientProvider, useSuspenseQuery } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { routes } from '@wakit-example/routes'
-import { type ReactNode, Suspense } from 'react'
+import { MantineProvider } from '@mantine/core'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { routeTree } from '@wakit-example/routes.gen'
 
 const queryClient = new QueryClient ()
 
-export function Root ()
+const router = createRouter (
+{
+  defaultPreload: 'intent',
+  routeTree,
+  scrollRestoration: true,
+})
+
+declare module '@tanstack/react-router'
+{
+  interface Register { router: typeof router }
+}
+
+export default function App ()
 {
 
   return <MantineProvider defaultColorScheme={defaultColorScheme} theme={theme}>
          <QueryClientProvider client={queryClient}>
-         <ErrorBoundary FallbackComponent={Catch}>
-         <Suspense fallback={<Center h='100vh'> <Loader /> </Center>}>
+           <RouterProvider router={router} />
 
-            <BrowserRouter> <Shell> <Routes>{ routes.map (e => <Route {...e} />) }</Routes>
-                            </Shell>
-            </BrowserRouter>
-         </Suspense> </ErrorBoundary>
-      <ReactQueryDevtools buttonPosition='bottom-right' position='bottom' />
   </QueryClientProvider> </MantineProvider>
-}
-
-export function Shell ({ children }: { children: ReactNode })
-{
-
-  const { data: Component, error, isFetching } = useSuspenseQuery (
-    {
-      queryFn: async () => (await import ('@wakit-example/parts/Shell')).Shell,
-      queryKey: [ 'import', 'part', 'Shell' ],
-      staleTime: 'static',
-    })
-
-  if (error && false === isFetching) throw error
-
-return <Component>{ children }</Component>
 }

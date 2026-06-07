@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { createRoot } from 'react-dom/client'
-import { Root } from '@wakit-example/app'
+import App from '@wakit-example/app'
 import React from 'react'
+import ReactDOM from 'react-dom/client'
 
 const assert = function<T> (value: T, message?: string): T
 {
@@ -30,12 +30,17 @@ const assert = function<T> (value: T, message?: string): T
 return value
 }
 
-const body = assert (document.getElementsByTagName ('body')) [0]
+const Root = () => <React.StrictMode> <App /> </React.StrictMode>
 
-const root = document.getElementById ('root')
-          ?? body.appendChild (document.createElement ('div'))
+const setup = function ()
+{
 
-const router = React.createElement (Root)
-const strict = React.createElement (React.StrictMode, { children: router })
+  const body = assert (document.getElementsByTagName ('body')) [0]
 
-createRoot ((root.id = 'root', root)).render (strict)
+  const root = document.getElementById ('root')
+            ?? body.appendChild (document.createElement ('div'))
+
+return ReactDOM.createRoot ((root.id = 'root', root)).render (<Root />)
+}
+
+setup ()

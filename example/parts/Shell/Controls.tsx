@@ -24,6 +24,8 @@ function collect<T> (p: Promise<T>)
   p.catch (e => console.error (e))
 }
 
+(globalThis as unknown as { browserWindow: object }).browserWindow ??= { }
+
 function Control ({ children, onClick, size = 30 }: { children?: ReactNode, onClick?: () => void, size?: number })
 {
 

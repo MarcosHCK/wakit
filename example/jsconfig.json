@@ -17,6 +17,6 @@
       "@wakit-example/*": ["./*"]
     }
   },
-  "include": ["**/*.js", "**/*.jsx"],
-  "exclude": ["node_modules"]
+  "include": [ "**/*.js", "**/*.jsx" ],
+  "exclude": [ "./node_modules/**/*", "./routes.gen.ts" ]
 }

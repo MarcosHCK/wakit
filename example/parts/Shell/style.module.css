@@ -34,6 +34,12 @@
   padding-right: var(--mantine-spacing-xs);
 }
 
+.appShellHeaderLink
+{
+
+  background-color: unset;
+}
+
 .appShellMain
 {
 

@@ -14,10 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+import { createFileRoute } from '@tanstack/react-router'
 import { Stack } from '@mantine/core'
 import { useQuery } from '@tanstack/react-query'
 
-export default function Page ()
+export const Route = createFileRoute ('/') (
+{
+  component: Page,
+})
+
+function Page ()
 {
 
   const { data: numbers } = useQuery (
@@ -28,7 +34,7 @@ export default function Page ()
 
           const client = bridge.Interface
           const numbers = await client.RandomNumbers ()
-          const value = numbers.reduce ((a, e) => a === '' ? `${e}` : `${a}, ${e}`, '')
+          const value = numbers.reduce ((a, e) => '' === a ? `${e}` : `${a}, ${e}`, '')
         return value
         },
 
@@ -38,5 +44,6 @@ export default function Page ()
   return <Stack>
 
     <p>Application showcase</p>
+    <p>Numbers: { numbers }</p>
   </Stack>
 }

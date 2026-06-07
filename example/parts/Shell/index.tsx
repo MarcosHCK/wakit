@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+'use client';
 import { AppShell, Burger, Grid, Group } from '@mantine/core'
 import { Header } from './Header'
 import { type ReactNode } from 'react'
@@ -74,7 +75,7 @@ export const Shell = ({ children }: { children?: ReactNode }) =>
 
     <AppShell.Main className={css.appShellMain}>
 
-      <Grid columns={columns} gutter={0}>
+      <Grid columns={columns} gap={0}>
 
         <Grid.Col className={css.appShellMainCol} offset={spaceSizes} span={centerSizes}> { children } </Grid.Col>
       </Grid>
