@@ -39,13 +39,13 @@ namespace Wakit.Binding
           Object (dbus_service: dbus_service);
         }
 
-      async ProxyBase create_async (JSC.Context context, string name, string interface_name, string object_path) throws GLib.Error
+      public async ProxyBase create_async (JSC.Context context, string bus_name, string interface_name, string object_path) throws GLib.Error
         {
 
           unowned var flag1 = GLib.DBusProxyFlags.DO_NOT_AUTO_START;
           unowned var flag2 = GLib.DBusProxyFlags.GET_INVALIDATED_PROPERTIES;
           unowned var flags = flag1 | flag2;
-          unowned var info = yield _dbus_service.lookup_info (name, interface_name, object_path);
+          unowned var info = yield _dbus_service.lookup_info (bus_name, interface_name, object_path);
           unowned var type = GLib.Type.INVALID;
 
           yield async_lock (_types_lock);
@@ -58,7 +58,7 @@ namespace Wakit.Binding
 
           _types_lock.unlock ();
 
-          var dbus_proxy = yield _dbus_service.make_proxy (name, interface_name, object_path, flags);
+          var dbus_proxy = yield _dbus_service.make_proxy (bus_name, interface_name, object_path, flags);
           var proxy = GLib.Object.new (type, "dbus-proxy", dbus_proxy, null);
         return (ProxyBase) proxy;
         }

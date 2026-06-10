@@ -34,31 +34,10 @@ foreach bit: []
   __extension_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'extension', 'module', 'resource' ]
+foreach bit: [ 'extension', 'module' ]
 
   __extension_src += [ '@0@.vala'.format (bit) ]
 endforeach
-
-__extension_bundle = []
-
-foreach bit: [ 'extension' ]
-
-  __extension_bundle += esbuild_js_gen.process ('@0@.ts'.format (bit))
-endforeach
-
-__extension_src += custom_target ('wakit-extension-resources',
-  command: [ python_exe,
-             mkresources_py,
-             '--basedir', '@PRIVATE_DIR@',
-             '--bin', resources_exe.full_path (),
-             '--dep', '@DEPFILE@',
-             '--header', '@OUTPUT0@',
-             '--source', '@OUTPUT1@',
-             '--name', 'wakit_extension_',
-             '-s', '/org/hck/wakit/extension', '@INPUT@' ],
-  depfile: 'resources.deps',
-  input: __extension_bundle,
-  output: [ 'resources.bundle.h', 'resources.bundle.c' ])
 
 __extension_deps = [ __common_dep,
                      __extension_binding_dep.as_link_whole (),

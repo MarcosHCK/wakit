@@ -15,9 +15,9 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 from contextlib import contextmanager
-from os import fdopen, fsync
+from os import fsync
 from pathlib import Path
-from tempfile import mkstemp
+from tempfile import NamedTemporaryFile
 from typing import overload, IO, Literal
 
 _ABinary = Literal['ab', 'a+b']
@@ -34,50 +34,54 @@ _RMode = _RText | _RBinary
 _WMode = _WText | _WBinary
 _XMode = _XText | _XBinary
 
+def compare (file1: str | Path, file2: str | Path):
+
+  with Path (file1).open ('rb') as stream1, Path (file2).open ('rb') as stream2:
+
+    while True:
+
+      chunk1 = stream1.read (65536)
+      chunk2 = stream2.read (65536)
+
+      if chunk1 != chunk2:
+        return False
+
+      if not chunk1:
+        return True
+
 @overload
-def AtomicWrite (file: str | Path, mode: _ABinary | _RBinary | _WBinary | _XBinary, encoding: str | None = 'utf-8') -> IO[bytes]:
+def AtomicWrite (file: str | Path, mode: _ABinary | _RBinary | _WBinary | _XBinary, encoding: str | None = 'utf-8', leaveIfUnmodified: bool = False) -> IO[bytes]:
   ...
 
 @overload
-def AtomicWrite (file: str | Path, mode: _AText | _RText | _WText | _XText, encoding: str | None = 'utf-8') -> IO[str]:
+def AtomicWrite (file: str | Path, mode: _AText | _RText | _WText | _XText, encoding: str | None = 'utf-8', leaveIfUnmodified: bool = False) -> IO[str]:
   ...
 
 @contextmanager
-def AtomicWrite (file: str | Path, mode: str = 'w', encoding: str | None = 'utf-8'):
+def AtomicWrite (file: str | Path, mode: str = 'w', encoding: str | None = 'utf-8', leaveIfUnmodified: bool = False):
 
   file = Path (file)
   (dirname := file.parent).mkdir (exist_ok = True, parents = True)
 
-  name = None
-  stream = None
+  tmpfile = None
 
   try:
 
-    binary = 'b' in mode
-    fd, name = mkstemp (dir = dirname, suffix = '.tmp', text = not binary)
+    tmpfile = NamedTemporaryFile (mode, delete = False, dir = dirname, encoding = encoding, suffix = '.tmp')
+    yield tmpfile.file
 
-    if binary:
+    tmpfile.flush ()
+    fsync (tmpfile.fileno ())
 
-      stream = fdopen (fd, mode)
-    else:
-      stream = fdopen (fd, mode, encoding = encoding)
+    if not leaveIfUnmodified or not compare (file, tmpfile.name):
 
-    yield stream
+      tmpfile.close ()
+      Path (tmpfile.name).replace (file)
+      tmpfile = None
 
-    stream.flush ()
-    fsync (fd)
-
-    (name := Path (name)).replace (file)
-  except Exception:
-
-    if not not stream:
-      stream.close ()
-
-    if not not name and (name := Path (name)).exists ():
-      name.unlink ()
-
-    raise
   finally:
 
-    if not not stream:
-      stream.close ()
+    if not not tmpfile:
+
+      tmpfile.close ()
+      Path (tmpfile.name).unlink ()

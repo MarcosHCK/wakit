@@ -46,6 +46,9 @@ namespace Wakit
       public WebKit.WebProcessExtension wk_extension { get; construct; }
 
       private Binding.DBusService _dbus_service;
+      private bool _ready = false;
+      private Binding.ProxyBuilder _proxy_builder;
+      private Binding.ProxyLister _proxy_lister;
 
       internal WebExtension (WebKit.WebProcessExtension wk_extension, GLib.Variant parameters)
         {
@@ -88,14 +91,19 @@ namespace Wakit
         {
 
           _appbus = yield AppBus.connect_client (_bus_address, 0, cancellable);
+
           _dbus_service = new Binding.DBusService (_appbus, BUS_NAME);
+
+          _proxy_builder = new Binding.ProxyBuilder (_dbus_service);
+          _proxy_lister = new Binding.ProxyLister (_dbus_service);
         }
 
       private void init_complete (GLib.Object? o, GLib.AsyncResult result)
         {
 
           try
-            { ((WebExtension) o).init_async.end (result); }
+            { ((WebExtension) o).init_async.end (result);
+              _ready = true; }
           catch (GLib.Error error)
             { GLib.error ("Wakit.WebExtension.init_complete ()!: %s: %u: %s",
                 error.domain.to_string (), error.code, error.message); }
@@ -134,6 +142,30 @@ namespace Wakit
         return found;
         }
 
+      async Binding.ProxyBase make_browser_window (JSC.Context context, uint64 page_id) throws GLib.Error
+        {
+
+          const string bus_name = BUS_NAME;
+          const string interface_name = "org.hck.wakit.Browser.Window";
+          const string path_format = "%s/windows/%" + uint64.FORMAT;
+
+          var object_path = path_format.printf (BUS_OBJECT_PATH, page_id);
+          var dbus_proxy = yield _proxy_builder.create_async (context, bus_name, interface_name, object_path);
+
+        return dbus_proxy;
+        }
+
+      static void make_browser_window_complete (JSC.Context context, GLib.Object? o, GLib.AsyncResult res)
+        {
+
+          try
+            { var dbus_proxy = ((WebExtension) o).make_browser_window.end (res);
+              context.set_value ("browserWindow", dbus_proxy.to_value (context)); }
+          catch (GLib.Error error)
+            { GLib.error ("Wakit.WebExtension.make_browser_window ()!: %s: %u: %s",
+                error.domain.to_string (), error.code, error.message); }
+        }
+
       public extern static unowned Wakit.WebExtension new_default (WebKit.WebProcessExtension wk_extension,
                                                                    [CCode (type = "const GVariant*")]
                                                                    GLib.Variant? parameters,
@@ -155,16 +187,13 @@ namespace Wakit
             && ! is_uri_accessible (uri, ((PtrArrayCollection<GLib.Regex>) collection).struct);
         }
 
-      [CCode (cheader_filename = "glib.h", cname = "g_bytes_get_data")]
-      extern static unowned void* _g_bytes_get_data (GLib.Bytes bytes, out size_t size);
-
       private void on_window_object_cleared (WebKit.WebPage web_page, WebKit.Frame frame)
         {
 
           if (! is_uri_secure (frame.get_uri (), ((GenericSetCollection<string>) _secure_schemes).struct))
             return;
 
-          for (var main_context = GLib.MainContext.get_thread_default (); null == _dbus_service; )
+          for (var main_context = GLib.MainContext.get_thread_default (); false == _ready; )
             main_context.iteration (false);
 
           JSC.Context context = frame.get_js_context_for_script_world (_script_world);
@@ -175,23 +204,14 @@ namespace Wakit
           Binding.ProxyBuilder.register (context);
           Binding.ProxyLister.register (context);
 
-          var bytes = lookup_build_script (Resource.peek (),
-            "/org/hck/wakit/extension/extension.min.js");
+          var ready = false;
+          unowned var _p_ready = (bool[]) &ready;
 
-          unowned var size = (size_t) 0;
-          unowned var code = (string) _g_bytes_get_data (bytes, out size);
+          make_browser_window.begin (context, web_page.get_id (), (o, res) =>
+            { make_browser_window_complete (context, o, res); _p_ready [0] = true; });
 
-          var setup = context.evaluate_with_source_uri (code, (ssize_t) size,
-            "wakit:///extension/extension.ts", 1);
-
-          var page_id = new JSC.Value.string (context, web_page.get_id ().to_string ());
-          var proxy_builder = (new Binding.ProxyBuilder (_dbus_service)).to_value (context);
-          var proxy_lister = (new Binding.ProxyLister (_dbus_service)).to_value (context);
-
-          JSC.Value parameters [] = { page_id, proxy_builder, proxy_lister };
-          JSC.Value promise = setup.object_get_property ("setup").function_callv (parameters);
-
-          context.set_value ("__setup_promise", promise);
+          for (var main_context = GLib.MainContext.get_thread_default (); false == ready; )
+            main_context.iteration (false);
         }
 
       [CCode (cname = "WAKIT_WEB_EXTENSION_GET_CLASS (self)->registration")]

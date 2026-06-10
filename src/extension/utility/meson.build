@@ -17,7 +17,7 @@
 
 __extension_utility_src = [ 'marshalling.h',
                             'marshallingpack.cc',
-                            'marshallingunpack.cc' ]
+                            'marshallingunpack.cc', ]
 
 foreach bit: [ 'promise' ]
 

@@ -79,7 +79,7 @@ def patch_attribute (chunks: Iterable[str], transform: Callable[[str], str]):
 
 def patch_vapi (file: Path, transform: Callable[[str], str], chunk_siz: int = 1024):
 
-  with file.open ('rt') as input, AtomicWrite (file, 'wt') as output:
+  with file.open ('rt') as input, AtomicWrite (file, 'wt', leaveIfUnmodified = True) as output:
     patch_vapi_ (input, output, transform, chunk_siz)
 
 def patch_vapi_ (input: IO[str], output: IO[str], transform: Callable[[str], str], chunk_siz: int = 1024):

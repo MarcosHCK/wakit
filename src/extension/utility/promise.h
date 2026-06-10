@@ -43,7 +43,4 @@ G_BEGIN_DECLS
   void wakit_promise_resolve (WakitPromise* self,
                               JSCValue* value);
 
-  void wakit_promise_wait (JSCValue* promise, GAsyncReadyCallback callback, gpointer user_data);
-  gboolean wakit_promise_wait_finish (GAsyncResult* result, JSCValue** out_result);
-
 G_END_DECLS
