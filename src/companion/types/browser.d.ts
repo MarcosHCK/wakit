@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 /* eslint-disable @typescript-eslint/no-namespace */
-import { SignalSpec } from './signal'
+import type { SignalSpec } from './signal'
 
 declare global
 {

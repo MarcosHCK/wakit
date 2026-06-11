@@ -19,7 +19,7 @@
  * instead modify your interface source code (xml or vala)
  */
 {% if has_signals %}
-import { SignalSpec, IWithSignals } from '@wakit-companion/types/signal'
+import { type SignalSpec } from '@wakit/companion'
 {% endif %}
 
 declare global
@@ -60,9 +60,9 @@ declare global
         {% for info_ in default (dbus_info.signals, []) %}
           {% set out_args = typename_from_out_args (info_.args) %}
           {% if "[" == substr (out_args, 0, 1) %}
-          const {{ info_.name }} = SignalSpec<{{ out_args }}>;
+          const {{ info_.name }}: SignalSpec<{{ out_args }}>;
           {% else %}
-          const {{ info_.name }} = SignalSpec<[{{ out_args }}]>;
+          const {{ info_.name }}: SignalSpec<[{{ out_args }}]>;
           {% endif %}
         {% endfor %}
         }

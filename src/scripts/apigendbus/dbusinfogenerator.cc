@@ -27,7 +27,8 @@ dbus_info_generator::~dbus_info_generator ()
     _p_impl = (delete (impl*) _p_impl, nullptr);
 }
 
-dbus_info_generator::dbus_info_generator (std::string_view template_): _p_impl (new impl (template_))
+dbus_info_generator::dbus_info_generator (std::string_view template_, typename_builder typename_builder):
+  _p_impl (new impl (template_, std::move (typename_builder)))
 {
 }
 
@@ -93,12 +94,8 @@ nlohmann::json impl::_callback_typename_from_interface_info (std::vector<const n
   assert (args [0]->is_string ());
 
   auto interface_name = args[0]->get<std::string_view> ();
-
-  if (auto pos = interface_name.find_last_of ('.'); pos == interface_name.npos)
-
-    return *args [0];
-  else
-    return interface_name.substr (pos + 1);
+  auto type_name = _typename_builder.build (interface_name);
+return type_name;
 }
 
 inja::Environment impl::_make_environment ()
@@ -106,12 +103,17 @@ inja::Environment impl::_make_environment ()
 
   inja::Environment env;
 
-  env.add_callback ("has_flag", _callback_has_flag);
-  env.add_callback ("substr", _callback_substr);
-  env.add_callback ("typename_from_in_args", 1, _callback_typename_from_in_args);
-  env.add_callback ("typename_from_interface_info", 1, _callback_typename_from_interface_info);
-  env.add_callback ("typename_from_out_args", 1, _callback_typename_from_out_args);
-  env.add_callback ("typename_from_signature", 1, _callback_typename_from_signature);
+# define _define_function(name,...) \
+  env.add_callback (G_STRINGIFY (name) __VA_ARGS__, [this](inja::Arguments& a) \
+    { return this->_callback_##name (a); })
+
+  _define_function (has_flag);
+  _define_function (substr);
+  _define_function (typename_from_in_args,, 1);
+  _define_function (typename_from_interface_info,, 1);
+  _define_function (typename_from_out_args,, 1);
+  _define_function (typename_from_signature,, 1);
+#undef _define_function
 
 # define _define_constant(name) \
   env.add_callback (G_STRINGIFY (name), 0, [](inja::Arguments&) \

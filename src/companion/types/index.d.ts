@@ -14,36 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { createFileRoute } from '@tanstack/react-router'
-import { Stack } from '@mantine/core'
-import { useQuery } from '@tanstack/react-query'
-
-export const Route = createFileRoute ('/') (
-{
-  component: Page,
-})
-
-function Page ()
-{
-
-  const { data: numbers } = useQuery (
-    {
-
-      queryFn: async () =>
-        {
-
-          const client = bridge.WakitExampleInterface
-          const numbers = await client.RandomNumbers ()
-          const value = numbers.reduce ((a, e) => '' === a ? `${e}` : `${a}, ${e}`, '')
-        return value
-        },
-
-      queryKey: [ 'interface', 'RandomNumbers' ]
-    })
-
-  return <Stack>
-
-    <p>Application showcase</p>
-    <p>Numbers: { numbers }</p>
-  </Stack>
-}
+export type * from './browser'
+export type * from './logging'
+export type * from './signal'

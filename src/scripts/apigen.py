@@ -26,6 +26,8 @@ if __name__ == '__main__':
 
   parser.add_argument ('--apigen-bin', default = 'apigen-dbus', metavar = 'bin', type = str)
   parser.add_argument ('--introspect-bin', default = 'introspect-dbus', metavar = 'bin', type = str)
+  parser.add_argument ('--name', default = None, metavar = 'bin', type = str)
+  parser.add_argument ('--type-name', default = None, metavar = 'bin', type = str)
   parser.add_argument ('-o', '--output', default = '-', metavar = 'file', type = str)
 
   args = parser.parse_args () 
@@ -33,4 +35,13 @@ if __name__ == '__main__':
   with NamedTemporaryFile ('r+t') as tmpfile:
 
     introspect (args.introspect_bin, [ '--output', tmpfile.name, *args.input ])
-    apigen (args.apigen_bin, [ tmpfile.name, args.output ])
+
+    apigen_args = [ tmpfile.name, args.output ]
+
+    if not not (name := args.name):
+      apigen_args.extend ([ '--name', name ])
+
+    if not not (type_name := args.type_name):
+      apigen_args.extend ([ '--type-name', type_name ])
+
+    apigen (args.apigen_bin, apigen_args)

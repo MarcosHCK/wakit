@@ -22,14 +22,19 @@
 #include <scripts/apigendbus/dbusinfo.h>
 #include <scripts/apigendbus/dbusinfogenerator.h>
 #include <scripts/apigendbus/dbusinfoimporter.h>
+#include <scripts/apigendbus/typenamebuilder.h>
 #include <sstream>
 #include <vector>
 
 class application: public common::application
 {
+
+  const gchar* _name = "";
+  const gchar* _type_name = "";
 public:
 
   inline application (const gchar* parameter_string = nullptr) noexcept;
+  inline int process (std::string_view template_, std::istream& istream, std::ostream& ostream);
   inline int open (int n_files, char* files [], GError** error) noexcept override;
 };
 
@@ -51,6 +56,18 @@ return app.run (argc, argv);
 inline application::application (const gchar* parameter_string) noexcept:
   common::application (parameter_string)
 {
+
+  auto context = **this;
+
+  static GOptionEntry entries [] =
+  {
+
+    { "name", 0, 0, G_OPTION_ARG_FILENAME, &_name, nullptr, nullptr },
+    { "type-name", 0, 0, G_OPTION_ARG_FILENAME, &_type_name, nullptr, nullptr },
+    { nullptr, 0, 0, G_OPTION_ARG_NONE, nullptr, nullptr, nullptr },
+  };
+
+  g_option_context_add_main_entries (context, entries, "en_US");
 }
 
 [[gnu::always_inline]]
@@ -68,7 +85,7 @@ static inline boxing::bytes load_template (const gchar* path, GError** error) no
 }
 
 [[gnu::always_inline]]
-static inline void process (std::string_view template_, std::istream& istream, std::ostream& ostream)
+inline int application::process (std::string_view template_, std::istream& istream, std::ostream& ostream)
 {
 
   dbus_info info;
@@ -82,12 +99,13 @@ static inline void process (std::string_view template_, std::istream& istream, s
 
       infos.push_back (std::move ((importer.import_ (stream, info), info)));
     }
-return (dbus_info_generator (template_)).generate (ostream, infos);
+return ((dbus_info_generator (template_, typename_builder::create (_name, _type_name))).generate (ostream, infos), 0);
 }
 
 int application::open (int argc, char* argv[], GError** error) noexcept
 {
 
+  int result = 0;
   GError* tmperr = NULL;
   boxing::bytes template_ = NULL;
 
@@ -110,10 +128,10 @@ int application::open (int argc, char* argv[], GError** error) noexcept
       gsize size;
       gchar* data = (gchar*) g_bytes_get_data (*template_, &size);
 
-      process (std::string_view (data, size), **istream, **ostream); }
+      result = process (std::string_view (data, size), **istream, **ostream); }
 
   catch (const std::exception& exception)
     { return (g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED, exception.what ()), 1); }
 
-return ((void) template_, 0);
+return ((void) template_, result);
 }

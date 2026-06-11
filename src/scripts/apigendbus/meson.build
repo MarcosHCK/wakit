@@ -20,7 +20,7 @@ nlohmann_json_dep = dependency ('nlohmann_json', required: true)
 
 __apigen_dbus_src = [ 'genimpl.h', 'typenameinargs.cc', 'typenameoutargs.cc' ]
 
-foreach bit: [ 'dbusinfo', 'dbusinfogenerator', 'dbusinfoimporter' ] 
+foreach bit: [ 'dbusinfo', 'dbusinfogenerator', 'dbusinfoimporter', 'typenamebuilder' ] 
 
   __apigen_dbus_src += [ '@0@.cc'.format (bit) ]
   __apigen_dbus_src += [ '@0@.h'.format (bit) ]

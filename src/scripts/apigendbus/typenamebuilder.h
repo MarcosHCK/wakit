@@ -14,36 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { createFileRoute } from '@tanstack/react-router'
-import { Stack } from '@mantine/core'
-import { useQuery } from '@tanstack/react-query'
+#pragma once
+#include <string>
+#include <type_traits>
 
-export const Route = createFileRoute ('/') (
-{
-  component: Page,
-})
-
-function Page ()
+class typename_builder
 {
 
-  const { data: numbers } = useQuery (
-    {
+  std::string _client_prefix;
+  std::string _server_prefix;
 
-      queryFn: async () =>
-        {
+  inline typename_builder (std::string client_prefix, std::string server_prefix)
+    noexcept (std::is_nothrow_move_constructible_v<std::string>):
+    _client_prefix (std::move (client_prefix)),
+    _server_prefix (std::move (server_prefix))
+  { }
 
-          const client = bridge.WakitExampleInterface
-          const numbers = await client.RandomNumbers ()
-          const value = numbers.reduce ((a, e) => '' === a ? `${e}` : `${a}, ${e}`, '')
-        return value
-        },
+public:
 
-      queryKey: [ 'interface', 'RandomNumbers' ]
-    })
-
-  return <Stack>
-
-    <p>Application showcase</p>
-    <p>Numbers: { numbers }</p>
-  </Stack>
-}
+  std::string build (std::string_view name);
+  static typename_builder create (std::string_view name, std::string_view type_name);
+};

@@ -17,27 +17,30 @@
 #pragma once
 #include <gio/gio.h>
 #include <inja/inja.hpp>
-#include <stdexcept>
+#include <scripts/apigendbus/typenamebuilder.h>
 
 class impl
 {
 
   inja::Environment _environment;
   inja::Template _template;
+  typename_builder _typename_builder;
 
-  static nlohmann::json _callback_has_flag (std::vector<const nlohmann::json*>& args);
-  static nlohmann::json _callback_substr (std::vector<const nlohmann::json*>& args);
-  static nlohmann::json _callback_typename_from_in_args (std::vector<const nlohmann::json*>& args);
-  static nlohmann::json _callback_typename_from_interface_info (std::vector<const nlohmann::json*>& args);
-  static nlohmann::json _callback_typename_from_out_args (std::vector<const nlohmann::json*>& args);
-  static nlohmann::json _callback_typename_from_signature (std::vector<const nlohmann::json*>& args);
+  nlohmann::json _callback_has_flag (std::vector<const nlohmann::json*>& args);
+  nlohmann::json _callback_substr (std::vector<const nlohmann::json*>& args);
+  nlohmann::json _callback_typename_from_in_args (std::vector<const nlohmann::json*>& args);
+  nlohmann::json _callback_typename_from_interface_info (std::vector<const nlohmann::json*>& args);
+  nlohmann::json _callback_typename_from_out_args (std::vector<const nlohmann::json*>& args);
+  nlohmann::json _callback_typename_from_signature (std::vector<const nlohmann::json*>& args);
 
-  static inja::Environment _make_environment ();
+  inja::Environment _make_environment ();
 
 public:
 
-  inline impl (std::string_view template_): _environment (_make_environment ()),
-                                            _template (_environment.parse (template_))
+  inline impl (std::string_view template_, typename_builder typename_builder):
+      _environment (_make_environment ()),
+      _template (_environment.parse (template_)),
+      _typename_builder (std::move (typename_builder))
     { }
 
   inline void render (std::ostream& stream, const nlohmann::json& data);

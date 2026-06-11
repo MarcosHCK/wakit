@@ -17,6 +17,7 @@
 #pragma once
 #include <ostream>
 #include <scripts/apigendbus/dbusinfo.h>
+#include <scripts/apigendbus/typenamebuilder.h>
 
 class dbus_info_generator
 {
@@ -30,7 +31,7 @@ public:
   dbus_info_generator (dbus_info_generator&&) = delete;
   dbus_info_generator (const dbus_info_generator&) = delete;
 
-  dbus_info_generator (std::string_view template_);
+  dbus_info_generator (std::string_view template_, typename_builder typename_builder);
 
   void generate (std::ostream& stream, std::span<dbus_info> infos);
 };
