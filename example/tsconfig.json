@@ -17,9 +17,10 @@
       "@wakit-example/*": ["./*"]
     }
   },
-  "include": [ "**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx",
-               "../src/companion/types/*.d.ts",
-               ".eslintrc.js" ],
-  "typeRoots": [ "../src/companion/types/" ],
-  "exclude": [ "./node_modules/**/*", "./routes.gen.ts" ]
+  "include": [ "./hooks/**/*.js", "./hooks/**/*.jsx", "./hooks/**/*.ts", "./hooks/**/*.tsx",
+               "./parts/**/*.js", "./parts/**/*.jsx", "./parts/**/*.ts", "./parts/**/*.tsx",
+               "./routes/**/*.js", "./routes/**/*.jsx", "./routes/**/*.ts", "./routes/**/*.tsx",
+               "./types/**/*.d.ts",
+               "./*.ts", "./*.tsx", "./*.js", "./*.jsx" ],
+  "exclude": [ "./node_modules/" ]
 }

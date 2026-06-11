@@ -16,7 +16,6 @@
  */
 import { defineConfig } from 'eslint/config'
 import eslintPluginReact from '@eslint-react/eslint-plugin'
-import eslintPluginZodX from 'eslint-plugin-zod-x'
 import globals from 'globals'
 import importPlugin from 'eslint-plugin-import'
 import js from '@eslint/js'
@@ -28,7 +27,6 @@ export default defineConfig (
 [
   js.configs.recommended,
   eslintPluginReact.configs.recommended,
-  eslintPluginZodX.configs.recommended,
 {
 
   files: [ '**/*.{js,jsx,ts,tsx}' ],
@@ -67,12 +65,14 @@ export default defineConfig (
 
   rules:
     {
+
       ...js.configs.recommended.rules,
       ...typescriptEslint.configs.recommended.rules,
       ...importPlugin.configs.recommended.rules,
       ...promisePlugin.configs.recommended.rules,
 
       'no-redeclare': 'off',
+      'no-undef': 'off',
       '@typescript-eslint/no-redeclare': 'error',
       
       '@typescript-eslint/no-unused-vars': [ 'error',
@@ -84,6 +84,7 @@ export default defineConfig (
 
   settings:
     {
+
       'import/resolver':
         {
 
