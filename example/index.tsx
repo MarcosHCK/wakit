@@ -43,5 +43,4 @@ const setup = function ()
 return ReactDOM.createRoot ((root.id = 'root', root)).render (<Root />)
 }
 
-console.log ('browserWindow = ', globalThis.browserWindow, globalThis.bridge)
-// setup ()
+setup ()

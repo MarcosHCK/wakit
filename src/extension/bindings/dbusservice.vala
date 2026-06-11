@@ -44,7 +44,7 @@ namespace Wakit.Binding
           _infos = new GLib.HashTable<string, GLib.DBusNodeInfo> (hash_func, key_equal_func);
         }
 
-      private async GLib.DBusNodeInfo introspect (string bus_name, string object_path) throws GLib.Error
+      private async GLib.DBusNodeInfo introspect (string bus_name, string object_path, GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
           unowned var flag1 = GLib.DBusCallFlags.NO_AUTO_START;
@@ -55,18 +55,18 @@ namespace Wakit.Binding
           unowned var reply_type = (GLib.VariantType) "(s)";
           unowned var timeout_msec = _timeout_msec;
 
-          GLib.Variant reply = yield _connection.call (bus_name, object_path, interface_name, method_name, parameters, reply_type, flags, timeout_msec);
+          GLib.Variant reply = yield _connection.call (bus_name, object_path, interface_name, method_name, parameters, reply_type, flags, timeout_msec, cancellable);
 
         return new GLib.DBusNodeInfo.for_xml (reply.get_child_value (0).get_string ());
         }
 
-      public async unowned GLib.DBusInterfaceInfo lookup_info (string bus_name, string interface_name, string object_path) throws GLib.Error
+      public async unowned GLib.DBusInterfaceInfo lookup_info (string bus_name, string interface_name, string object_path, GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
           unowned GLib.DBusInterfaceInfo? interface_info;
           unowned GLib.DBusNodeInfo? node_info;
 
-          node_info = yield lookup_node_info (bus_name, object_path);
+          node_info = yield lookup_node_info (bus_name, object_path, cancellable);
 
           if (null == (interface_info = node_info.lookup_interface (interface_name)))
             {
@@ -76,7 +76,7 @@ namespace Wakit.Binding
         return interface_info;
         }
 
-      public async unowned GLib.DBusNodeInfo lookup_node_info (string bus_name, string object_path) throws GLib.Error
+      public async unowned GLib.DBusNodeInfo lookup_node_info (string bus_name, string object_path, GLib.Cancellable? cancellable = null) throws GLib.Error
         {
 
           unowned GLib.DBusNodeInfo? info;
@@ -85,7 +85,7 @@ namespace Wakit.Binding
           if (null == (info = _infos.lookup (key)))
             {
 
-              var owned_ = yield introspect (bus_name, object_path);
+              var owned_ = yield introspect (bus_name, object_path, cancellable);
 
               info = owned_;
               _infos.insert ((owned) key, (owned) owned_);

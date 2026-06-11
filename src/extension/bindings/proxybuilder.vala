@@ -63,6 +63,26 @@ namespace Wakit.Binding
         return (ProxyBase) proxy;
         }
 
+      public ProxyBase create_for_proxy (JSC.Context context, GLib.DBusProxy dbus_proxy)
+        {
+
+          unowned var info = dbus_proxy.get_info ();
+          unowned var type = GLib.Type.INVALID;
+
+          _types_lock.lock ();
+
+          if (! _types.lookup_extended (info, null, out type))
+            type = _types.add (info);
+
+          if (null == IBinding<ProxyBase>.get_class (context, type))
+            ProxyBase.register (context, info, type.name (), type);
+
+          _types_lock.unlock ();
+
+          var proxy = GLib.Object.new (type, "dbus-proxy", dbus_proxy, null);
+        return (ProxyBase) proxy;
+        }
+
       private void create_complete (Promise p, GLib.AsyncResult result)
         {
   

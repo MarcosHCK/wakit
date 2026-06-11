@@ -23,7 +23,7 @@ foreach bit: [ 'proxybuildertypes' ]
   __extension_bindings_src += [ '@0@.h'.format (bit) ]
 endforeach
 
-foreach bit: [ 'dbusservice', 'proxybase', 'proxybuilder', 'proxybuildertypes', 'proxylister' ]
+foreach bit: [ 'bridgemodule', 'bridgemoduleexport', 'bridgeservice', 'dbusservice', 'proxybase', 'proxybuilder', 'proxybuildertypes' ]
 
   __extension_bindings_src += [ '@0@.vala'.format (bit) ]
 endforeach

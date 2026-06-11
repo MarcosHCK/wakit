@@ -14,19 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#include <glib.h>
 
-namespace Wakit.Host.Module
+static __inline gchar** _g_strndupv (gchar** strv, guint length)
 {
 
-  /**
-   * Keep well-known object path in sync with extension/bindings/bridgemodule.vala
-   */
+  if (NULL == strv)
+    return NULL;
 
-  public interface IModuleHost: GLib.Object
-    {
+  gchar** ar = g_new (gchar*, 1 + length);
 
-      public const string OBJECT_PATH = "/org/hck/wakit/Host/Module";
+  for (guint i = 0; i < length; ++i)
+    ar [i] = g_strdup (strv [i]);
 
-      public abstract ICollection<IPostable> postables { get; }
-    }
+return (ar [length] = NULL, ar);
 }

@@ -15,18 +15,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Wakit.Host.Module
+namespace Wakit.Binding
 {
 
-  /**
-   * Keep well-known object path in sync with extension/bindings/bridgemodule.vala
-   */
-
-  public interface IModuleHost: GLib.Object
+  internal struct BridgeModuleExport
     {
 
-      public const string OBJECT_PATH = "/org/hck/wakit/Host/Module";
+      public GLib.DBusProxy dbus_proxy;
+      public string type_name; 
 
-      public abstract ICollection<IPostable> postables { get; }
+      public BridgeModuleExport (GLib.DBusProxy dbus_proxy, owned string type_name)
+        {
+
+          this.dbus_proxy = dbus_proxy;
+          this.type_name = (owned) type_name;
+        }
     }
 }

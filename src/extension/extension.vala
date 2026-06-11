@@ -24,8 +24,7 @@ namespace Wakit
    */
 
   /**
-   * Keep well-known bus things in sync with extension/extension.vala
-   * - note: the constants named BUS_* on the WebExtension class
+   * Keep well-known bus things in sync with extension/bindings/bridgeservice.vala
    */
 
   public class WebExtension: GLib.Object, GLib.Initable, IExtensionDataGuest
@@ -45,10 +44,9 @@ namespace Wakit
       public GLib.Variant parameters { construct; }
       public WebKit.WebProcessExtension wk_extension { get; construct; }
 
-      private Binding.DBusService _dbus_service;
-      private bool _ready = false;
+      private Binding.BridgeService _bridge_service;
       private Binding.ProxyBuilder _proxy_builder;
-      private Binding.ProxyLister _proxy_lister;
+      private bool _ready = false;
 
       internal WebExtension (WebKit.WebProcessExtension wk_extension, GLib.Variant parameters)
         {
@@ -83,19 +81,19 @@ namespace Wakit
           _script_world = WebKit.ScriptWorld.get_default ();
           _script_world.window_object_cleared.connect (on_window_object_cleared);
 
-          init_async.begin (cancellable, init_complete);
+          init_async.begin (GLib.Priority.DEFAULT, cancellable, init_complete);
         return true;
         }
 
-      async void init_async (GLib.Cancellable? cancellable) throws GLib.Error
+      async void init_async (int io_priority, GLib.Cancellable? cancellable) throws GLib.Error
         {
 
           _appbus = yield AppBus.connect_client (_bus_address, 0, cancellable);
 
-          _dbus_service = new Binding.DBusService (_appbus, BUS_NAME);
+          var dbus_service = new Binding.DBusService (_appbus, BUS_NAME);
 
-          _proxy_builder = new Binding.ProxyBuilder (_dbus_service);
-          _proxy_lister = new Binding.ProxyLister (_dbus_service);
+          _proxy_builder = new Binding.ProxyBuilder (dbus_service);
+          _bridge_service = yield new Binding.BridgeService (dbus_service, _proxy_builder, io_priority, cancellable);
         }
 
       private void init_complete (GLib.Object? o, GLib.AsyncResult result)
@@ -201,11 +199,12 @@ namespace Wakit
           registration (context, web_page, frame);
           context.set_value ("logging", Libraries.Logging.register (context));
 
-          Binding.ProxyBuilder.register (context);
-          Binding.ProxyLister.register (context);
+          Binding.BridgeService.register (context);
 
           var ready = false;
           unowned var _p_ready = (bool[]) &ready;
+
+          context.set_value ("bridge", _bridge_service.to_value (context));
 
           make_browser_window.begin (context, web_page.get_id (), (o, res) =>
             { make_browser_window_complete (context, o, res); _p_ready [0] = true; });
