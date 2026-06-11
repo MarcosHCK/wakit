@@ -203,16 +203,7 @@ namespace Wakit.Binding
           unowned var _klass = Connector.register_maybe (context);
           klass.jsc_class.add_method ("disconnect", (JSC.ClassMethodCb) disconnect, typeof (JSC.Value));
 
-          /*
-           * WebKitGTK6 (specifically javascriptcore) has a weird bug, where a JSCClass's prototype (the
-           * actual thing used by the engine to back the instances, not the object the C API returns)
-           * isn't actually held by the JSCClass. If there are no instances and the GC pops, the prototype
-           * will be erased and any further instantiation (even using the same JSCClass) will get an empty
-           * prototype (all methods and properties gone). Will keep a dummy instance here.
-           */
-          var keeper = new JSC.Value.object (context, new ConnectorKeeper (), _klass.jsc_class);
-
-          context.get_global_object ().object_define_property_data ("__connector_keeper__", 0, keeper);
+          KlassReserve.preserve (context, _klass.jsc_class);
         }
     }
 }

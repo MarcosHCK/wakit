@@ -199,6 +199,7 @@ namespace Wakit
           registration (context, web_page, frame);
           context.set_value ("logging", Libraries.Logging.register (context));
 
+          Binding.KlassReserve.make_resident (context);
           Binding.BridgeService.register (context);
 
           var ready = false;

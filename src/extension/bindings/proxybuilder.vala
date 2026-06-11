@@ -54,7 +54,10 @@ namespace Wakit.Binding
             type = _types.add (info);
 
           if (null == IBinding<ProxyBase>.get_class (context, type))
-            ProxyBase.register (context, info, type.name (), type);
+            {
+              unowned var klass = ProxyBase.register (context, info, type.name (), type);
+              KlassReserve.preserve (context, klass.jsc_class);
+            }
 
           _types_lock.unlock ();
 
@@ -75,7 +78,10 @@ namespace Wakit.Binding
             type = _types.add (info);
 
           if (null == IBinding<ProxyBase>.get_class (context, type))
-            ProxyBase.register (context, info, type.name (), type);
+            {
+              unowned var klass = ProxyBase.register (context, info, type.name (), type);
+              KlassReserve.preserve (context, klass.jsc_class);
+            }
 
           _types_lock.unlock ();
 
@@ -138,6 +144,7 @@ namespace Wakit.Binding
           unowned Class klass = IBinding<ProxyBuilder>.register (context, "Wakit.ProxyBuilder");
 
           IInvocable<ProxyBuilder>.add_method (klass, "create", (c, a) => c.create_method (a));
+          KlassReserve.preserve (context, klass.jsc_class);
         return klass;
         }
     }
