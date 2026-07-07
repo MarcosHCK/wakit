@@ -31,7 +31,7 @@ namespace Wakit.Host.Configuration
   public const GLib.OptionEntry CONFIG_ENTRY = { "config", 'c', 0, GLib.OptionArg.FILENAME, null,
     "Configuration file to use (default: wakit.config.json)", "FILE" };
 
-  public static Config capture ([CCode (array_length_cname = "argc", array_length_pos = 0.9)] ref unowned string[] argv) throws GLib.Error
+  public static Config capture ([CCode (array_length_cname = "argc", array_length_pos = 0.9)] ref unowned string[] argv, out bool loaded, out string filename) throws GLib.Error
     {
 
       unowned string config = "wakit.config.json";
@@ -46,10 +46,21 @@ namespace Wakit.Host.Configuration
       context.set_ignore_unknown_options (true);
       context.parse (ref argv);
 
-    return capture_construct (config);
+    return capture_construct (filename = config, out loaded);
     }
 
-  private static Config capture_construct (string filename) throws GLib.Error
+  private static Config capture_construct (string filename, out bool loaded) throws GLib.Error
+    {
+
+      Config config; try
+        { config = capture_construct_from_file (filename); loaded = true; }
+      catch (GLib.FileError.NOENT error)
+        { config = new Config (); loaded = false; }
+
+    return config;
+    }
+
+  private static Config capture_construct_from_file (string filename) throws GLib.Error
     {
 
       var mapped_file = new GLib.MappedFile (filename, false);

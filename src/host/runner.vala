@@ -43,7 +43,7 @@ namespace Wakit.Host
         {
 
           var args = CommandLine.ensure_argv (ref argv);
-          var config = Configuration.capture (ref argv);
+          var config = Configuration.capture (ref argv, null, null);
 
           configure_capture (config);
 
