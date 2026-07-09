@@ -24,7 +24,7 @@ namespace Wakit.AppBus
       [CCode (cname = "BUSMASTER_PATH")]
       extern const string BUSMASTER_PATH;
 #if DEVELOP
-      private const string DEFAULT_CONFIG = Config.SOURCE_DIR + "/daemon.json";
+      private const string DEFAULT_CONFIG = BuildConfig.SOURCE_DIR + "/daemon.json";
       private const string DEFAULT_EXECUTABLE = BUSMASTER_PATH;
 #else // DEVELOP
       private const string DEFAULT_CONFIG = Config.DATA_DIR + "/daemon.json";

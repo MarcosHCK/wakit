@@ -25,7 +25,7 @@ namespace Wakit.Host.Configuration
 
         return (ssize_t) value;
       else
-        throw new GLib.OptionError.BAD_VALUE ("file is too big");
+        throw new GLib.OptionError.BAD_VALUE (_ ("file is too big"));
     }
 
   public const GLib.OptionEntry CONFIG_ENTRY = { "config", 'c', 0, GLib.OptionArg.FILENAME, null,
@@ -41,7 +41,7 @@ namespace Wakit.Host.Configuration
 
       entries [0].arg_data = &config;
 
-      context.add_main_entries (entries, "en_US");
+      context.add_main_entries (entries, Wakit.BuildConfig.GETTEXT_PACKAGE);
       context.set_help_enabled (false);
       context.set_ignore_unknown_options (true);
       context.parse (ref argv);

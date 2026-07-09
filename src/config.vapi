@@ -18,14 +18,14 @@
 namespace Wakit
 {
 
-  [CCode (cheader_filename = "config.h", cprefix = "", lower_case_cprefix = "")] namespace Config
+  [CCode (cheader_filename = "config.h", cprefix = "", lower_case_cprefix = "")] namespace BuildConfig
     {
 
-      public const bool DEBUG;
-      public const bool DEVELOP;
       public const string BUILD_DIR;
       public const string DATA_DIR;
-      public const string SOURCE_DIR;
+      public const bool DEBUG;
+      public const bool DEVELOP;
+      public const string GETTEXT_PACKAGE;
       public const string G_LOG_DOMAIN;
       public const int G_LOG_USE_STRUCTURED;
       public const string LIBEXEC_DIR;
@@ -35,9 +35,10 @@ namespace Wakit
       public const string PACKAGE_TARNAME;
       public const string PACKAGE_URL;
       public const string PACKAGE_VERSION;
+      public const string SOURCE_DIR;
       public const uint PACKAGE_VERSION_MAJOR;
-      public const uint PACKAGE_VERSION_MINOR;
       public const uint PACKAGE_VERSION_MICRO;
+      public const uint PACKAGE_VERSION_MINOR;
       public const uint PACKAGE_VERSION_STAGE;
     }
 }

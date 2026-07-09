@@ -42,6 +42,7 @@ config = configuration_data ()
 
 config.set ('DEBUG', get_option ('debug').to_int ())
 config.set ('DEVELOP', get_option ('develop').to_int ())
+config.set_quoted ('GETTEXT_PACKAGE', 'wakit')
 # TODO: edit this
 config.set_quoted ('PACKAGE_BUGREPORT', 'nouser@nohost.com')
 config.set_quoted ('PACKAGE_NAME', meson.project_name ())
@@ -127,6 +128,8 @@ if get_option ('develop')
 
   add_project_arguments (([ '-D', 'DEVELOP' ]), language: 'vala')
 endif
+
+add_project_arguments ('-DGETTEXT_PACKAGE=@0@'.format (config.get ('GETTEXT_PACKAGE')), language: 'c')
 
 add_project_arguments (cc.get_supported_arguments (warning_c_args), language: 'c')
 add_project_link_arguments (cc.get_supported_link_arguments (warning_c_link_args), language: 'c')

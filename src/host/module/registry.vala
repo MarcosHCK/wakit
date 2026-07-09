@@ -124,7 +124,7 @@ namespace Wakit.Host.Module
                 return file.get_path ();
             }
 
-          throw new GLib.IOError.NOT_FOUND ("module file not found (loader %s, name '%s')", loader, name);
+          throw new GLib.IOError.NOT_FOUND (_ ("module file not found (loader %s, name '%s')"), loader, name);
         }
 
       public async bool quit_async (uint timeout)

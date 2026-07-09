@@ -20,6 +20,7 @@ subdir ('asynchelp')
 subdir ('enum')
 subdir ('ffi')
 subdir ('hex')
+subdir ('i18n')
 
 # level 2
 subdir ('krypt')
@@ -59,12 +60,14 @@ __common_deps = [ __common_appbus_dep.as_link_whole (),
                   __common_enum_dep.as_link_whole (),
                   __common_ffi_dep.as_link_whole (),
                   __common_hex_dep.as_link_whole (),
+                  __common_i18n_dep.as_link_whole (),
                   __common_json_dep.as_link_whole (),
                   __common_krypt_dep.as_link_whole (), ]
 
 __common_fwds = [ __common_appbus_dep,
                   __common_asynchelp_dep,
                   __common_enum_dep,
+                  __common_i18n_dep,
                   __common_json_dep ]
 
 if gio_unix_dep.found ()

@@ -76,6 +76,7 @@ namespace Wakit.Host.Module
       static int main (string[] argv)
         {
 
+          I18n.app_setup ();
         return (new HostApplication ()).run ();
         }
 
@@ -178,26 +179,26 @@ namespace Wakit.Host.Module
           var arguments = (Arguments) Json.gobject_deserialize (typeof (Arguments), root);
 
           if (unlikely (null == (_appbus_address = arguments.appbus_address)))
-            throw new GLib.OptionError.FAILED ("specify the appbus address");
+            throw new GLib.OptionError.FAILED (_ ("specify the appbus address"));
 
           if (unlikely (! GLib.DBus.is_address (_appbus_address)))
-            throw new GLib.OptionError.FAILED ("invalid appbus address");
+            throw new GLib.OptionError.FAILED (_ ("invalid appbus address"));
 
           _appbus_timeout = arguments.appbus_timeout;
           _launch_timeout = arguments.launch_timeout;
 
           if (unlikely (null == (module_filename = arguments.module_filename)))
-            throw new GLib.OptionError.FAILED ("specify the module filename");
+            throw new GLib.OptionError.FAILED (_ ("specify the module filename"));
 
           if (unlikely (null == (_module_loader = arguments.module_loader)))
-            throw new GLib.OptionError.FAILED ("specify the module type");
+            throw new GLib.OptionError.FAILED (_ ("specify the module type"));
 
           GLib.File _file;
           _module_filename = (_file = GLib.File.new_for_commandline_arg (module_filename)).get_path ();
 
           if (null != (_module_digest = arguments.module_digest)
             && unlikely (false == check_digest (_file, _module_digest)))
-            throw new GLib.OptionError.FAILED ("module file digest mismatch");
+            throw new GLib.OptionError.FAILED (_ ("module file digest mismatch"));
 
           _module_name = arguments.module_name;
           _module_type_prefix = arguments.module_type_prefix;

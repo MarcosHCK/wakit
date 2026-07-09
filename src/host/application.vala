@@ -130,7 +130,7 @@ namespace Wakit.Host
           unowned string? loader_tree = scheme_config.tree;
 
           if ((null == loader_bundle && null == loader_tree) || (null != loader_bundle && null != loader_tree))
-            throw new GLib.OptionError.FAILED ("please specify one of --bundle or --tree");
+            throw new GLib.OptionError.FAILED (_ ("please specify one of --bundle or --tree"));
 
           if (null != loader_bundle)
             loader = new Loaders.BundleLoader.from_file (loader_bundle);

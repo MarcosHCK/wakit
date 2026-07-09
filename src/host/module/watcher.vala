@@ -118,7 +118,7 @@ namespace Wakit.Host.Module
           var unique_name = yield stdout.read_line_async (io_priority, cancellable);
 
           if (unlikely (null == unique_name || false == GLib.DBus.is_unique_name (unique_name)))
-            throw new GLib.IOError.INVALID_DATA ("bad dbus address");
+            throw new GLib.IOError.INVALID_DATA (_ ("bad dbus address"));
 
         return unique_name;
         }

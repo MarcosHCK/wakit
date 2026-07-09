@@ -56,7 +56,7 @@ namespace Wakit.Host.Module
 
             _module_init = (ModuleInitFunc) symbol;
           else
-            throw new GLib.ModuleError.FAILED ("can not find module init function");
+            throw new GLib.ModuleError.FAILED (_ ("can not find module init function"));
 
         return use ();
         }

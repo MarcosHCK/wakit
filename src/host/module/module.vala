@@ -46,7 +46,7 @@ namespace Wakit.Host.Module
           unowned LoaderMapEntry entry;
 
           if (unlikely (false == get_loader_entry (type, out entry)))
-            throw new GLib.IOError.INVALID_ARGUMENT ("unknown module type '%s'", type);
+            throw new GLib.IOError.INVALID_ARGUMENT (_ ("unknown module type '%s'"), type);
 
           GLib.Type g_type = entry.g_type;
 
