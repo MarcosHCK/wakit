@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
-#include <host/loaders/wakit-host-loaders.h>
+#include <core/apploader/wakit-core-loaders.h>
 #include <tests/testing.h>
 using namespace testing;
 
