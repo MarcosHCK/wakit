@@ -42,7 +42,7 @@ __busmaster_exe = executable ('wakit-busmaster',
   cpp_args: [ '-DG_LOG_DOMAIN="Wakit.BusMaster"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_dep, gio_dep, json_dep, __busmaster_deps ],
+  dependencies: [ config_vala_dep, gio_dep, json_dep, __busmaster_deps ],
   sources: __busmaster_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 

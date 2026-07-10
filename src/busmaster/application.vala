@@ -41,7 +41,7 @@ namespace Wakit.Busmaster
           _context.set_help_enabled (true);
           _context.set_ignore_unknown_options (false);
           _context.set_strict_posix (false);
-          _context.set_translation_domain ("en_US");
+          _context.set_translation_domain (Wakit.BuildConfig.GETTEXT_PACKAGE);
 
           GLib.OptionEntry entries [] = {
 
@@ -51,12 +51,13 @@ namespace Wakit.Busmaster
             (GLib.OptionEntry) GLib.OptionEntry.NULL,
           };
 
-          _context.add_main_entries (entries, "en_US");
+          _context.add_main_entries (entries, Wakit.BuildConfig.GETTEXT_PACKAGE);
         }
 
       static int main (string[] argv)
         {
 
+          I18n.app_setup ();
         return (new Application ()).run (argv);
         }
 
@@ -203,7 +204,7 @@ namespace Wakit.Busmaster
                   last_error = (owned) error;
                 }
             }
-        throw last_error ?? new GLib.IOError.INVALID_ARGUMENT ("no transport address provided");
+        throw last_error ?? new GLib.IOError.INVALID_ARGUMENT (_ ("no transport address provided"));
         }
 
       static void print_address (string address, string guid, string? cookie)

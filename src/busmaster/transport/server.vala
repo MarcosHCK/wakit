@@ -60,7 +60,7 @@ namespace Wakit.Busmaster.Transport
             case "unix": result = yield init_unix_async (address, io_priority, cancellable);
               break;
 
-            default: throw new GLib.IOError.INVALID_ARGUMENT ("invalid address transport '%s'", address.transport);
+            default: throw new GLib.IOError.INVALID_ARGUMENT (_ ("invalid address transport '%s'"), address.transport);
             }
         return result;
         }
@@ -213,7 +213,7 @@ namespace Wakit.Busmaster.Transport
             {
 
               if (! GLib.UnixSocketAddress.abstract_names_supported ())
-                throw new GLib.IOError.NOT_SUPPORTED ("Abstract namespace not supported");
+                throw new GLib.IOError.NOT_SUPPORTED (_ ("abstract namespace not supported"));
 
               unowned string path = option1._value.value;
               unowned int length = (int) option1._value.length;
@@ -223,7 +223,7 @@ namespace Wakit.Busmaster.Transport
             }
 
           if (unlikely (null == socket_address))
-            throw new GLib.IOError.INVALID_ARGUMENT ("bad unix socket address");
+            throw new GLib.IOError.INVALID_ARGUMENT (_ ("bad unix socket address"));
 
           string address_path = socket_address.get_path ();
           string escaped_path = GLib.DBus.address_escape_value (address_path);
