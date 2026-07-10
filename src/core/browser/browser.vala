@@ -123,6 +123,12 @@ namespace Wakit.Browser
             });
         }
 
+      public void register_uri_scheme_as_cors_enabled (string scheme)
+        {
+
+          _context.get_security_manager ().register_uri_scheme_as_cors_enabled (scheme);
+        }
+
       public void register_uri_scheme_as_local (string scheme)
         {
 

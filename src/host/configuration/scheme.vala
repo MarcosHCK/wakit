@@ -23,9 +23,9 @@ namespace Wakit.Host.Configuration
 
       public SchemeAliasArray aliases { get; construct; }
       public string? bundle { get; construct; default = null; }
-      public bool local { get; construct; default = true; }
+      public bool cors_enabled { get; construct; default = true; }
+      public bool local { get; construct; default = false; }
       public string name { get; construct; }
-      public bool secure { get; construct; default = false; }
       public string? tree { get; construct; default = null; }
 
       public override void constructed ()

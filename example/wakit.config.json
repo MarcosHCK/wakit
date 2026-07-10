@@ -24,7 +24,6 @@
           "verbatim": true
         }
       ],
-      "local": true,
       "name": "app",
       "tree": "../example/dist/"
     }

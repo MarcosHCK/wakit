@@ -26,6 +26,7 @@ namespace Wakit
 
       public abstract Wakit.IWebView create_view ();
       public abstract void register_uri_scheme (string scheme, owned UriRequestResolver resolver);
+      public abstract void register_uri_scheme_as_cors_enabled (string scheme);
       public abstract void register_uri_scheme_as_local (string scheme);
       public abstract void register_uri_scheme_as_secure (string scheme);
     }

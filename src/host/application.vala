@@ -66,11 +66,11 @@ namespace Wakit.Host
 
           Loaders.register_uri_scheme (scheme, browser, prepare_loader (scheme_config));
 
+          if (scheme_config.cors_enabled)
+            browser.register_uri_scheme_as_cors_enabled (scheme);
+
           if (scheme_config.local)
             browser.register_uri_scheme_as_local (scheme);
-
-          if (scheme_config.secure)
-            browser.register_uri_scheme_as_secure (scheme);
         }
 
       public override void constructed ()
@@ -94,7 +94,10 @@ namespace Wakit.Host
             configure_scheme (scheme_config);
 
           foreach (unowned var secure_scheme in config.secure_schemes.data)
-            extension_host.secure_schemes.add (secure_scheme);
+            {
+              browser.register_uri_scheme_as_secure (secure_scheme);
+              extension_host.secure_schemes.add (secure_scheme);
+            }
 
         return true;
         }
