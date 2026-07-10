@@ -51,7 +51,7 @@ namespace Wakit.Browser
             "allow-universal-access-from-file-urls", false,
             "default-charset", "UTF-8",
             "enable-back-forward-navigation-gestures", false,
-            "enable-developer-extras", BuildConfig.DEVELOP,
+            "enable-developer-extras", BuildConfig.DEBUG,
             "enable-dns-prefetching", _config.enable_dns_prefetching,
             "enable-fullscreen", _config.enable_fullscreen,
             "enable-html5-database", _config.enable_html5_database,
@@ -78,23 +78,6 @@ namespace Wakit.Browser
 
           _user_content_manager = (WebKit.UserContentManager) GLib.Object.new (typeof (WebKit.UserContentManager),
             null);
-
-          string allow_list [] = { "app:///*" };
-
-          unowned var resource = Resource.peek ();
-
-          GLib.Bytes css = lookup_build_resource (resource, "/org/hck/wakit/browser/browser.min.css");
-          GLib.Bytes js = lookup_build_resource (resource, "/org/hck/wakit/browser/browser.min.js");
-
-          _user_content_manager.add_script (new WebKit.UserScript ((string) js.get_data (),
-                                                                   WebKit.UserContentInjectedFrames.ALL_FRAMES,
-                                                                   WebKit.UserScriptInjectionTime.END,
-                                                                   allow_list, null));
-
-          _user_content_manager.add_style_sheet (new WebKit.UserStyleSheet ((string) css.get_data (),
-                                                                            WebKit.UserContentInjectedFrames.ALL_FRAMES,
-                                                                            WebKit.UserStyleLevel.USER,
-                                                                            allow_list, null));
         }
 
       public Wakit.IWebView create_view ()

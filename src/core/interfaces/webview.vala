@@ -30,6 +30,7 @@ namespace Wakit
 
       public abstract bool maximized { get; set; }
       public abstract bool minimized { get; set; }
+      public abstract ICollection<string> secure_schemes { get; }
 
       public unowned WebViewBinding bind_window (Gtk.Window window)
         {

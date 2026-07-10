@@ -109,6 +109,11 @@ namespace Wakit.Host
           window.set_child (web_view = browser.create_view ());
           window.set_default_size (800, 600);
 
+          foreach (unowned var scheme in ((Wakit.Host.Configuration.Config) configuration).secure_schemes.data)
+            {
+              web_view.secure_schemes.add (scheme);
+            }
+
           web_view.bind_window (window);
           web_view.open_uri (file, hint);
 

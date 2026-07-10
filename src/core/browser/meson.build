@@ -30,28 +30,6 @@ foreach bit: [ 'browser', 'dragcontroller', 'extensionhost', 'resource', 'urireq
   __core_browser_src += [ '@0@.vala'.format (bit) ]
 endforeach
 
-__core_browser_bundle = []
-
-foreach bit: [ 'browser' ]
-
-  __core_browser_bundle += esbuild_css_gen.process ('@0@.css'.format (bit))
-  __core_browser_bundle += esbuild_js_gen.process ('@0@.ts'.format (bit))
-endforeach
-
-__core_browser_src += custom_target ('wakit-core-browser-resources',
-  command: [ python_exe,
-             mkresources_py,
-             '--basedir', '@PRIVATE_DIR@',
-             '--bin', resources_exe.full_path (),
-             '--dep', '@DEPFILE@',
-             '--header', '@OUTPUT0@',
-             '--source', '@OUTPUT1@',
-             '--name', 'wakit_browser_',
-             '-s', '/org/hck/wakit/browser/', '@INPUT@' ],
-  depfile: 'resources.deps',
-  input: __core_browser_bundle,
-  output: [ 'resources.bundle.h', 'resources.bundle.c' ])
-
 __core_browser_deps = [ __common_dep,
                         __core_configuration_dep,
                         __core_gui_dep,

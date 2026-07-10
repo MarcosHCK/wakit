@@ -30,6 +30,7 @@ namespace Wakit.Browser
       public Gtk.GestureDrag controller { get; }
       public bool drag { get; set; }
       public uint drag_delay { get; construct; }
+      public ICollection<string> schemes { get; }
       public WebKit.WebView web_view { get; construct; }
 
       public DragController (WebKit.WebView web_view, uint drag_delay = DEFAULT_DRAG_DELAY)
@@ -48,6 +49,8 @@ namespace Wakit.Browser
           _controller.drag_update.connect (on_drag_update);
 
           _controller.propagation_phase = Gtk.PropagationPhase.CAPTURE;
+
+          _schemes = new GenericSetCollection<string> (str_hash, str_equal);
         }
 
       static double distance (double dx, double dy)
@@ -129,7 +132,7 @@ namespace Wakit.Browser
 
           var scheme = GLib.Uri.parse_scheme (_web_view.get_uri ());
 
-          if ("app" != scheme)
+          if (! ((GenericSetCollection<string>) _schemes).struct.contains (scheme))
             return false;
 
           yield async_delay (_drag_delay, GLib.Priority.DEFAULT, cancellable);

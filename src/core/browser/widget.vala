@@ -23,6 +23,7 @@ namespace Wakit.Browser
 
       public bool maximized { get; set; }
       public bool minimized { get; set; }
+      public ICollection<string> secure_schemes { get { return _drag_controller.schemes; } }
       public WebKit.WebView web_view { get; construct; }
 
       private DragController _drag_controller;
