@@ -15,6 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
+#include <glib/gi18n-lib.h>
 #include <common/appbus/address.h>
 
 static void parse_options (const gchar* first, const gchar* list, guint length, WakitAppBusAddressForeachOption callback, gpointer user_data, GError** error);
@@ -50,7 +51,7 @@ const gchar* wakit_app_bus_address_parse (const gchar* address, guint* out_lengt
                   return (g_propagate_error (error, tmperr), nullptr);
           break;
 
-        case 2: g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT, "bad address (%li, unexpected ':')", last - address);
+        case 2: g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT, _ ("bad address (%li, unexpected ':')"), last - address);
           return NULL;
     } }
 return address;
@@ -73,12 +74,12 @@ static void parse_options (const gchar* first, const gchar* list, guint length, 
         last = list + length;
 
       if (auto sep = g_strstr_len (curr, last - curr, "="); G_UNLIKELY (sep == NULL))
-        g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT, "bad address (%li: missing '=')", curr - first + 1);
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT, _ ("bad address (%li: missing '=')"), curr - first + 1);
 
       else if (auto ext = g_strstr_len (1 + sep, last - sep - 1, "="); G_UNLIKELY (ext == NULL))
 
         callback (curr, sep - curr, 1 + sep, last - (1 + sep), user_data);
       else
-        g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT, "bad address (%li: unexpected '=') %.*s", ext - first + 1, (int) (last - curr), sep);
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT, _ ("bad address (%li: unexpected '=') %.*s"), ext - first + 1, (int) (last - curr), sep);
     }
 }

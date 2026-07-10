@@ -45,7 +45,7 @@ namespace Wakit.AppBus
           yield response.read (_istream, GLib.Priority.DEFAULT, cancellable);
 
           if (! _auth_server.check_challenge (challenge, response))
-            throw new GLib.DBusError.AUTH_FAILED ("invalid authentication cookie");
+            throw new GLib.DBusError.AUTH_FAILED (_ ("invalid authentication cookie"));
 
           yield _ostream.write_all_async (FINE, GLib.Priority.DEFAULT, cancellable, null);
 

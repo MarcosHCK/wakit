@@ -49,7 +49,7 @@ namespace Wakit.AppBus
           yield _istream.read_all_async (answer, GLib.Priority.DEFAULT, cancellable, null);
 
           if (unlikely (0 != GLib.Memory.cmp (answer, FINE, answer.length)))
-            throw new GLib.DBusError.AUTH_FAILED ("server refused connection");
+            throw new GLib.DBusError.AUTH_FAILED (_ ("server refused connection"));
 
         return true;
         }

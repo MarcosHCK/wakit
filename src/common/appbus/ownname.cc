@@ -15,6 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
+#include <glib/gi18n-lib.h>
 #include <common/appbus/ownname.h>
 
 struct _OwnData
@@ -58,7 +59,7 @@ static void on_name_lost (GDBusConnection* connection, const gchar* name, struct
   if (auto task = data->future; NULL != task)
     {
 
-      g_task_return_new_error_literal (task, G_IO_ERROR, G_IO_ERROR_CLOSED, "connection is closed");
+      g_task_return_new_error_literal (task, G_IO_ERROR, G_IO_ERROR_CLOSED, _ ("connection is closed"));
       _g_object_unref0 (data->future);
     }
 }
