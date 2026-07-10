@@ -104,7 +104,7 @@ namespace Wakit.Binding
 
           if (args.length < 3)
             {
-              JSC.Context.get_current ().throw ("expected two arguments");
+              JSC.Context.get_current ().throw (_ ("expected two arguments"));
               return null;
             }
 
@@ -112,7 +112,7 @@ namespace Wakit.Binding
 
           if (! GLib.DBus.is_name (name))
             {
-              JSC.Context.get_current ().throw ("invalid bus name");
+              JSC.Context.get_current ().throw (_ ("invalid bus name"));
               return null;
             }
 
@@ -120,7 +120,7 @@ namespace Wakit.Binding
 
           if (! GLib.DBus.is_interface_name (interface_name))
             {
-              JSC.Context.get_current ().throw ("invalid interface name");
+              JSC.Context.get_current ().throw (_ ("invalid interface name"));
               return null;
             }
 
@@ -128,7 +128,7 @@ namespace Wakit.Binding
 
           if (! GLib.Variant.is_object_path (object_path))
             {
-              JSC.Context.get_current ().throw ("invalid interface name");
+              JSC.Context.get_current ().throw (_ ("invalid interface name"));
               return null;
             }
 

@@ -16,6 +16,7 @@
  */
 #include <config.h>
 #include <common/bits.h>
+#include <glib/gi18n-lib.h>
 #include <extension/utility/marshalling.h>
 
 G_DEFINE_QUARK (wakit-marshalling-error-quark, wakit_marshalling_error)
@@ -67,7 +68,7 @@ GVariant* wakit_marshalling_jsc_value_to_variant (JSCContext* context, const GVa
 
           return (g_set_error_literal (error, WAKIT_MARSHALLING_ERROR,
                                               WAKIT_MARSHALLING_ERROR_ARRAY_EXPECTED,
-                    "tuple/dict-entry expansion needs an array/object argument"), nullptr);
+                    _ ("tuple/dict-entry expansion needs an array/object argument")), nullptr);
 
         switch (vt) { case '(': return _tuple_pack<'('> (context, vtype, value, error);
                       case '{': return _tuple_pack<'{'> (context, vtype, value, error); }
@@ -91,7 +92,7 @@ GVariant* wakit_marshalling_jsc_value_to_variant (JSCContext* context, const GVa
 
             return (g_set_error (error, WAKIT_MARSHALLING_ERROR,
                                         WAKIT_MARSHALLING_ERROR_ARRAY_EXPECTED,
-                      "%s expansion needs an array-like value", str = g_variant_type_dup_string (child_type)),
+                      _ ("%s expansion needs an array-like value"), str = g_variant_type_dup_string (child_type)),
                       g_free (str), nullptr);
         }
       else
@@ -107,7 +108,7 @@ GVariant* wakit_marshalling_jsc_value_to_variant (JSCContext* context, const GVa
 
             return (g_set_error (error, WAKIT_MARSHALLING_ERROR,
                                         WAKIT_MARSHALLING_ERROR_ARRAY_EXPECTED,
-                        "%s expansion needs an array-like value", str = g_variant_type_dup_string (child_type)),
+                        _ ("%s expansion needs an array-like value"), str = g_variant_type_dup_string (child_type)),
                         g_free (str), nullptr);
         }
 
@@ -311,14 +312,14 @@ static GVariant* _typearray_pack (JSCContext* context, const GVariantType* child
 
                 return _typearray_make<alignof (guint8)> (G_VARIANT_TYPE (cs), value);
               else
-                return (jsc_context_throw (context, "(U)Int8Array expected"), nullptr);
+                return (jsc_context_throw (context, _ ("(U)Int8Array expected")), nullptr);
 
     case 'd': if (auto type = jsc_value_typed_array_get_type (value); type == JSC_TYPED_ARRAY_FLOAT32
                                                                    || type == JSC_TYPED_ARRAY_FLOAT64)
 
                 return _floatXXarray_pack (context, type, value);
               else
-                return (jsc_context_throw (context, "Float32Array or Float64Array expected"), nullptr);
+                return (jsc_context_throw (context, _ ("Float32Array or Float64Array expected")), nullptr);
 
     case 'h': G_GNUC_FALLTHROUGH;
 
@@ -326,43 +327,43 @@ static GVariant* _typearray_pack (JSCContext* context, const GVariantType* child
 
                 return _typearray_make<alignof (gint32)> (G_VARIANT_TYPE (cs), value);
               else
-                return (jsc_context_throw (context, "Int32Array expected"), nullptr);
+                return (jsc_context_throw (context, _ ("Int32Array expected")), nullptr);
 
     case 'n': if (auto type = jsc_value_typed_array_get_type (value); type == JSC_TYPED_ARRAY_INT16)
 
                 return _typearray_make<alignof (gint16)> (G_VARIANT_TYPE (cs), value);
               else
-                return (jsc_context_throw (context, "Int16Array expected"), nullptr);
+                return (jsc_context_throw (context, _ ("Int16Array expected")), nullptr);
 
     case 'q': if (auto type = jsc_value_typed_array_get_type (value); type == JSC_TYPED_ARRAY_UINT16)
 
                 return _typearray_make<alignof (guint16)> (G_VARIANT_TYPE (cs), value);
               else
-                return (jsc_context_throw (context, "Uint16Array expected"), nullptr);
+                return (jsc_context_throw (context, _ ("Uint16Array expected")), nullptr);
 
     case 't': if (auto type = jsc_value_typed_array_get_type (value); type == JSC_TYPED_ARRAY_UINT64)
 
                 return _typearray_make<alignof (guint64)> (G_VARIANT_TYPE (cs), value);
               else
-                return (jsc_context_throw (context, "Uint64Array expected"), nullptr);
+                return (jsc_context_throw (context, _ ("Uint64Array expected")), nullptr);
 
     case 'u': if (auto type = jsc_value_typed_array_get_type (value); type == JSC_TYPED_ARRAY_UINT32)
 
                 return _typearray_make<alignof (guint32)> (G_VARIANT_TYPE (cs), value);
               else
-                return (jsc_context_throw (context, "Uint32Array expected"), nullptr);
+                return (jsc_context_throw (context, _ ("Uint32Array expected")), nullptr);
 
     case 'x': if (auto type = jsc_value_typed_array_get_type (value); type == JSC_TYPED_ARRAY_INT64)
 
                 return _typearray_make<alignof (gint64)> (G_VARIANT_TYPE (cs), value);
               else
-                return (jsc_context_throw (context, "Int64Array expected"), nullptr);
+                return (jsc_context_throw (context, _ ("Int64Array expected")), nullptr);
 
     case 'y': if (auto type = jsc_value_typed_array_get_type (value); type == JSC_TYPED_ARRAY_UINT8)
 
                 return _typearray_make<alignof (guint8)> (G_VARIANT_TYPE (cs), value);
               else
-                return (jsc_context_throw (context, "Uint8Array expected"), nullptr);
+                return (jsc_context_throw (context, _ ("Uint8Array expected")), nullptr);
 
     default:
       g_error ("unknown variant type '%s', fix this!", g_variant_type_peek_string (G_VARIANT_TYPE (cs)));

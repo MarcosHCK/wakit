@@ -74,7 +74,7 @@ namespace Wakit.Binding
 
           if (args.length < 1)
             {
-              JSC.Context.get_current ().throw ("expected an argument");
+              JSC.Context.get_current ().throw (_ ("expected an argument"));
               return null;
             }
 

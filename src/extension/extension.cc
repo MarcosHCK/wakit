@@ -15,6 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
+#include <glib/gi18n-lib.h>
 #include <extension/extension.hh>
 #include <webkit/webkit-web-process-extension.h>
 
@@ -70,7 +71,7 @@ static gpointer wakit_web_extension_new_default_once (WebKitWebProcessExtension*
 
   if ((g_value_unsets (values), (void) success); G_UNLIKELY (nullptr != error))
 
-    { g_error ("can not initialize web extension: %s: %u: %s", g_quark_to_string (error->domain), error->code, error->message);
+    { g_error (_ ("can not initialize web extension: %s: %u: %s"), g_quark_to_string (error->domain), error->code, error->message);
       g_assert_not_reached (); }
 
 return object;

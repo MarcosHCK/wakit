@@ -53,14 +53,14 @@ namespace Wakit.Binding
           GLib.DBusProxy dbus_proxy;
 
           if (unlikely (null == (dbus_proxy = _dbus_proxy)))
-            throw new GLib.IOError.NOT_CONNECTED ("proxy object is not connected");
+            throw new GLib.IOError.NOT_CONNECTED (_ ("proxy object is not connected"));
 
           GLib.Variant? variant;
 
           if (likely (null != (variant = dbus_proxy.get_cached_property (property_name))))
             return Marshalling.variant_to_jsc_value (context, variant);
 
-          throw new GLib.IOError.INVALID_DATA ("uncached property");
+          throw new GLib.IOError.INVALID_DATA (_ ("uncached property"));
         }
 
       static JSC.Value? invoke (DBusProxy dbus_proxy, string method_name, string signature, GenericArray<JSC.Value> a)
@@ -156,7 +156,7 @@ namespace Wakit.Binding
           GLib.DBusProxy dbus_proxy;
 
           if (unlikely (null == (dbus_proxy = _dbus_proxy)))
-            throw new GLib.IOError.NOT_CONNECTED ("proxy object is not connected");
+            throw new GLib.IOError.NOT_CONNECTED (_ ("proxy object is not connected"));
 
           unowned var dbus_info = dbus_proxy.get_info ();
           unowned var property_info = dbus_info.lookup_property (property_name);
@@ -195,7 +195,7 @@ namespace Wakit.Binding
             { unowned uint code = error.code;
               unowned string domain = error.domain.to_string ();
               unowned string message = error.message.to_string ();
-              critical ("can not write property: %s: %u: %s", domain, code, message); }
+              critical (_ ("can not write property: %s: %u: %s"), domain, code, message); }
         }
     }
 }

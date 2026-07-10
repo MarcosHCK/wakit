@@ -15,6 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
+#include <glib/gi18n-lib.h>
 #include <extension/utility/marshalling.h>
 
 static inline GPtrArray* _container_unpack (JSCContext* context, GVariant* variant);

@@ -15,6 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
+#include <glib/gi18n-lib.h>
 #include <common/boxing.h>
 #include <common/mixin.h>
 #include <common/wakit-common.h>
@@ -101,10 +102,10 @@ static void log_callback (GPtrArray* array, GFlagsClass* flags_class)
   constexpr auto n_base_args = 2;
 
   if (array->len < n_base_args)
-    return throw_literal ("at least 2 values expected");
+    return throw_literal (_ ("at least 2 values expected"));
 
   if ((array->len - n_base_args) & 1)
-    return throw_literal ("field arguments must come name-value pairs");
+    return throw_literal (_ ("field arguments must come name-value pairs"));
 
   gchar* domain = nullptr;
   guint log_level = 0;
@@ -116,7 +117,7 @@ static void log_callback (GPtrArray* array, GFlagsClass* flags_class)
   if (log_level = jsc_value_to_double (values [1]); log_level != (log_level & flags_class->mask))
     {
       auto left = log_level & ~flags_class->mask;
-      return throw ("unknown log level flag value %u", left);
+      return throw (_ ("unknown log level flag value %u"), left);
     }
 
   _mixin_new (boxing::string, keys, 16, n_fields);

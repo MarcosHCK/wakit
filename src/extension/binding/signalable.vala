@@ -43,7 +43,7 @@ namespace Wakit.Binding
                   return new JSC.Value.number (JSC.Context.get_current (), (double) id); }
               else
                 { string got = a.length < 1 ? "nothing" : a [0].to_string ();
-                  JSC.Context.get_current ().throw (@"expected callable argument, got $(got)"); }
+                  JSC.Context.get_current ().throw ((_ ("expected callable argument, got %s")).printf (got)); }
             return null;
             }
 
@@ -180,7 +180,7 @@ namespace Wakit.Binding
               unowned JSC.Context context = JSC.Context.get_current ();
               unowned GLib.Type g_type = _G_TYPE_FROM_INSTANCE (c);
 
-              context.throw (@"$(get_class (context, g_type).name).disconnect expects a handler id");
+              context.throw ((_ ("%s.disconnect expects a handler id")).printf (get_class (context, g_type).name));
             }
         return null;
         }

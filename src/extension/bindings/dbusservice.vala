@@ -71,7 +71,7 @@ namespace Wakit.Binding
           if (null == (interface_info = node_info.lookup_interface (interface_name)))
             {
 
-              throw new GLib.IOError.NOT_FOUND ("interface '%s' don't exist under path '%s'", interface_name, object_path);
+              throw new GLib.IOError.NOT_FOUND (_ ("interface '%s' don't exist under path '%s'"), interface_name, object_path);
             }
         return interface_info;
         }
