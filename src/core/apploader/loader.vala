@@ -74,7 +74,7 @@ namespace Wakit.Loaders
                 { continue; }
             }
 
-          throw new GLib.IOError.NOT_FOUND ("resource not found");
+          throw new GLib.IOError.NOT_FOUND (_ ("resource not found"));
         }
     }
 }

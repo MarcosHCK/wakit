@@ -60,7 +60,7 @@ namespace Wakit.AppBus
           var address = (string?) yield stdout.read_line_async (GLib.Priority.DEFAULT, cancellable);
 
           if (unlikely (null == address || false == GLib.DBus.is_address (address)))
-            throw new GLib.IOError.INVALID_DATA ("bad dbus address");
+            throw new GLib.IOError.INVALID_DATA (_ ("bad dbus address"));
 
           _address = (owned) address;
           _connection = yield Wakit.AppBus.connect_client (_address, 0, cancellable);
@@ -115,7 +115,7 @@ namespace Wakit.AppBus
               unowned string domain = error.domain.to_string ();
               unowned string message = error.message.to_string ();
 
-              warning ("daemon reap failed: %s: %u: %s", domain, code, message);
+              warning ("Wakit.AppBus.Watcher.quit_async ()!: %s: %u: %s", domain, code, message);
             }
         }
     }

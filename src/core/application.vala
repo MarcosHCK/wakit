@@ -63,14 +63,14 @@ namespace Wakit
 
           if (null == error)
 
-            critical ("AppBus crashed!");
+            critical (_ ("AppBus crashed!"));
           else
             {
               unowned uint code = error.code;
               unowned string domain = error.domain.to_string ();
               unowned string message = error.message.to_string ();
 
-              critical ("AppBus crashed!: %s: %u: %s", domain, code, message);
+              critical (_ ("AppBus crashed!: %s: %u: %s"), domain, code, message);
             }
 
           quit ();
@@ -198,7 +198,7 @@ namespace Wakit
 
           catch (GLib.Error error)
             {
-              GLib.Error.prefix_literal (out error, "couldn't launch appbus: ");
+              GLib.Error.prefix_literal (out error, _ ("couldn't launch appbus: "));
               throw (owned) error;
             }
 

@@ -107,7 +107,7 @@ namespace Wakit.Browser
               unowned string domain = error.domain.to_string ();
               unowned string message = error.message.to_string ();
 
-              warning ("can not retrieve policy choice: %s: %u: %s", domain, code, message);
+              warning (_ ("can not retrieve policy choice: %s: %u: %s"), domain, code, message);
               decision.ignore ();
             }
         }
@@ -131,7 +131,7 @@ namespace Wakit.Browser
               return true;
             }
 
-          var message = new Gui.Message.question ("%s wants to redirect to %s", webview.get_uri (),
+          var message = new Gui.Message.question (_ ("%s wants to redirect to %s"), webview.get_uri (),
                                                                                 request.get_uri ());
 
           on_decide_policy_ask (message, get_toplevel (), decision);
@@ -142,7 +142,7 @@ namespace Wakit.Browser
         {
 
           decision.ignore ();
-          warning ("pop-up window blocked");
+          warning (_ ("pop-up window blocked"));
         return true;
         }
 
@@ -150,7 +150,7 @@ namespace Wakit.Browser
         {
 
           request.deny ();
-          warning ("permission request (type %s) denied", request.get_type ().name ());
+          warning (_ ("permission request (type %s) denied"), request.get_type ().name ());
         return true;
         }
 
