@@ -43,6 +43,8 @@ __busmaster_exe = executable ('wakit-busmaster',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, gio_dep, json_dep, __busmaster_deps ],
+  install: true,
+  install_dir: libexec_dir,
   sources: __busmaster_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 

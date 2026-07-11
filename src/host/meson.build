@@ -54,12 +54,19 @@ __host_lib = library ('wakit-host',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, gtk_dep, __host_deps ],
+  install: true,
+  install_dir: lib_dir,
   sources: __host_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
 __host_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __common_dep, __host_fwds ],
   link_with: __host_lib)
 
+import ('pkgconfig').generate (__host_lib,
+  libraries: [ __host_dep ],
+  version: meson.project_version ())
+
+install_headers (__host_lib.vala_header (), install_dir: include_dir, preserve_path: true)
 meson.override_dependency ('wakit-host', __host_dep)
 
 __host_bin = executable ('wakit-host-app',
@@ -70,6 +77,8 @@ __host_bin = executable ('wakit-host-app',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_dep, gtk_dep, __host_dep ],
+  install: true,
+  install_dir: bin_dir,
   sources: 'main.cc',
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 

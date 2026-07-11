@@ -50,3 +50,5 @@ __core_appbus_lib = static_library ('wakit-core-appbus',
 
 __core_appbus_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
   link_with: __core_appbus_lib)
+
+install_data ('daemon.json', install_dir: data_dir, preserve_path: true)

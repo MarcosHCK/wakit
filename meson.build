@@ -57,10 +57,16 @@ config.set ('PACKAGE_VERSION_MICRO', git_version_micro)
 config.set_quoted ('PACKAGE_VERSION_STAGE', git_version_stage)
 
 prefix = get_option ('prefix')
+bin_dir = prefix / get_option ('bindir')
+data_dir = prefix / get_option ('datadir') / 'wakit'
+extension_dir = prefix / get_option ('libexecdir') / 'wakit-web-extensions'
+include_dir = prefix / get_option ('includedir') / 'wakit'
+lib_dir = prefix / get_option ('libdir')
+libexec_dir = prefix / get_option ('libexecdir')
 
-config.set_quoted ('DATA_DIR', prefix / get_option ('datadir') / 'wakit')
-config.set_quoted ('LIB_DIR', prefix / get_option ('libdir') / 'wakit')
-config.set_quoted ('LIBEXEC_DIR', prefix / get_option ('libexecdir') / 'wakit')
+config.set_quoted ('DATA_DIR', data_dir)
+config.set_quoted ('LIB_DIR', lib_dir)
+config.set_quoted ('LIBEXEC_DIR', libexec_dir)
 
 config_dep = declare_dependency (sources: configure_file (output: 'config.h', configuration: config))
 config_dep = declare_dependency (dependencies: config_dep, include_directories: include_directories ('.'))
@@ -155,20 +161,29 @@ subdir ('tests')
 ########################
 
 summary ({
-    'C compiler': cc.get_id (),
-    'C++ compiler': cpp.get_id (),
-    'debug build': get_option ('debug') ? 'yes' : 'no',
-    'develop build': get_option ('develop') ? 'yes' : 'no',
-    'host cpu': host_machine.cpu_family (),
-    'host endian': host_machine.endian (),
-    'host system': host_machine.system (),
-  }, section: 'Build environment')
+  'C compiler': cc.get_id (),
+  'C++ compiler': cpp.get_id (),
+  'debug build': get_option ('debug') ? 'yes' : 'no',
+  'develop build': get_option ('develop') ? 'yes' : 'no',
+  'host cpu': host_machine.cpu_family (),
+  'host endian': host_machine.endian (),
+  'host system': host_machine.system (),
+}, section: 'Build environment')
+
+summary ({
+  'bin': bin_dir,
+  'data': data_dir,
+  'extension': extension_dir,
+  'include': include_dir,
+  'lib': lib_dir,
+  'libexec': libexec_dir,
+}, section: 'Install paths')
 
 if build_machine.system () != host_machine.system ()
 
   summary ({
-      'build cpu' : build_machine.cpu_family (),
-      'build endian' : build_machine.endian (),
-      'build system' : build_machine.system (),
-    }, section: 'Build environment')
+    'build cpu' : build_machine.cpu_family (),
+    'build endian' : build_machine.endian (),
+    'build system' : build_machine.system (),
+  }, section: 'Build environment')
 endif

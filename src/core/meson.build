@@ -64,10 +64,17 @@ __core_lib = library ('wakit-core',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, gtk_dep, __core_deps ],
+  install: true,
+  install_dir: lib_dir,
   sources: __core_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
 __core_dep = declare_dependency (dependencies: [ config_dep, gtk_dep, __common_dep, __core_fwds ],
   link_with: __core_lib)
 
+import ('pkgconfig').generate (__core_lib,
+  libraries: [ __core_dep ],
+  version: meson.project_version ())
+
+install_headers (__common_lib.vala_header (), install_dir: include_dir, preserve_path: true)
 meson.override_dependency ('wakit-core', __core_dep)

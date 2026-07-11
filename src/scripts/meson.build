@@ -97,7 +97,6 @@ if get_option ('develop')
   __fixvapis_src = [ 'fixvapis.cc' ]
 
   __fixvapis_src += custom_target ('wakit-script-fixvapis-resources',
-    build_by_default: get_option ('buildtools'),
     command: [ python_exe,
               mkresources_py,
               '--basedir', meson.current_source_dir (),
@@ -112,7 +111,6 @@ if get_option ('develop')
     output: [ 'fixvapis.resources.h', 'fixvapis.resources.c' ])
 
   __fixvapis_exe = executable ('wakit-script-fixvapis',
-    build_by_default: get_option ('buildtools'),
     c_args: [ '-DG_LOG_DOMAIN="Wakit.Script.FixVapis"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],

@@ -32,10 +32,12 @@ subdir ('appbus')
 gio_unix_dep = dependency ('gio-unix-2.0', required: false)
 gio_win32_dep = dependency ('gio-win32-2.0', required: false)
 
-__common_src = [ 'bits.h', 'boxing.h', 'ccompat.h', 'constmap.h', 'constpairs.h', 'genericmap.h', 'hashing.h', 'mixin.h', 'slice.h', 'value.h' ]
+__common_headers = [ 'bits.h', 'boxing.h', 'ccompat.h', 'constmap.h', 'constpairs.h', 'genericmap.h', 'hashing.h', 'mixin.h', 'slice.h', 'value.h' ]
+__common_src = [  ] + __common_headers
 
 foreach lib: [ 'commandline' ]
 
+  __common_headers += [ '@0@.h'.format (lib) ]
   __common_src += [ '@0@.cc'.format (lib) ]
   __common_src += [ '@0@.h'.format (lib) ]
 endforeach
@@ -88,10 +90,18 @@ __common_lib = library ('wakit-common',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_dep, gio_dep, __common_deps ],
+  install: true,
+  install_dir: lib_dir,
   sources: __common_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
 __common_dep = declare_dependency (dependencies: [ config_dep, gio_dep, __common_fwds ],
   link_with: __common_lib)
 
+import ('pkgconfig').generate (__common_lib,
+  libraries: [ __common_dep ],
+  version: meson.project_version ())
+
+install_headers (__common_headers, install_dir: include_dir / 'common', preserve_path: true)
+install_headers (__common_lib.vala_header (), install_dir: include_dir, preserve_path: true)
 meson.override_dependency ('wakit-common', __common_dep)

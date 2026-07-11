@@ -53,11 +53,20 @@ __extension_lib = library ('wakit-extension',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, webkitext_dep, __extension_deps ],
+  install: true,
+  install_dir: lib_dir,
   sources: __extension_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
 __extension_dep = declare_dependency (dependencies: [ config_dep, webkitext_dep ],
   link_with: __extension_lib)
+
+import ('pkgconfig').generate (__extension_lib,
+  libraries: [ __extension_dep ],
+  version: meson.project_version ())
+
+install_headers (__extension_lib.vala_header (), install_dir: include_dir, preserve_path: true)
+meson.override_dependency ('wakit-extension', __extension_dep)
 
 __extension_mod = shared_module ('wakit-extension-mod',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Extension.Module"', '-DG_LOG_USE_STRUCTURED=1',
@@ -67,6 +76,6 @@ __extension_mod = shared_module ('wakit-extension-mod',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_dep, gmodule_dep, __extension_dep ],
+  install: true,
+  install_dir: extension_dir,
   sources: 'module.cc')
-
-meson.override_dependency ('wakit-extension', __extension_dep)
