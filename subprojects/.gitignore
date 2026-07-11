@@ -15,8 +15,9 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-*
-!.gitignore
-!cpp-peglib.wrap
-!inja.wrap
-!nlohmann_json.wrap
+/packagecache/
+/.wraplock
+
+/cpp-peglib*/
+/inja*/
+/nlohmann_json*/
