@@ -59,7 +59,7 @@ config.set_quoted ('PACKAGE_VERSION_STAGE', git_version_stage)
 prefix = get_option ('prefix')
 bin_dir = prefix / get_option ('bindir')
 data_dir = prefix / get_option ('datadir') / 'wakit'
-extension_dir = prefix / get_option ('libexecdir') / 'wakit-web-extensions'
+extension_dir = prefix / get_option ('libdir') / 'wakit-web-extensions'
 include_dir = prefix / get_option ('includedir') / 'wakit'
 lib_dir = prefix / get_option ('libdir')
 libexec_dir = prefix / get_option ('libexecdir')

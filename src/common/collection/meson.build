@@ -15,29 +15,25 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-__core_interfaces_src = [ ]
+__common_collection_src = [ ]
 
-foreach lib: [ ]
+foreach lib: [ 'collection', 'collectioniter' ]
 
-  __core_interfaces_src += [ '@0@.cc'.format (lib) ]
-  __core_interfaces_src += [ '@0@.h'.format (lib) ]
+  __common_collection_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-foreach lib: [ 'appbus', 'browser', 'extensionhost', 'urirequest', 'webview', 'webviewbinding', 'window' ]
+__common_collection_deps = [ ]
 
-  __core_interfaces_src += [ '@0@.vala'.format (lib) ]
-endforeach
-
-__core_interfaces_lib = static_library ('wakit-core-interfaces',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Core.Interfaces"', '-DG_LOG_USE_STRUCTURED=1',
+__common_collection_lib = static_library ('wakit-common-collection',
+  c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Collection"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Core.Interfaces"', '-DG_LOG_USE_STRUCTURED=1',
+  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Common.Collection"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  dependencies: [ config_vala_dep, gtk_dep, __common_dep ],
-  sources: __core_interfaces_src,
+  dependencies: [ config_dep, glib_dep ],
+  sources: __common_collection_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__core_interfaces_dep = declare_dependency (dependencies: [ config_dep, gtk_dep ],
-  link_with: __core_interfaces_lib)
+__common_collection_dep = declare_dependency (dependencies: [ config_dep, glib_dep ],
+  link_with: __common_collection_lib)

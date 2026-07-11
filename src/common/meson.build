@@ -15,14 +15,18 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
+glib_dep = dependency ('glib-2.0', required: true)
+
 # level 1
 subdir ('asynchelp')
+subdir ('collection')
 subdir ('enum')
 subdir ('ffi')
 subdir ('hex')
 subdir ('i18n')
 
 # level 2
+subdir ('collections')
 subdir ('krypt')
 subdir ('jsontypes')
 
@@ -42,23 +46,15 @@ foreach lib: [ 'commandline' ]
   __common_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'genericset', 'list', 'ptrarray' ]
-
-  __common_src += [ '@0@collection.vala'.format (lib) ]
-endforeach
-
-foreach lib: [ 'guest', 'host' ]
-
-  __common_src += [ 'extensiondata@0@.vala'.format (lib) ]
-endforeach
-
-foreach lib: [ 'collection', 'collectioniter', 'commandline', 'resource' ]
+foreach lib: [ 'commandline', 'extensiondataguest', 'extensiondatahost', 'resource' ]
 
   __common_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
 __common_deps = [ __common_appbus_dep.as_link_whole (),
                   __common_asynchelp_dep.as_link_whole (),
+                  __common_collection_dep.as_link_whole (),
+                  __common_collections_dep.as_link_whole (),
                   __common_enum_dep.as_link_whole (),
                   __common_ffi_dep.as_link_whole (),
                   __common_hex_dep.as_link_whole (),
@@ -68,6 +64,8 @@ __common_deps = [ __common_appbus_dep.as_link_whole (),
 
 __common_fwds = [ __common_appbus_dep,
                   __common_asynchelp_dep,
+                  __common_collection_dep,
+                  __common_collections_dep,
                   __common_enum_dep,
                   __common_i18n_dep,
                   __common_json_dep ]
@@ -92,6 +90,7 @@ __common_lib = library ('wakit-common',
   dependencies: [ config_dep, gio_dep, __common_deps ],
   install: true,
   install_dir: lib_dir,
+  install_rpath: lib_dir,
   sources: __common_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 

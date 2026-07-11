@@ -23,7 +23,7 @@ namespace Wakit.Host.Module
 
       public string module_filename { construct; }
       public string module_loader { construct; }
-      public ICollection<IPostable> postables { get; }
+      public ICollection<AppBus.IPostable> postables { get; }
 
       private IModule? _module = null;
       private const string OBJECT_PATH = IModuleHost.OBJECT_PATH + "/Types";

@@ -21,30 +21,15 @@ namespace Wakit.Host.Module
   public sealed class Watcher: GLib.Object, GLib.AsyncInitable
     {
 
-      [CCode (cname = "MODULE_HOST_PATH")]
-      extern const string BUSMASTER_PATH;
-#if DEVELOP
-      private const string DEFAULT_EXECUTABLE = BUSMASTER_PATH;
-#else // DEVELOP
-      private const string DEFAULT_EXECUTABLE = Config.LIBEXEC_DIR + "/wakit-host-module-host";
-#endif // DEVELOP
-
       public Arguments arguments { get; construct; }
       public string bus_name { get; construct set; default = null; }
-      public string executable { get; construct; }
+      public string executable { get; construct set; }
       public uint kill_timeout { get; construct; default = 600; }
-
-      [HasEmitter]
-      public signal void crashed (GLib.Error? error);
 
       private Process.Watcher? _watcher = null;
 
-      public override void constructed ()
-        {
-
-          base.constructed ();
-          _executable = _executable ?? DEFAULT_EXECUTABLE;
-        }
+      [HasEmitter]
+      public signal void crashed (GLib.Error? error);
 
       public async string boot_async (int io_priority, GLib.Cancellable? cancellable) throws GLib.Error
           requires (null == _watcher)

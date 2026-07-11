@@ -17,21 +17,23 @@
 
 __common_appbus_src = [ ]
 
-foreach lib: [ 'address', 'ownname' ]
+foreach lib: [ 'address', 'ownname', 'postablecollection' ]
 
   __common_appbus_src += [ '@0@.cc'.format (lib) ]
   __common_appbus_src += [ '@0@.h'.format (lib) ]
 endforeach
 
-foreach lib: [ 'address', 'addressoption', 'addressstring', 'connectclient', 'connectserver', 'cookie', 'ownname' ]
+foreach lib: [ 'address', 'addressoption', 'addressstring', 'connectclient', 'connectserver', 'cookie', 'ownname', 'postable', 'postablecollection' ]
 
   __common_appbus_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
 __common_appbus_deps = [ __common_asynchelp_dep,
+                         __common_collection_dep,
                          __common_krypt_dep, ]
 
-__common_appbus_fwds = [ __common_krypt_dep, ]
+__common_appbus_fwds = [ __common_collection_dep,
+                         __common_krypt_dep, ]
 
 __common_appbus_lib = static_library ('wakit-common-appbus',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Common.AppBus"', '-DG_LOG_USE_STRUCTURED=1',

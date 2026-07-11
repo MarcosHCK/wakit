@@ -52,7 +52,11 @@ namespace Wakit.Browser
           GLib.Variant @params = serialize (GLib.Uuid.string_random ());
 
           if (null != _extension_dir)
-          _context.set_web_process_extensions_directory (_extension_dir);
+            {
+              _context.add_path_to_sandbox (_extension_dir, false);
+              _context.set_web_process_extensions_directory (_extension_dir);
+            }
+
           _context.set_web_process_extensions_initialization_user_data (@params);
         }
     }

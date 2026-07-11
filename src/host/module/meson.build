@@ -29,7 +29,7 @@ foreach bit: [ 'module' ]
   __host_module_src += [ '@0@.cc'.format (bit), '@0@.h'.format (bit) ]
 endforeach
 
-__host_module_client_deps = [ __common_dep, __core_dep ]
+__host_module_client_deps = [ __common_dep ]
 
 __host_module_client_lib = static_library ('wakit-host-module-client',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Module"', '-DG_LOG_USE_STRUCTURED=1',
@@ -42,10 +42,10 @@ __host_module_client_lib = static_library ('wakit-host-module-client',
   sources: __host_module_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
-__host_module_client_dep = declare_dependency (dependencies: [ config_dep, __common_dep, __core_dep ],
+__host_module_client_dep = declare_dependency (dependencies: [ config_dep, __common_dep ],
   link_with: __host_module_client_lib)
 
-__host_module_client_deps = [ __common_dep, __core_dep, __core_appbus_dep ]
+__host_module_client_deps = [ __common_dep ]
 
 __host_module_client_exe = executable ('wakit-host-module-host',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Module.Host"', '-DG_LOG_USE_STRUCTURED=1',
@@ -55,22 +55,21 @@ __host_module_client_exe = executable ('wakit-host-module-host',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, json_dep, __host_module_client_dep, __host_module_client_deps ],
+  install: true,
+  install_dir: libexec_dir,
+  install_rpath: lib_dir,
   sources: [ 'host.vala', 'hostapplication.vala' ],
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
-
-__host_module_server_args = [
-  '-DMODULE_HOST_PATH="@0@"'.format (__host_module_client_exe.full_path ()),
-]
 
 __host_module_server_deps = [ __common_dep, __host_configuration_dep, __core_dep, __core_process_dep ]
 
 __host_module_server_lib = static_library ('wakit-host-module-server',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Module"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()), ] + __host_module_server_args,
+            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()), ],
   cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host.Module"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ] + __host_module_server_args,
+              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
   dependencies: [ config_vala_dep, __host_module_client_dep, __host_module_server_deps ],
   sources: [ 'registry.cc', 'registry.h', 'registry.vala', 'registrypostable.vala', 'watcher.vala' ],
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])

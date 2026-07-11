@@ -56,16 +56,23 @@ __core_fwds = [ __core_configuration_dep,
                 __core_interfaces_dep,
                 __core_loaders_dep ]
 
+__core_c_args = [
+  '-DEXTENSION_DIR_PATH="@0@"'.format (extension_dir),
+  '-DBUSMASTER_BIN_PATH="@0@"'.format (libexec_dir / __busmaster_exe.name ()),
+  '-DBUSMASTER_CONFIG_PATH="@0@"'.format (data_dir / __core_appbus_config),
+]
+
 __core_lib = library ('wakit-core',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Core"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ] + __core_c_args,
   cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Core"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ] + __core_c_args,
   dependencies: [ config_vala_dep, gtk_dep, __core_deps ],
   install: true,
   install_dir: lib_dir,
+  install_rpath: lib_dir,
   sources: __core_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 

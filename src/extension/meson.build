@@ -55,6 +55,7 @@ __extension_lib = library ('wakit-extension',
   dependencies: [ config_vala_dep, webkitext_dep, __extension_deps ],
   install: true,
   install_dir: lib_dir,
+  install_rpath: lib_dir,
   sources: __extension_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
@@ -78,4 +79,5 @@ __extension_mod = shared_module ('wakit-extension-mod',
   dependencies: [ config_dep, gmodule_dep, __extension_dep ],
   install: true,
   install_dir: extension_dir,
+  install_rpath: lib_dir,
   sources: 'module.cc')

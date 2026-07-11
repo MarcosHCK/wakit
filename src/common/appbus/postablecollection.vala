@@ -71,7 +71,7 @@ namespace Wakit.AppBus
         return _result;
         }
 
-      [CCode (cheader_filename = "core/appbus/postablecollection.h")]
+      [CCode (cheader_filename = "common/appbus/postablecollection.h")]
       static extern bool del_impl (Array<Entry> ar, IPostable postable, bool touched, out uint post_id);
 
       public bool post (GLib.DBusConnection connection, string object_path) throws GLib.Error

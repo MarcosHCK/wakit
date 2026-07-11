@@ -19,7 +19,7 @@ namespace Wakit.Example
 {
 
   [DBus (name = "org.hck.wakit.Example.Interface")]
-  public sealed class Interface: GLib.Object, IPostable
+  public sealed class Interface: GLib.Object, AppBus.IPostable
     {
 
       private string _store = "<nothing>";

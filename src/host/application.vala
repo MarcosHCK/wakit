@@ -23,6 +23,9 @@ namespace Wakit.Host
 
       private Module.Registry _module_registry;
 
+      [CCode (cname = "MODULE_HOST_BIN_PATH")]
+      extern const string MODULE_HOST_BIN_PATH;
+
       class construct
         {
           class_extend ();
@@ -58,6 +61,18 @@ namespace Wakit.Host
 
       [CCode (cheader_filename = "host/application.h")]
       extern class void class_extend ();
+
+      void configure_module_registry ()
+        {
+
+          string str;
+
+          if (unlikely (null != (str = GLib.Environment.get_variable ("WAKIT_MODULE_HOST_BIN"))))
+
+            _module_registry.host_executable = str;
+          else
+            _module_registry.host_executable = MODULE_HOST_BIN_PATH;
+        }
 
       void configure_scheme (Configuration.Scheme scheme_config) throws GLib.Error
         {
@@ -198,6 +213,8 @@ namespace Wakit.Host
             "bus-address", appbus_address,
             "configuration", configuration,
             null);
+
+          configure_module_registry ();
 
           yield (postable.registry = _module_registry).init_async (GLib.Priority.DEFAULT, cancellable);
         return true;

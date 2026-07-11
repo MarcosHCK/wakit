@@ -17,6 +17,10 @@
 #
 
 binary="@host_bin_path@"
+busmaster_bin_path="@busmaster_bin_path@"
+busmaster_config_path="@busmaster_config_path@"
+extension_dir_path="@extension_mod_path@"
+module_host_bin_path="@module_host_bin_path@"
 
 extra_paths=("@common_lib_path@"
              "@core_lib_path@"
@@ -28,4 +32,4 @@ extra_paths=("@common_lib_path@"
 IFS=":"
 extra_paths="${extra_paths[*]}"
 
-LD_LIBRARY_PATH="$extra_paths" $binary $@
+LD_LIBRARY_PATH="$extra_paths" WAKIT_BUSMASTER_BIN="$busmaster_bin_path" WAKIT_BUSMASTER_CONFIG="$busmaster_config_path" WAKIT_EXTENSION_DIR="$extension_dir_path" WAKIT_MODULE_HOST_BIN="$module_host_bin_path" $binary $@

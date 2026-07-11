@@ -19,7 +19,7 @@ namespace Wakit.Host.Module
 {
 
   [DBus (name = "org.hck.wakit.Host.Module.Registry")]
-  public sealed class RegistryPostable: GLib.Object, IPostable
+  public sealed class RegistryPostable: GLib.Object, AppBus.IPostable
     {
 
       [DBus (visible = false)] public Registry? registry { set; }

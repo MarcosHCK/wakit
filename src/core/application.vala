@@ -35,6 +35,40 @@ namespace Wakit
       public IExtensionHost extension_host { get { return _browser_extension_host; } }
       public bool ready { get; private set; default = false; }
 
+      [CCode (cname = "BUSMASTER_BIN_PATH")] extern const string BUSMASTER_BIN_PATH;
+      [CCode (cname = "BUSMASTER_CONFIG_PATH")] extern const string BUSMASTER_CONFIG_PATH;
+      [CCode (cname = "EXTENSION_DIR_PATH")] extern const string EXTENSION_DIR_PATH;
+
+      void configure_appbus ()
+        {
+
+          string str;
+
+          if (likely (null == (str = GLib.Environment.get_variable ("WAKIT_BUSMASTER_BIN"))))
+
+            _appbus_watcher.executable = BUSMASTER_BIN_PATH;
+          else
+            _appbus_watcher.executable = GLib.File.new_for_commandline_arg (str).peek_path ();
+
+          if (likely (null == (str = GLib.Environment.get_variable ("WAKIT_BUSMASTER_CONFIG"))))
+
+            _appbus_watcher.configuration = BUSMASTER_CONFIG_PATH;
+          else
+            _appbus_watcher.configuration = GLib.File.new_for_commandline_arg (str).peek_path ();
+        }
+
+      void configure_extension_host ()
+        {
+
+          string str;
+
+          if (likely (null == (str = GLib.Environment.get_variable ("WAKIT_EXTENSION_DIR"))))
+
+            _browser_extension_host.extension_dir = EXTENSION_DIR_PATH;
+          else
+            _browser_extension_host.extension_dir = GLib.File.new_for_commandline_arg (str).peek_path ();
+        }
+
       public override void constructed ()
         {
 
@@ -149,8 +183,7 @@ namespace Wakit
       public virtual async void shutdown_async ()
         {
 
-          _appbus_bus.reap_on_connection (_appbus_watcher.connection);
-
+          _appbus_bus?.reap_on_connection (_appbus_watcher.connection);
           yield _appbus_watcher.quit_async (_configuration.appbus_shutdown_timeout);
         }
 
@@ -165,6 +198,9 @@ namespace Wakit
 
       async bool startup_appbus (GLib.Cancellable? cancellable = null) throws GLib.Error
         {
+
+          configure_appbus ();
+          configure_extension_host ();
 
           var timeout = _configuration.appbus_launch_timeout;
 

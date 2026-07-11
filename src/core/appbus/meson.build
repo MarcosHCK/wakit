@@ -17,20 +17,13 @@
 
 __core_appbus_src = [ 'watcher.vala' ]
 
-foreach lib: [ 'postablecollection' ]
-
-  __core_appbus_src += [ '@0@.cc'.format (lib) ]
-  __core_appbus_src += [ '@0@.h'.format (lib) ]
-endforeach
-
-foreach lib: [ 'bus', 'postablecollection', 'watcher' ]
+foreach lib: [ 'bus', 'watcher' ]
 
   __core_appbus_src += [ '@0@.vala'.format (lib) ]
 endforeach
 
-__core_appbus_args = [
-  '-DBUSMASTER_PATH="@0@"'.format (__busmaster_exe.full_path ()),
-]
+__core_appbus_config = 'daemon.json'
+__core_appbus_src_dir = meson.current_source_dir ()
 
 __core_appbus_deps = [ __common_dep,
                        __core_interfaces_dep,
@@ -39,11 +32,10 @@ __core_appbus_deps = [ __common_dep,
 __core_appbus_lib = static_library ('wakit-core-appbus',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Core.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()), ] + __core_appbus_args,
+            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()), ],
   cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Core.AppBus"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()),
-              '-DBUSMASTER_PATH="@0@"'.format (__busmaster_exe.full_path ()) ] + __core_appbus_args,
+              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()), ],
   dependencies: [ config_vala_dep, gio_dep, __core_appbus_deps ],
   sources: __core_appbus_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])

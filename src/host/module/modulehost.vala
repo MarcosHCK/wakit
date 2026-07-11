@@ -27,6 +27,6 @@ namespace Wakit.Host.Module
 
       public const string OBJECT_PATH = "/org/hck/wakit/Host/Module";
 
-      public abstract ICollection<IPostable> postables { get; }
+      public abstract ICollection<AppBus.IPostable> postables { get; }
     }
 }

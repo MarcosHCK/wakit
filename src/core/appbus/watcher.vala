@@ -21,24 +21,11 @@ namespace Wakit.AppBus
   public sealed class Watcher: GLib.Object
     {
 
-      [CCode (cname = "BUSMASTER_PATH")]
-      extern const string BUSMASTER_PATH;
-#if DEVELOP
-      private const string DEFAULT_CONFIG = BuildConfig.SOURCE_DIR + "/daemon.json";
-      private const string DEFAULT_EXECUTABLE = BUSMASTER_PATH;
-#else // DEVELOP
-      private const string DEFAULT_CONFIG = Config.DATA_DIR + "/daemon.json";
-      private const string DEFAULT_EXECUTABLE = Config.LIBEXEC_DIR + "/wakit-busmaster";
-#endif // DEVELOP
-
-      public string config { get { return _config; } set { _config = value; } }
-      public string executable { get { return _executable; } set { _executable = value; } }
-
       public string address { get; private set; }
+      public string configuration { get; set; }
       public GLib.DBusConnection connection { get; private set; }
+      public string executable { get; set; }
 
-      private string _config = DEFAULT_CONFIG;
-      private string _executable = DEFAULT_EXECUTABLE;
       private Process.Watcher? _watcher = null;
 
       [HasEmitter]
@@ -74,7 +61,7 @@ namespace Wakit.AppBus
           unowned var flag1 = GLib.SubprocessFlags.STDOUT_PIPE;
           unowned var flag2 = GLib.SubprocessFlags.STDIN_PIPE;
           unowned var flags = flag1 | flag2;
-          var argv = new string[] { _executable, "--config-file", _config, "--nofork", "--print-address" };
+          var argv = new string[] { _executable, "--config-file", _configuration, "--nofork", "--print-address" };
 
           var launcher = new GLib.SubprocessLauncher (flags);
           Process.Impl.setup_launcher (launcher);

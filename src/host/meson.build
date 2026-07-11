@@ -40,6 +40,10 @@ __host_fwds = [ __core_dep,
                 __host_configuration_dep,
                 __host_module_dep ]
 
+__host_c_args = [
+  '-DMODULE_HOST_BIN_PATH="@0@"'.format (libexec_dir / __host_module_client_exe.name ()),
+]
+
 __host_src += import ('gnome').compile_resources ('wakit-host-resoures',
   'resources.xml',
   c_name: 'wakit_host',
@@ -49,13 +53,14 @@ __host_src += import ('gnome').compile_resources ('wakit-host-resoures',
 __host_lib = library ('wakit-host',
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Host"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ] + __host_c_args,
   cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Host"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+              '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ] + __host_c_args,
   dependencies: [ config_vala_dep, gtk_dep, __host_deps ],
   install: true,
   install_dir: lib_dir,
+  install_rpath: lib_dir,
   sources: __host_src,
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
@@ -79,12 +84,16 @@ __host_bin = executable ('wakit-host-app',
   dependencies: [ config_dep, gtk_dep, __host_dep ],
   install: true,
   install_dir: bin_dir,
+  install_rpath: lib_dir,
   sources: 'main.cc',
   vala_args: [ '--includedir', meson.current_build_dir ().replace (base_dir + '/', '') ])
 
 __host_runner_cfg = configuration_data ()
 
+__host_runner_cfg.set ('busmaster_bin_path', __busmaster_exe.full_path ())
+__host_runner_cfg.set ('busmaster_config_path', __core_appbus_src_dir / __core_appbus_config)
 __host_runner_cfg.set ('host_bin_path', __host_bin.full_path ())
+__host_runner_cfg.set ('module_host_bin_path', __host_module_client_exe.full_path ())
 
 foreach tuple: [ [ __common_lib, 'common_lib_path' ],
                  [ __core_lib, 'core_lib_path' ],

@@ -23,6 +23,7 @@ namespace Wakit.Host.Module
 
       public string bus_address { get; construct; }
       public Configuration.Config configuration { get; construct; }
+      public string host_executable { get; set; }
 
       public GenericArray<Watcher> watchers { get; }
 
@@ -73,6 +74,7 @@ namespace Wakit.Host.Module
 
           var watcher = (Watcher) GLib.Object.new (typeof (Watcher),
             "arguments", arguments,
+            "executable", _host_executable,
             null);
 
           yield watcher.init_async (io_priority, cancellable);

@@ -16,7 +16,6 @@
 #
 
 ffi_dep = cc.find_library ('libffi', required: true)
-glib_dep = dependency ('glib-2.0', required: true)
 
 __common_ffi_src = [ 'primitives.h' ]
 

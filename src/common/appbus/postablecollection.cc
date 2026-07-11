@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include <config.h>
-#include <core/appbus/postablecollection.h>
+#include <common/appbus/postablecollection.h>
 
 struct _Entry
 {
