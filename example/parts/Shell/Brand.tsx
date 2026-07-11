@@ -15,18 +15,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 import { Center, getFontSize } from '@mantine/core'
-import { useImage } from '@wakit-example/hooks/useImage'
+import { type Ref } from 'react'
 import * as css from './style.module.css'
 
-export function Brand ({ size = 24, title }: { size?: number, title?: string })
+export function Brand ({ ref, size = 24, title }: { ref?: Ref<HTMLImageElement>, size?: number, title?: string })
 {
 
-  const data = useImage ('/favicon.ico')
-
   return  <Center>
-            <img alt='ICON' height={size} src={data?.src} style={{ borderRadius: '100%' }} width={size} />
-          { title && <>
-            <span className={css.brandSeparator} />
-            <span className={css.brandText} style={{ fontSize: getFontSize (size) }} >{ title }</span> </> }
-          </Center>
+      <img alt='ICON' height={size} ref={ref} src={'/favicon.svg'} style={{ borderRadius: '100%' }} width={size} />
+    { title && <>
+      <span className={css.brandSeparator} />
+      <span className={css.brandText} style={{ fontSize: getFontSize (size) }} >{ title }</span> </> }
+    </Center>
 }

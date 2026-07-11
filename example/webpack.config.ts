@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { ManifestPlugin } from 'webpack'
+import { ManifestPlugin, ProgressPlugin } from 'webpack'
 import { TanStackRouterCodeSplitterWebpack } from '@tanstack/router-plugin/webpack'
 import { type Configuration } from 'webpack'
 import { type Configuration as DevServerConfiguration } from 'webpack-dev-server'
+import CopyWebpackPlugin from 'copy-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 
@@ -130,18 +131,26 @@ export async function createWebpackConfig ()
               target: 'react',
             }),
 
-          new ManifestPlugin ({ entrypoints: false,
-                                filename: 'manifest.json' }),
-          new MiniCssExtractPlugin ({ filename: '[name].css',
-                                      chunkFilename: '[name].[contenthash].chunk.css' }),
+          new CopyWebpackPlugin ({ patterns:
+            [
+              { from: './assets/favicon.svg' },
+              { from: './assets/public/**/*', noErrorOnMissing: true, }
+            ]}),
 
           ...Object.keys (entries).map (name => new HtmlWebpackPlugin (
             {
               chunks: [ name ],
+              favicon: './assets/favicon.svg',
               filename: `${name}.html`,
               template: './index.html',
               xhtml: true,
-            }))
+            })),
+
+          new ManifestPlugin ({ entrypoints: false,
+                                filename: 'manifest.json' }),
+          new MiniCssExtractPlugin ({ filename: '[name].css',
+                                      chunkFilename: '[name].[contenthash].chunk.css' }),
+          new ProgressPlugin (),
         ],
 
       resolve: { extensions: [ ...extensions ] },
