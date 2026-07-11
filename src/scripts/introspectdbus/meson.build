@@ -28,6 +28,7 @@ foreach bit: [ 'dbusinfoexplorer', 'dbusinfoexporter', 'explorer' ]
 endforeach
 
 __introspect_dbus_lib = static_library ('wakit-scripts-introspect-dbus',
+  build_by_default: get_option ('buildtools'),
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.Introspect.DBus"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],

@@ -15,4 +15,5 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
+option ('buildtools', type: 'boolean', value: false, description: 'build development tools by default')
 option ('develop', type: 'boolean', value: false, description: 'build with development in mind')

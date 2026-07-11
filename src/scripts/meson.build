@@ -18,6 +18,7 @@
 gio_dep = dependency ('gio-2.0', required: true)
 
 __script_common_lib = static_library ('wakit-script-common',
+  build_by_default: get_option ('buildtools'),
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Script.Common"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
@@ -59,6 +60,7 @@ subdir ('apigendbus')
 subdir ('introspectdbus')
 
 __dbus_apigen_exe = executable ('wakit-script-dbus-apigen',
+  build_by_default: get_option ('buildtools'),
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.DBus.ApiGen"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
@@ -70,6 +72,7 @@ __dbus_apigen_exe = executable ('wakit-script-dbus-apigen',
   sources: 'apigendbus.cc')
 
 __dbus_introspect_exe = executable ('wakit-script-dbus-introspect',
+  build_by_default: get_option ('buildtools'),
   c_args: [ '-DG_LOG_DOMAIN="Wakit.Scripts.DBus.Introspect"', '-DG_LOG_USE_STRUCTURED=1',
             '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
             '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
@@ -89,38 +92,43 @@ __dbus_apigen_cfg.set ('python_exe', python_exe.full_path ())
 
 configure_file (configuration: __dbus_apigen_cfg, input: 'apigen.sh.in', output: 'apigen.sh')
 
-__fixvapis_src = [ 'fixvapis.cc' ]
+if get_option ('develop')
 
-__fixvapis_src += custom_target ('wakit-script-fixvapis-resources',
-  command: [ python_exe,
-             mkresources_py,
-             '--basedir', meson.current_source_dir (),
-             '--bin', resources_exe.full_path (),
-             '--dep', '@DEPFILE@',
-             '--header', '@OUTPUT0@',
-             '--source', '@OUTPUT1@',
-             '--name', 'wakit_script_fixvapis_',
-             '-s', '/org/hck/wakit', '@INPUT@' ],
-  depfile: 'resources.deps',
-  input: 'fixvapis.peg',
-  output: [ 'fixvapis.resources.h', 'fixvapis.resources.c' ])
+  __fixvapis_src = [ 'fixvapis.cc' ]
 
-__fixvapis_exe = executable ('wakit-script-fixvapis',
-  c_args: [ '-DG_LOG_DOMAIN="Wakit.Script.FixVapis"', '-DG_LOG_USE_STRUCTURED=1',
-            '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
-            '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Script.FixVapis"', '-DG_LOG_USE_STRUCTURED=1',
+  __fixvapis_src += custom_target ('wakit-script-fixvapis-resources',
+    build_by_default: get_option ('buildtools'),
+    command: [ python_exe,
+              mkresources_py,
+              '--basedir', meson.current_source_dir (),
+              '--bin', resources_exe.full_path (),
+              '--dep', '@DEPFILE@',
+              '--header', '@OUTPUT0@',
+              '--source', '@OUTPUT1@',
+              '--name', 'wakit_script_fixvapis_',
+              '-s', '/org/hck/wakit', '@INPUT@' ],
+    depfile: 'resources.deps',
+    input: 'fixvapis.peg',
+    output: [ 'fixvapis.resources.h', 'fixvapis.resources.c' ])
+
+  __fixvapis_exe = executable ('wakit-script-fixvapis',
+    build_by_default: get_option ('buildtools'),
+    c_args: [ '-DG_LOG_DOMAIN="Wakit.Script.FixVapis"', '-DG_LOG_USE_STRUCTURED=1',
               '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
               '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
-  cpp_pch: 'pch/fixvapis.h',
-  dependencies: [ config_dep, __script_common_dep, dependency ('cpp-peglib', required: true) ],
-  sources: __fixvapis_src)
+    cpp_args: [ '-DG_LOG_DOMAIN="Wakit.Script.FixVapis"', '-DG_LOG_USE_STRUCTURED=1',
+                '-DBUILD_DIR="@0@"'.format (meson.current_build_dir ()),
+                '-DSOURCE_DIR="@0@"'.format (meson.current_source_dir ()) ],
+    cpp_pch: 'pch/fixvapis.h',
+    dependencies: [ config_dep, __script_common_dep, dependency ('cpp-peglib', required: true) ],
+    sources: __fixvapis_src)
 
-__fixvapis_cfg = configuration_data ()
+  __fixvapis_cfg = configuration_data ()
 
-__fixvapis_cfg.set ('base_dir', project_build_dir)
-__fixvapis_cfg.set ('python_exe', python_exe.full_path ())
-__fixvapis_cfg.set ('fixvapis_exe', __fixvapis_exe.full_path ())
-__fixvapis_cfg.set ('fixvapis_py', meson.current_source_dir () / 'fixvapis.py')
+  __fixvapis_cfg.set ('base_dir', project_build_dir)
+  __fixvapis_cfg.set ('python_exe', python_exe.full_path ())
+  __fixvapis_cfg.set ('fixvapis_exe', __fixvapis_exe.full_path ())
+  __fixvapis_cfg.set ('fixvapis_py', meson.current_source_dir () / 'fixvapis.py')
 
-configure_file (configuration: __fixvapis_cfg, input: 'fixvapis.sh.in', output: 'fixvapis.sh')
+  configure_file (configuration: __fixvapis_cfg, input: 'fixvapis.sh.in', output: 'fixvapis.sh')
+endif
