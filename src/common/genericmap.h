@@ -15,10 +15,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #pragma once
-#include <array>
 #include <common/boxing.h>
-#include <common/slice.h>
+#include <common/soo.h>
+#include <cstring>
 #include <glib-object.h>
+#include <type_traits>
 
 namespace generic_map
 {
@@ -32,38 +33,60 @@ class generic_map::generic_map
 {
 public:
 
-  typedef typename std::array<GType, _nargs> key_type;
+  struct key_type
+    {
+
+      GType arguments [_nargs];
+
+      inline constexpr const GType* data () const noexcept
+        {
+        return arguments;
+        }
+
+      inline constexpr bool operator== (const key_type& o) const noexcept
+        {
+          constexpr auto size = sizeof (arguments[0]) * _nargs;
+        return 0 == memcmp (arguments, o.arguments, size);
+        }
+    };
+
   typedef GType value_type;
 
 private:
-  G_LOCK_DEFINE (lock);
+  GRWLock _lock;
 
   static gboolean _equal_func (gconstpointer p_key_a, gconstpointer p_key_b) noexcept
     {
 
-      auto& key_a = *(key_type*) p_key_a;
-      auto& key_b = *(key_type*) p_key_b;
+      auto& key_a = *soo_ptr::cast<key_type> (&p_key_a);
+      auto& key_b = *soo_ptr::cast<key_type> (&p_key_b);
     return key_a == key_b;
     }
 
   static guint _hash_func (gconstpointer p_key) noexcept
     {
 
-      auto& key = *(key_type*) p_key;
+      auto& key = *soo_ptr::cast<key_type> (&p_key);
 
       constexpr guint FNV_OFFSET_BASIS = 2166136261u;
       constexpr guint FNV_PRIME = 16777619u;
-      constexpr guint element_size = sizeof (typename key_type::value_type);
+      constexpr guint element_size = sizeof (key_type[0]);
 
-      auto data = (guint8*) key.data ();
+      auto data = (const guint8*) key.data ();
       auto hash = FNV_OFFSET_BASIS;
 
-      for (decltype (key.size ()) i = 0; i < _nargs * element_size; ++i)
+      for (std::remove_cvref_t<decltype (_nargs)> i = 0; i < _nargs * element_size; ++i)
         {
           hash ^= data [i];
           hash *= FNV_PRIME;
         }
     return hash;
+    }
+
+  static void _notify_func (gpointer key) noexcept
+    {
+
+      soo_ptr::destroy<key_type> (&key);
     }
 
   struct initialize_func_helper
@@ -109,9 +132,10 @@ public:
   typedef typename initialize_func_helper::type InitializeFunc;
 
   inline generic_map () noexcept:
-      G_LOCK_NAME (lock) { },
-      _table (g_hash_table_new_full (_hash_func, _equal_func, g_slice_free_<key_type>, NULL))
-    { }
+      _table (g_hash_table_new_full (_hash_func, _equal_func, _notify_func, NULL))
+    {
+      g_rw_lock_init (&_lock);
+    }
 
   template<typename... Args>
     requires (sizeof... (Args) == _nargs && (std::same_as<Args, GType> &&...))
@@ -135,16 +159,23 @@ public:
   inline GType ensure_type (InitializeFunc init_func, Args... types) noexcept
     {
 
-      G_LOCK (lock);
-
-      std::array<GType, _nargs> args { types ... };
+      key_type args { types ... };
       gpointer result { };
 
-      if (! g_hash_table_lookup_extended (*_table, &args, NULL, &result))
-        {
-          auto g_type = init_func (types ...);
-          g_hash_table_insert (*_table, g_slice_new_<key_type> (args), result = GTYPE_TO_POINTER (g_type));
-        }
-    return (G_UNLOCK (lock), GPOINTER_TO_TYPE (result));
+      if (g_rw_lock_reader_lock (&_lock); FALSE == g_hash_table_lookup_extended (*_table, &args, NULL, &result))
+
+        g_rw_lock_reader_unlock (&_lock);
+      else
+        return (g_rw_lock_reader_unlock (&_lock), GPOINTER_TO_TYPE (result));
+
+      if (g_rw_lock_writer_lock (&_lock); TRUE == g_hash_table_lookup_extended (*_table, &args, NULL, &result))
+        return GPOINTER_TO_TYPE (result);
+
+      auto g_type = init_func (types ...);
+      auto key = (void*) NULL;
+
+      g_hash_table_insert (*_table, (soo_ptr::create<key_type> (&key, args), key), result = GTYPE_TO_POINTER (g_type));
+
+    return (g_rw_lock_writer_unlock (&_lock), g_type);
     }
 };

@@ -21,6 +21,7 @@
 #include <common/genericmap.h>
 #include <common/jsontypes/ptrarray.h>
 #include <common/jsontypes/takepointer.h>
+#include <common/slice.h>
 #include <json-glib/json-glib.h>
 
 boxing::destructible_box<GPtrArray, g_ptr_array_unref> _ptr_array_deserializers (
