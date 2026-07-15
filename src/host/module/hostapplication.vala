@@ -77,6 +77,7 @@ namespace Wakit.Host.Module
         {
 
           I18n.app_setup ();
+          GLib.Log.writer_default_set_use_stderr (true);
         return (new HostApplication ()).run ();
         }
 

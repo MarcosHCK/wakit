@@ -216,7 +216,14 @@ namespace Wakit.Host
 
           configure_module_registry ();
 
-          yield (postable.registry = _module_registry).init_async (GLib.Priority.DEFAULT, cancellable);
+          try
+            { var io_priority = GLib.Priority.DEFAULT;
+              yield (postable.registry = _module_registry).init_async (io_priority, cancellable); }
+          catch (GLib.Error error)
+            {
+              GLib.Error.prefix_literal (out error, _ ("couldn't launch module host: "));
+              throw (owned) error;
+            }
         return true;
         }
     }

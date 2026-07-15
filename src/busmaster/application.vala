@@ -58,6 +58,7 @@ namespace Wakit.Busmaster
         {
 
           I18n.app_setup ();
+          GLib.Log.writer_default_set_use_stderr (true);
         return (new Application ()).run (argv);
         }
 

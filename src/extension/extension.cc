@@ -53,11 +53,11 @@ static void __attribute__((destructor)) wakit_web_extension_del_default (void)
 static gpointer wakit_web_extension_new_default_once (WebKitWebProcessExtension* wk_extension, GVariant* parameters, GType g_type)
 {
 
+  g_debug ("Web-Process-Extension loading");
+
   g_return_val_if_fail (WEBKIT_IS_WEB_PROCESS_EXTENSION (wk_extension), NULL);
   g_return_val_if_fail (nullptr != parameters, NULL);
   g_return_val_if_fail (g_type_is_a (g_type, WAKIT_TYPE_WEB_EXTENSION), NULL);
-
-  g_debug ("Web-Process-Extension loaded");
 
   GError* error = NULL;
   const gchar* names [] = { "parameters", "wk_extension" };

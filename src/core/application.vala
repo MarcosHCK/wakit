@@ -207,9 +207,9 @@ namespace Wakit
           bool result = (yield _appbus_watcher.launch (timeout, cancellable))
                      && (yield _appbus_bus.graft_on_connection (_appbus_watcher.connection, cancellable));
 
-          GLib.debug ("AppBus launched (address = '%s')", _appbus_watcher.address);
-
           var address = new AppBus.Address.from_string (_appbus_watcher.address);
+
+          GLib.debug ("AppBus launched (address = '%s')", _appbus_watcher.address);
 
           AppBus.AddressOption? opt; switch (address.transport)
             {
@@ -222,7 +222,6 @@ namespace Wakit
             }
 
           _browser_extension_host.bus_address = _appbus_watcher.address;
-
         return result;
         }
 
@@ -237,7 +236,6 @@ namespace Wakit
               GLib.Error.prefix_literal (out error, _ ("couldn't launch appbus: "));
               throw (owned) error;
             }
-
         return true;
         }
 

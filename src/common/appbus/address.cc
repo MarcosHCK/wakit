@@ -18,7 +18,32 @@
 #include <glib/gi18n-lib.h>
 #include <common/appbus/address.h>
 
-static void parse_options (const gchar* first, const gchar* list, guint length, WakitAppBusAddressForeachOption callback, gpointer user_data, GError** error);
+static void parse_options (const gchar* first, const gchar* list, guint length, WakitAppBusAddressForeachOption callback, gpointer user_data, GError** error)
+{
+
+  const gchar* curr = list;
+  const gchar* last = NULL;
+  const gchar* next = NULL;
+
+  for (; curr != NULL; curr = next)
+    {
+
+      if ((next = last = g_strstr_len (curr, length, ",")) != NULL)
+
+        ++next;
+      else
+        last = list + length;
+
+      if (auto sep = g_strstr_len (curr, last - curr, "="); G_UNLIKELY (sep == NULL))
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT, _ ("bad address (%li: missing '=')"), curr - first + 1);
+
+      else if (auto ext = g_strstr_len (1 + sep, last - sep - 1, "="); G_UNLIKELY (ext == NULL))
+
+        callback (curr, sep - curr, 1 + sep, last - (1 + sep), user_data);
+      else
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT, _ ("bad address (%li: unexpected '=') %.*s"), ext - first + 1, (int) (last - curr), sep);
+    }
+}
 
 const gchar* wakit_app_bus_address_parse (const gchar* address, guint* out_length, WakitAppBusAddressForeachOption callback, gpointer user_data, GError** error)
 {
@@ -55,31 +80,4 @@ const gchar* wakit_app_bus_address_parse (const gchar* address, guint* out_lengt
           return NULL;
     } }
 return address;
-}
-
-static void parse_options (const gchar* first, const gchar* list, guint length, WakitAppBusAddressForeachOption callback, gpointer user_data, GError** error)
-{
-
-  const gchar* curr = list;
-  const gchar* last = NULL;
-  const gchar* next = NULL;
-
-  for (; curr != NULL; curr = next)
-    {
-
-      if ((next = last = g_strstr_len (curr, length, ",")) != NULL)
-
-        ++next;
-      else
-        last = list + length;
-
-      if (auto sep = g_strstr_len (curr, last - curr, "="); G_UNLIKELY (sep == NULL))
-        g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT, _ ("bad address (%li: missing '=')"), curr - first + 1);
-
-      else if (auto ext = g_strstr_len (1 + sep, last - sep - 1, "="); G_UNLIKELY (ext == NULL))
-
-        callback (curr, sep - curr, 1 + sep, last - (1 + sep), user_data);
-      else
-        g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT, _ ("bad address (%li: unexpected '=') %.*s"), ext - first + 1, (int) (last - curr), sep);
-    }
 }
