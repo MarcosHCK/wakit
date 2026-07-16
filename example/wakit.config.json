@@ -2,7 +2,7 @@
   "application-id": "org.hck.wakit.Simple.Application",
   "application-version": "v0.0.0-devel",
   "default-route": "app:///",
-  "extensions-dir": "src/extension/",
+  "extensions-dir": "wakit/extension/",
   "modules": {
     "base-dir": "example/",
     "items": [

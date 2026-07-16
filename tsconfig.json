@@ -9,9 +9,9 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "paths": {
-      "@wakit-companion/*": ["./src/companion/"]
+      "@wakit-companion/*": ["./wakit/companion/"]
     }
   },
-  "include": [ "src/**/*.ts" ],
-  "typeRoots": [ "src/companion/types/" ],
+  "include": [ "wakit/**/*.ts" ],
+  "typeRoots": [ "wakit/companion/types/" ],
 }

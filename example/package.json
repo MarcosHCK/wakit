@@ -29,7 +29,7 @@
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.61.0",
     "@typescript-eslint/parser": "^8.61.0",
-    "@wakit/companion": "file:../src/companion",
+    "@wakit/companion": "file:../wakit/companion",
     "babel-loader": "^9.2.1",
     "babel-plugin-module-resolver": "^5.0.3",
     "copy-webpack-plugin": "^14.0.0",
@@ -55,7 +55,7 @@
   "license": "SEE LICENSE IN COPYING",
   "name": "wakit-example",
   "scripts": {
-    "apigen": "bash ../builddir/src/scripts/apigen.sh -o types/api.d.ts ../builddir/example/libwakit-example-mod.so --name wakit-example --type-name org.hck.wakit.Example",
+    "apigen": "bash ../builddir/wakit/scripts/apigen.sh -o types/api.d.ts ../builddir/example/libwakit-example-mod.so --name wakit-example --type-name org.hck.wakit.Example",
     "build": "webpack --mode=production",
     "dev": "webpack build --mode=development --watch",
     "devServe": "webpack serve --mode=development --config webpack.config.ts",
