@@ -48,3 +48,7 @@ __common_appbus_lib = static_library ('wakit-common-appbus',
 
 __common_appbus_dep = declare_dependency (dependencies: [ config_dep, gio_dep, __common_appbus_fwds ],
   link_with: __common_appbus_lib)
+
+__common_appbus_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__common_appbus_lib.vala_header (), install_dir: __common_appbus_incdir, preserve_path: true)

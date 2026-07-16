@@ -49,3 +49,7 @@ __host_configuration_lib = static_library ('wakit-host-configuration',
 
 __host_configuration_dep = declare_dependency (dependencies: [ config_dep, json_dep, __common_dep, __core_dep ],
   link_with: __host_configuration_lib)
+
+__host_configuration_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__host_configuration_lib.vala_header (), install_dir: __host_configuration_incdir, preserve_path: true)

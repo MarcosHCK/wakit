@@ -18,12 +18,12 @@
 namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "struct gcry_cipher_handle", free_function = "gcry_cipher_close", has_type_id = false)]
+  [CCode (cheader_filename = "common/krypt/gcrypt/gcryptapi.h", cname = "struct gcry_cipher_handle", free_function = "gcry_cipher_close", has_type_id = false)]
   [Compact (opaque = true)]
   public class Cipher
     {
 
-      [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h")]
+      [CCode (cheader_filename = "common/krypt/gcrypt/gcryptapi.h")]
       public Cipher ([CCode (type = "int")] CipherAlgo algo,
                      [CCode (type = "int")] CipherMode mode,
                      [CCode (type = "int")] CipherFlags flags) throws GCrypt.Error;

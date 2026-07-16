@@ -45,3 +45,7 @@ __common_json_lib = static_library ('wakit-common-json',
 
 __common_json_dep = declare_dependency (dependencies: [ config_dep, json_dep ],
   link_with: __common_json_lib)
+
+__common_json_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__common_json_lib.vala_header (), install_dir: __common_json_incdir, preserve_path: true)

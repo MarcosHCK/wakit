@@ -17,10 +17,12 @@
 
 gcrypt_dep = cc.find_library ('libgcrypt', required: true)
 
+__common_krypt_gcrypt_headers = [ ]
 __common_krypt_gcrypt_src = [ ]
 
 foreach lib: [ 'gcryptapi' ]
 
+  __common_krypt_gcrypt_headers += [ '@0@.h'.format (lib) ]
   __common_krypt_gcrypt_src += [ '@0@.cc'.format (lib) ]
   __common_krypt_gcrypt_src += [ '@0@.h'.format (lib) ]
 endforeach
@@ -56,3 +58,8 @@ __common_krypt_gcrypt_dep = declare_dependency (dependencies: [ config_dep, gio_
 
 __common_krypt_gcrypt_vapi_dep = declare_dependency (dependencies: __common_krypt_gcrypt_dep,
   sources: __common_krypt_gcrypt_vapis)
+
+__common_krypt_gcrypt_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__common_krypt_gcrypt_headers, install_dir: __common_krypt_gcrypt_incdir, preserve_path: true)
+install_headers (__common_krypt_gcrypt_lib.vala_header (), install_dir: __common_krypt_gcrypt_incdir, preserve_path: true)

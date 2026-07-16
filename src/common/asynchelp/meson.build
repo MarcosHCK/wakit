@@ -43,3 +43,7 @@ __common_asynchelp_lib = static_library ('wakit-common-asynchelp',
 
 __common_asynchelp_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
   link_with: __common_asynchelp_lib)
+
+__common_asynchelp_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__common_asynchelp_lib.vala_header (), install_dir: __common_asynchelp_incdir, preserve_path: true)

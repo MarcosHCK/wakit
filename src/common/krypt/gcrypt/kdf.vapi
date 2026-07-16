@@ -18,7 +18,7 @@
 namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h")]
+  [CCode (cheader_filename = "common/krypt/gcrypt/gcryptapi.h")]
   namespace Kdf
     {
 

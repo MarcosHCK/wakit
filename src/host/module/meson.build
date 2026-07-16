@@ -78,3 +78,8 @@ __host_module_server_dep = declare_dependency (dependencies: [ config_dep, __hos
   link_with: __host_module_server_lib)
 
 __host_module_dep = declare_dependency (dependencies: [ config_dep, __host_module_client_dep, __host_module_server_dep ])
+
+__host_module_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__host_module_client_lib.vala_header (), install_dir: __host_module_incdir, preserve_path: true)
+install_headers (__host_module_server_lib.vala_header (), install_dir: __host_module_incdir, preserve_path: true)

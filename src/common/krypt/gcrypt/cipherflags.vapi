@@ -18,7 +18,7 @@
 namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "enum gcry_cipher_flags", has_type_id = false)]
+  [CCode (cheader_filename = "common/krypt/gcrypt/gcryptapi.h", cname = "enum gcry_cipher_flags", has_type_id = false)]
   [Flags]
   public enum CipherFlags
     {

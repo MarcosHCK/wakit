@@ -37,3 +37,7 @@ __common_collections_lib = static_library ('wakit-common-collections',
 
 __common_collections_dep = declare_dependency (dependencies: [ config_dep, glib_dep, __common_collection_dep ],
   link_with: __common_collections_lib)
+
+__common_collections_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__common_collections_lib.vala_header (), install_dir: __common_collections_incdir, preserve_path: true)

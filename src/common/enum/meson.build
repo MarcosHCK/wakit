@@ -45,3 +45,7 @@ __common_enum_lib = static_library ('wakit-common-enum',
 
 __common_enum_dep = declare_dependency (dependencies: [ config_dep, gobject_dep ],
   link_with: __common_enum_lib)
+
+__common_enum_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__common_enum_lib.vala_header (), install_dir: __common_enum_incdir, preserve_path: true)

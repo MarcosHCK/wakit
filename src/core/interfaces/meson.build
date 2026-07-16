@@ -41,3 +41,7 @@ __core_interfaces_lib = static_library ('wakit-core-interfaces',
 
 __core_interfaces_dep = declare_dependency (dependencies: [ config_dep, gtk_dep ],
   link_with: __core_interfaces_lib)
+
+__core_interface_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__core_interfaces_lib.vala_header (), install_dir: __core_interface_incdir, preserve_path: true)

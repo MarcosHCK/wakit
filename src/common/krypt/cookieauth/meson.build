@@ -46,3 +46,7 @@ __common_krypt_cookieauth_lib = static_library ('wakit-common-krypt-cookieauth',
 
 __common_krypt_cookieauth_dep = declare_dependency (dependencies: [ config_dep, gio_dep ],
   link_with: __common_krypt_cookieauth_lib)
+
+__common_krypt_cookieauth_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__common_krypt_cookieauth_lib.vala_header (), install_dir: __common_krypt_cookieauth_incdir, preserve_path: true)

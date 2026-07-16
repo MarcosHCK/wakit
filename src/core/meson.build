@@ -83,5 +83,7 @@ import ('pkgconfig').generate (__core_lib,
   libraries: [ __core_dep ],
   version: meson.project_version ())
 
-install_headers (__common_lib.vala_header (), install_dir: include_dir, preserve_path: true)
+__core_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__core_lib.vala_header (), install_dir: __core_incdir, preserve_path: true)
 meson.override_dependency ('wakit-core', __core_dep)

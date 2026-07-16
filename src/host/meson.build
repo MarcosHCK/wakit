@@ -71,7 +71,9 @@ import ('pkgconfig').generate (__host_lib,
   libraries: [ __host_dep ],
   version: meson.project_version ())
 
-install_headers (__host_lib.vala_header (), install_dir: include_dir, preserve_path: true)
+__host_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__host_lib.vala_header (), install_dir: __host_incdir, preserve_path: true)
 meson.override_dependency ('wakit-host', __host_dep)
 
 __host_bin = executable ('wakit-host-app',

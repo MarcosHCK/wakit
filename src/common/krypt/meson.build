@@ -54,3 +54,7 @@ __common_krypt_lib = static_library ('wakit-common-krypt',
 
 __common_krypt_dep = declare_dependency (dependencies: [ config_dep, gio_dep, __common_krypt_fwds ],
   link_with: __common_krypt_lib)
+
+__common_krypt_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__common_krypt_lib.vala_header (), install_dir: __common_krypt_incdir, preserve_path: true)

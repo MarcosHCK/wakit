@@ -18,7 +18,7 @@
 namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "gcry_error_t")]
+  [CCode (cheader_filename = "common/krypt/gcrypt/gcryptapi.h", cname = "gcry_error_t")]
   [SimpleType]
   [IntegerType (rank = 7)]
   public struct ErrorCode: uint

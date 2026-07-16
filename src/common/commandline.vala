@@ -18,17 +18,13 @@
 namespace Wakit.CommandLine
 {
 
-  [CCode (cheader_filename = "common/commandline.h",
-          array_length = false, array_null_terminated = true)]
+  [CCode (array_length = false, array_null_terminated = true)]
   public extern static string[] ensure_argv ([CCode (array_length_cname = "argc", array_length_pos = 0.9, array_length_type = "int")] ref unowned string[] argv);
 
-  [CCode (cheader_filename = "common/commandline.h")]
   public extern static unowned GLib.InputStream get_stdin ();
-
-  [CCode (cheader_filename = "common/commandline.h")]
   public extern static unowned GLib.OutputStream get_stdout ();
 
-  [CCode (cheader_filename = "common/commandline.h", cname = "GSource"), Compact] public extern class InterruptSource: GLib.Source
+  [CCode (cname = "GSource"), Compact] public extern class InterruptSource: GLib.Source
     {
 
       public extern InterruptSource ();

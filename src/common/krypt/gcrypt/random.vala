@@ -18,7 +18,7 @@
 namespace Wakit.Krypt.GCrypt
 {
 
-  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "gcry_random_level_t", has_type_id = false)]
+  [CCode (cheader_filename = "common/krypt/gcrypt/gcryptapi.h", cname = "gcry_random_level_t", has_type_id = false)]
   public extern enum RandomnessLevel
     {
 
@@ -27,6 +27,6 @@ namespace Wakit.Krypt.GCrypt
       [CCode (cname = "GCRY_VERY_STRONG_RANDOM")] VERY_STRONG,
     }
 
-  [CCode (cheader_filename = "src/common/krypt/gcrypt/gcryptapi.h", cname = "gcry_randomize")]
+  [CCode (cheader_filename = "common/krypt/gcrypt/gcryptapi.h", cname = "gcry_randomize")]
   public extern static void randomize ([CCode (array_length_pos = 1.1, array_length_type = "size_t", type = "void*")] uint8[] buffer, RandomnessLevel level);
 }

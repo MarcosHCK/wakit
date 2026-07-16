@@ -101,6 +101,8 @@ import ('pkgconfig').generate (__common_lib,
   libraries: [ __common_dep ],
   version: meson.project_version ())
 
-install_headers (__common_headers, install_dir: include_dir / 'common', preserve_path: true)
-install_headers (__common_lib.vala_header (), install_dir: include_dir, preserve_path: true)
+__common_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__common_headers, install_dir: __common_incdir, preserve_path: true)
+install_headers (__common_lib.vala_header (), install_dir: __common_incdir, preserve_path: true)
 meson.override_dependency ('wakit-common', __common_dep)

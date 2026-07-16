@@ -54,3 +54,7 @@ __core_loaders_lib = static_library ('wakit-core-loaders',
 
 __core_loaders_dep = declare_dependency (dependencies: [ config_dep, gio_dep, __common_dep ],
   link_with: __core_loaders_lib)
+
+__core_apploader_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__core_loaders_lib.vala_header (), install_dir: __core_apploader_incdir, preserve_path: true)

@@ -35,3 +35,7 @@ __core_configuration_lib = static_library ('wakit-core-configuration',
 
 __core_configuration_dep = declare_dependency (dependencies: [ config_dep, gobject_dep ],
   link_with: __core_configuration_lib)
+
+__core_configuration_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__core_configuration_lib.vala_header (), install_dir: __core_configuration_incdir, preserve_path: true)

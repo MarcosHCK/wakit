@@ -66,7 +66,9 @@ import ('pkgconfig').generate (__extension_lib,
   libraries: [ __extension_dep ],
   version: meson.project_version ())
 
-install_headers (__extension_lib.vala_header (), install_dir: include_dir, preserve_path: true)
+__extension_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__extension_lib.vala_header (), install_dir: __extension_incdir, preserve_path: true)
 meson.override_dependency ('wakit-extension', __extension_dep)
 
 __extension_mod = shared_module ('wakit-extension-mod',

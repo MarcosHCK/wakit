@@ -43,3 +43,7 @@ __common_i18n_lib = static_library ('wakit-common-i18n',
 
 __common_i18n_dep = declare_dependency (dependencies: [ config_dep, glib_dep ],
   link_with: __common_i18n_lib)
+
+__common_i18n_incdir = include_dir / meson.current_build_dir ().replace (base_dir + '/', '')
+
+install_headers (__common_i18n_lib.vala_header (), install_dir: __common_i18n_incdir, preserve_path: true)
