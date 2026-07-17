@@ -85,8 +85,8 @@ importers:
         specifier: ^8.61.0
         version: 8.61.0(eslint@10.4.1(jiti@2.7.0))(typescript@5.9.3)
       '@wakit/companion':
-        specifier: file:../src/companion
-        version: file:../src/companion
+        specifier: file:../wakit/companion
+        version: file:../wakit/companion
       babel-loader:
         specifier: ^9.2.1
         version: 9.2.1(@babel/core@7.29.7)(webpack@5.107.2)
@@ -1441,8 +1441,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@wakit/companion@file:../src/companion':
-    resolution: {directory: ../src/companion, type: directory}
+  '@wakit/companion@file:../wakit/companion':
+    resolution: {directory: ../wakit/companion, type: directory}
 
   '@webassemblyjs/ast@1.14.1':
     resolution: {integrity: sha512-nuBEDgQfm1ccRp/8bCQrx1frohyufl4JlbMMZ4P1wpeOfDhF6FQkxZJ1b/e+PLwr6X1Nhw6OLme5usuBWYBvuQ==}
@@ -5598,7 +5598,7 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@wakit/companion@file:../src/companion': {}
+  '@wakit/companion@file:../wakit/companion': {}
 
   '@webassemblyjs/ast@1.14.1':
     dependencies:
