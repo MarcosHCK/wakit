@@ -22,7 +22,7 @@
 void wakit_busmaster_bus_element_clear (WakitBusmasterBusMatchElement* element)
 {
 
-  g_printerr ("~Match.Element ()\n");
+  g_debug ("~Match.Element ()\n");
   _g_free0 (element->value);
 }
 

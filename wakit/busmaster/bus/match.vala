@@ -27,7 +27,7 @@ namespace Wakit.Busmaster.Bus
 
       ~Match ()
         {
-          printerr ("~Match ()\n");
+          debug ("~Match ()\n");
         }
 
       class construct

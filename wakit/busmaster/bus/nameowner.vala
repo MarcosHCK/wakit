@@ -26,7 +26,7 @@ namespace Wakit.Busmaster.Bus
 
       ~NameOwner ()
         {
-          printerr ("~NameOwner () <client.id = %s>\n", client.id);
+          debug ("~NameOwner () <client.id = %s>\n", client.id);
         }
 
       public NameOwner (Client client, NameFlags flags)

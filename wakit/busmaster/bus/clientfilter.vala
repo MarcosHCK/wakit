@@ -27,7 +27,7 @@ namespace Wakit.Busmaster.Bus
 
       ~ClientFilter ()
         {
-          printerr ("~ClientFilter ()\n");
+          debug ("~ClientFilter ()\n");
         }
 
       public ClientFilter (Client client, owned FilterFunction filter_function)

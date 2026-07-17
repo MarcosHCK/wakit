@@ -29,7 +29,7 @@ namespace Wakit.Busmaster.Bus
 
       ~Name ()
         {
-          printerr ("~Name () <name = %s>\n", _name);
+          debug ("~Name () <name = %s>\n", _name);
         }
 
       public Name (string name)

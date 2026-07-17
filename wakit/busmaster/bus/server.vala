@@ -30,7 +30,7 @@ namespace Wakit.Busmaster.Bus
 
       ~Server ()
         {
-          printerr ("~Server ()\n");
+          debug ("~Server ()\n");
         }
 
       public Server (string guid)
@@ -168,16 +168,15 @@ namespace Wakit.Busmaster.Bus
         return null;
         }
 
+      const string messages_types_map_ [] = { "invalid", "method_call", "method_return", "error", "signal" };
+
       private GLib.DBusMessage? filter (Client client, owned GLib.DBusMessage message, bool incoming)
         {
 
-        #if DEVELOP
-          string types[] = { "invalid", "method_call", "method_return", "error", "signal" };
-
-          printerr ("%s%s %s %u(%u) sender: %s, destination: %s %s %s.%s, body: %s\n",
+          debug ("%s%s %s %u(%u) sender: %s, destination: %s %s %s.%s, body: %s\n",
             client.id,
             incoming ? "->" : "<-",
-            types [message.get_message_type ()],
+            messages_types_map_ [message.get_message_type ()],
             (uint) message.get_serial (),
             (uint) message.get_reply_serial (),
             message.get_sender (),
@@ -186,7 +185,6 @@ namespace Wakit.Busmaster.Bus
             message.get_interface (),
             message.get_member (),
             message.get_body ()?.get_type_string () ?? "()");
-        #endif // DEVELOP
 
           switch (message.get_message_type ())
             {

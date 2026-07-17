@@ -37,7 +37,7 @@ namespace Wakit.Busmaster.Bus
 
       ~Client ()
         {
-          printerr ("~Client () <id = %s>\n", _id);
+          debug ("~Client () <id = %s>\n", _id);
         }
 
       public Client (GLib.DBusConnection connection, string id, Server server) throws GLib.Error
